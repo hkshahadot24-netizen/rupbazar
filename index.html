@@ -702,22 +702,31 @@
 
         if (user) {
             if (user.emailVerified) {
+                sessionStorage.removeItem('justRegistered'); // Cleanup flag
                 authModal.classList.add('hidden');
                 verifyEmailModal.classList.add('hidden');
                 mainAppContent.classList.remove('hidden');
                 startDataListener();
             } else {
-                document.getElementById('user-email-info').textContent = user.email;
-                authModal.classList.add('hidden');
-                mainAppContent.classList.add('hidden');
-                verifyEmailModal.classList.remove('hidden');
-                verifyEmailModal.classList.add('flex');
-                
-                verificationCheckInterval = setInterval(async () => {
-                    await user.reload();
-                }, 5000);
+                // User is logged in but not verified
+                if (sessionStorage.getItem('justRegistered')) {
+                    // They just registered, show verify modal
+                    document.getElementById('user-email-info').textContent = user.email;
+                    authModal.classList.add('hidden');
+                    mainAppContent.classList.add('hidden');
+                    verifyEmailModal.classList.remove('hidden');
+                    verifyEmailModal.classList.add('flex');
+                    
+                    verificationCheckInterval = setInterval(async () => {
+                        await user.reload(); // onAuthStateChanged will re-trigger on change
+                    }, 5000);
+                } else {
+                    // Existing unverified user, log them out to show login screen
+                    signOut(auth);
+                }
             }
         } else {
+            // No user logged in, show login modal
             authModal.classList.remove('hidden');
             authModal.classList.add('flex');
             requestAnimationFrame(() => {
@@ -761,6 +770,7 @@
     // Login Form
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        sessionStorage.removeItem('justRegistered');
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
         const errorEl = document.getElementById('login-error');
@@ -809,6 +819,7 @@
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await sendEmailVerification(userCredential.user);
+            sessionStorage.setItem('justRegistered', 'true');
             showMessage('নিবন্ধন সফল হয়েছে! আপনার ইমেইলে একটি ভেরিফিকেশন লিঙ্ক পাঠানো হয়েছে।', 'success');
         } catch (error) {
             console.error("Registration failed:", error.code);
@@ -838,6 +849,7 @@
     });
 
     document.getElementById('logout-btn').addEventListener('click', () => {
+        sessionStorage.removeItem('justRegistered');
         signOut(auth);
     });
 
