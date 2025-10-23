@@ -59,8 +59,9 @@
       
       <!-- Notice Board (Moved to Top as requested) -->
       <div class="bg-white p-6 rounded-xl shadow-lg mb-6 prose max-w-none">
-        <div class="flex justify-between items-center mb-4 not-prose">
-            <h3 class="text-2xl font-bold text-gray-800">নোটিশ বোর্ড</h3>
+        <!-- UPDATE: Removed "নোটিশ বোর্ড" title and changed justify-between to justify-end -->
+        <div class="flex justify-end items-center mb-4 not-prose">
+            <!-- <h3 class="text-2xl font-bold text-gray-800">নোটিশ বোর্ড</h3> -->
             <button id="edit-notice-btn" class="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm">
                 সম্পাদনা
             </button>
@@ -322,6 +323,13 @@
                         <input id="profile-phone-edit" type="text" class="hidden border rounded-lg p-2">
                     </p>
                 </div>
+
+                <!-- UPDATE: Moved Delete Member Button Here -->
+                <div class="mt-8 pt-6 border-t text-center">
+                    <button id="delete-member-btn" class="bg-red-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-red-700 transition duration-200 shadow-md">
+                        🗑️ সদস্য ডিলেট করুন
+                    </button>
+                </div>
             </div>
 
             <!-- Panel 2: Transactions -->
@@ -372,11 +380,7 @@
                         <p id="current-loan" class="text-2xl font-bold text-red-600">৳ ০</p>
                     </div>
                 </div>
-                <div class="mt-8 pt-4 border-t text-center">
-                    <button id="delete-member-btn" class="bg-red-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-red-700 transition duration-200 shadow-md">
-                        🗑️ সদস্য ডিলেট করুন
-                    </button>
-                </div>
+                <!-- UPDATE: Removed Delete Member Button From Here -->
             </div>
 
         </div> <!-- End of tab content container -->
@@ -617,6 +621,7 @@
                 
                 const placeholderUrl = `https://placehold.co/40x40/EFEFEF/AAAAAA?text=${encodeURIComponent(member.name.charAt(0))}`;
 
+                // UPDATE: Removed "delete-member-btn" from this template
                 row.innerHTML = `
                     <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-600">${getBengaliNumber(index + 1)}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -633,13 +638,12 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${member.phone}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">৳ ${getBengaliNumber(totals.totalDeposit)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">৳ ${getBengaliNumber(totals.currentLoan)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
+                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                         <button class="view-profile-btn" data-id="${member.id}">বিস্তারিত</button>
-                        <button class="delete-member-btn" data-id="${member.id}" data-name="${member.name}">ডিলেট</button>
                     </td>
                 `;
+                // UPDATE: Removed styling for the delete button
                 row.querySelector('.view-profile-btn').className = 'view-profile-btn bg-indigo-500 text-white px-3 py-1 rounded-full text-xs font-bold hover:bg-indigo-600 transition shadow';
-                row.querySelector('.delete-member-btn').className = 'delete-member-btn bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold hover:bg-red-600 transition shadow';
                 memberListContainer.appendChild(row);
             });
         }
@@ -1358,14 +1362,15 @@
         // --- Other Button Logic ---
         if (target.matches('.view-profile-btn')) {
             showProfile(target.dataset.id);
-        } else if (target.matches('.delete-member-btn, #delete-member-btn')) {
-            const memberId = target.dataset.id || activeMember?.id;
+        // UPDATE: Combined .delete-member-btn (from dashboard, now removed) and #delete-member-btn (from modal) logic
+        } else if (target.matches('#delete-member-btn')) { 
+            const memberId = activeMember?.id; // Only rely on activeMember
             const member = members.find(m => m.id === memberId);
             if (member && await showConfirmation(`আপনি কি "${member.name}"-কে মুছে ফেলতে নিশ্চিত? এর সাথে যুক্ত সকল লেনদেনও মুছে ফেলা হবে।`)) {
                 const updatedMembers = members.filter(m => m.id !== memberId);
                 await updateFirebaseData({ members: updatedMembers, fundDistribution, notice });
                 showMessage('সদস্যকে ডিলেট করা হয়েছে।');
-                if (target.matches('#delete-member-btn')) closeProfileModal();
+                closeProfileModal(); // Always close modal after delete
             }
         } else if (target.matches('.delete-transaction-btn')) {
             if (target.disabled) return; 
@@ -1384,6 +1389,7 @@
                 memberToUpdate.transactions = transactionsToKeep;
                 await updateFirebaseData({ members: updatedMembers, fundDistribution, notice });
                 showMessage('লেনদেন মুছে ফেলা হয়েছে।');
+                // The onSnapshot listener will automatically refresh the profile modal view
             }
         } else if (target.matches('.edit-transaction-btn')) {
             if (target.disabled) return; 
@@ -1492,5 +1498,4 @@
   </script>
 </body>
 </html>
-
 
