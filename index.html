@@ -7,6 +7,14 @@
   <!-- Added typography plugin for better notice rendering -->
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- PDF Generation Libraries (REMOVED) -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script> -->
+  
+  <!-- Bangla Font for PDF (REMOVED) -->
+  <!-- <script src="https://cdn.jsdelivr.net/gh/ParagonPrivacy/font-repository@master/bangla-font-base64.js"></script> -->
+
   <style>
     /* ফন্ট আপডেট: ব্যবহারকারীর অনুরোধ অনুযায়ী 'Noto Sans Bengali' প্রধান ফন্ট */
     body { font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif; }
@@ -119,11 +127,17 @@
       <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
         <div class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b">
            <h3 class="text-2xl font-bold text-gray-800">সদস্য তালিকা</h3>
-           <!-- (Add buttons referenced in script) -->
            <div class="space-x-2">
               <button id="open-fund-modal-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-blue-700 transition duration-200 shadow-sm">মাসিক তহবিল</button>
            </div>
         </div>
+        
+        <!-- START: Search Bar Request -->
+        <div class="p-4 border-b">
+            <input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন (নাম, আইডি, কার্ড নম্বর...)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" autocomplete="off">
+        </div>
+        <!-- END: Search Bar Request -->
+
         <div class="overflow-x-auto">
           <table class="min-w-full">
             <thead class="bg-gray-50">
@@ -322,6 +336,14 @@
                         <span id="profile-phone-view" class="text-gray-900 bg-gray-100 p-2 rounded"></span>
                         <input id="profile-phone-edit" type="text" class="hidden border rounded-lg p-2">
                     </p>
+
+                    <!-- START: Notes Textbox Request -->
+                    <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">সদস্য সম্পর্কে নোট:</span>
+                        <span id="profile-notes-view" class="text-gray-900 bg-gray-100 p-2 rounded min-h-[50px] whitespace-pre-wrap"></span>
+                        <textarea id="profile-notes-edit" rows="3" class="hidden border rounded-lg p-2"></textarea>
+                    </p>
+                    <!-- END: Notes Textbox Request -->
+
                 </div>
 
                 <!-- UPDATE: Moved Delete Member Button Here -->
@@ -335,7 +357,18 @@
             <!-- Panel 2: Transactions -->
             <div id="profile-content-transactions" class="hidden h-full">
                 <!-- Add Transaction Button (moved here for better context) -->
-                <div class="flex justify-end mb-4">
+                <div class="flex justify-end mb-4 gap-2">
+                    <!-- START: PDF Download Request (REMOVED) -->
+                    <!--
+                    <button id="download-pdf-btn" class="bg-green-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-700 transition flex items-center gap-2">
+                        <span>PDF ডাউনলোড</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </button>
+                    -->
+                    <!-- END: PDF Download Request -->
+
                     <button id="open-transaction-modal-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 transition flex items-center gap-2">
                         <span>নতুন লেনদেন</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
@@ -482,6 +515,7 @@
     let activeMember = null;
     let isSaving = false;
     let verificationCheckInterval = null;
+    let searchQuery = ''; // START: Search Query Request
     
     // UI Elements
     const mainAppContent = document.getElementById('main-app-content');
@@ -515,8 +549,29 @@
         if (format === 'monthYear') {
             return date.toLocaleString('bn-BD', { month: 'long', year: 'numeric'});
         }
+        // START: PDF Request - Added short format for PDF date (REMOVED)
+        /*
+        if (format === 'short') {
+            const day = new Intl.NumberFormat('bn-BD').format(date.getDate());
+            const month = new Intl.NumberFormat('bn-BD').format(date.getMonth() + 1);
+            const year = new Intl.NumberFormat('bn-BD').format(date.getFullYear());
+            return `${day}/${month}/${year}`;
+        }
+        */
+        // END: PDF Request
         return '';
     };
+
+    // START: PDF Request - Added transaction type translator (REMOVED)
+    /*
+    const getTransactionTypeBengali = (type) => {
+        if (type === 'deposit') return 'কিস্তি/জমা';
+        if (type === 'loanTaken') return 'ঋণ গ্রহণ';
+        if (type === 'loanRepayment') return 'ঋণ পরিশোধ';
+        return 'অন্যান্য';
+    }
+    */
+    // END: PDF Request
 
     const showMessage = (message, type = 'success') => {
       const messageBox = document.getElementById('message-box');
@@ -609,10 +664,34 @@
         document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(totalLoanTaken)}`;
 
         memberListContainer.innerHTML = ''; 
-        if (members.length === 0) {
-            memberListContainer.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">এখনও কোনো সদস্য যোগ করা হয়নি।</td></tr>`;
+        
+        // START: Search Filter Request
+        const filteredMembers = members.filter(member => {
+            const query = searchQuery.toLowerCase().trim();
+            if (!query) return true; // Show all if search is empty
+
+            const name = (member.name || '').toLowerCase();
+            const id = (member.id || '').toLowerCase();
+            const employeeId = (member.employeeId || '').toLowerCase(); // User called it NID, using this
+            const cardNumber = (member.cardNumber || '').toLowerCase(); // User called it NID, using this
+
+            return name.includes(query) || 
+                   id.includes(query) || 
+                   employeeId.includes(query) || 
+                   cardNumber.includes(query);
+        });
+        // END: Search Filter Request
+
+
+        if (filteredMembers.length === 0) {
+            if (searchQuery) {
+                 memberListContainer.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">"${searchQuery}" এর সাথে মিলে এমন কোনো সদস্য পাওয়া যায়নি।</td></tr>`;
+            } else {
+                 memberListContainer.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">এখনও কোনো সদস্য যোগ করা হয়নি।</td></tr>`;
+            }
         } else {
-            const sortedMembers = [...members].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'bn'));
+            // Sort the filtered members
+            const sortedMembers = [...filteredMembers].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'bn'));
             
             sortedMembers.forEach((member, index) => {
                 const totals = calculateMemberTotals(member);
@@ -621,7 +700,6 @@
                 
                 const placeholderUrl = `https://placehold.co/40x40/EFEFEF/AAAAAA?text=${encodeURIComponent(member.name.charAt(0))}`;
 
-                // UPDATE: Removed "delete-member-btn" from this template
                 row.innerHTML = `
                     <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-600">${getBengaliNumber(index + 1)}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -642,16 +720,26 @@
                         <button class="view-profile-btn" data-id="${member.id}">বিস্তারিত</button>
                     </td>
                 `;
-                // UPDATE: Removed styling for the delete button
                 row.querySelector('.view-profile-btn').className = 'view-profile-btn bg-indigo-500 text-white px-3 py-1 rounded-full text-xs font-bold hover:bg-indigo-600 transition shadow';
                 memberListContainer.appendChild(row);
             });
         }
         
         if (activeMember) {
+            // Refresh profile if open, but only if the active member is still in the main 'members' list
             const latestData = members.find(m => m.id === activeMember.id);
-            if (latestData) showProfile(latestData.id, false);
-            else closeProfileModal();
+            if (latestData) {
+                // Check if the currently active member is no longer in the filtered list
+                const stillInFilteredList = filteredMembers.some(m => m.id === activeMember.id);
+                if (stillInFilteredList) {
+                    showProfile(latestData.id, false); // Refresh data
+                } else {
+                    // Member is filtered out, but profile is open. Close it.
+                    closeProfileModal();
+                }
+            } else {
+                 closeProfileModal(); // Member was deleted
+            }
         }
     };
     
@@ -730,6 +818,7 @@
         document.getElementById('profile-card-number-view').textContent = member.cardNumber || 'N/A';
         document.getElementById('profile-email-view').textContent = member.email || 'N/A';
         document.getElementById('profile-phone-view').textContent = member.phone || 'N/A';
+        document.getElementById('profile-notes-view').textContent = member.notes || 'N/A'; // START: Notes Request
         
         // Populate edit elements (Details Tab)
         document.getElementById('profile-name-edit').value = member.name || '';
@@ -738,6 +827,7 @@
         document.getElementById('profile-card-number-edit').value = member.cardNumber || '';
         document.getElementById('profile-email-edit').value = member.email || '';
         document.getElementById('profile-phone-edit').value = member.phone || '';
+        document.getElementById('profile-notes-edit').value = member.notes || ''; // START: Notes Request
 
         // Populate summary elements (Summary Tab)
         document.getElementById('paid-total').textContent = `৳ ${getBengaliNumber(totals.totalDeposit)}`;
@@ -889,11 +979,30 @@
                 const distribution = fundDistribution[monthKey];
                 const receiver = distribution ? members.find(m => m.id === distribution.receiverId) : null;
                 const availableFund = calculateAvailableFund();
+                
+                // START: Define placeholderUrl for receiver
+                const placeholderUrl = receiver ? `https://placehold.co/40x40/EFEFEF/AAAAAA?text=${encodeURIComponent(receiver.name ? receiver.name.charAt(0) : '?')}` : '';
+                // END: Define placeholderUrl
+                
                 return `<div class="p-4 border rounded-lg shadow-sm">
                     <h4 class="text-lg font-semibold text-blue-700">${formatDate(monthKey + '-01', 'monthYear')}</h4>
                     <p>এই মাসে মোট জমা: <span class="font-bold">৳ ${getBengaliNumber(monthlyDeposits[monthKey])}</span></p>
                     ${receiver
-                        ? `<p class="mt-2 text-green-600 font-semibold">✅ তহবিল প্রাপ্ত: ${receiver.name} (৳ ${getBengaliNumber(distribution.amount)})</p>`
+                        ? `<!-- START: Updated Fund Receiver Display -->
+                           <div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center gap-4">
+                               <img 
+                                 src="${receiver.photoUrl || placeholderUrl}" 
+                                 onerror="this.onerror=null;this.src='${placeholderUrl}';"
+                                 alt="${receiver.name}" 
+                                 class="w-12 h-12 rounded-full object-cover border-2 border-green-200 flex-shrink-0">
+                               <div>
+                                 <p class="text-sm font-semibold text-green-700">✅ তহবিল প্রাপ্ত:</p>
+                                 <p class="text-lg font-bold text-gray-800">${receiver.name}</p>
+                                 <p class="text-xs text-gray-500 font-mono select-all">${receiver.id}</p>
+                                 <p class="text-md font-semibold text-green-600 mt-1">৳ ${getBengaliNumber(distribution.amount)}</p>
+                               </div>
+                           </div>
+                           <!-- END: Updated Fund Receiver Display -->`
                         : `<form class="assign-fund-form mt-3 space-y-2" data-month="${monthKey}">
                             <p class="text-xs">সর্বোচ্চ ঋণযোগ্য: ৳ ${getBengaliNumber(availableFund)}</p>
                             <select required class="w-full p-2 border rounded-lg bg-white"><option value="">সদস্য নির্বাচন</option>${members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}</select>
@@ -904,6 +1013,95 @@
                 </div>`;
             }).join('');
     };
+
+    // START: PDF Download Request (REMOVED)
+    /*
+    const generateTransactionPDF = (member) => {
+        if (!member) return;
+
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add the Bangla font
+            // The font `notoSansBengaliBase64` is loaded from the script tag in <head>
+            // *** FIX: Access the global variable via window object ***
+            doc.addFileToVFS('NotoSansBengali-Regular.ttf', window.notoSansBengaliBase64);
+            doc.addFont('NotoSansBengali-Regular.ttf', 'NotoSansBengali', 'normal');
+            doc.setFont('NotoSansBengali');
+
+            // --- Header ---
+            doc.setFontSize(20);
+            doc.text(member.name, 14, 22);
+            doc.setFontSize(14);
+            doc.text('লেনদেন বিবরণী', 14, 30);
+            doc.setFontSize(10);
+            doc.text(`তারিখ: ${formatDate(new Date().toISOString(), 'long')}`, 14, 36);
+
+            // --- Summary ---
+            const totals = calculateMemberTotals(member);
+            const summaryText = [
+                `মোট জমা: ৳ ${getBengaliNumber(totals.totalDeposit)}`,
+                `মোট ঋণ গ্রহণ: ৳ ${getBengaliNumber(totals.totalLoanTaken)}`,
+                `মোট ঋণ পরিশোধ: ৳ ${getBengaliNumber(totals.totalLoanRepaid)}`,
+                `বর্তমান ঋণ: ৳ ${getBengaliNumber(totals.currentLoan)}`
+            ];
+            doc.setFontSize(12);
+            doc.text(summaryText, 14, 48);
+
+            // --- Transactions Table ---
+            const head = [['তারিখ', 'বিবরণ', 'মন্তব্য', 'পরিমাণ (৳)']];
+            const body = [...(member.transactions || [])]
+                .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort by date ascending for PDF
+                .map(t => {
+                    const amount = t.type === 'deposit' ? `+ ${getBengaliNumber(t.amount)}` : `- ${getBengaliNumber(t.amount)}`;
+                    return [
+                        formatDate(t.date, 'short'),
+                        getTransactionTypeBengali(t.type),
+                        t.description || '',
+                        getBengaliNumber(t.amount) // Using Bengali number for consistency
+                    ];
+                });
+
+            doc.autoTable({
+                head: head,
+                body: body,
+                startY: 65,
+                theme: 'grid',
+                styles: {
+                    font: 'NotoSansBengali',
+                    fontStyle: 'normal',
+                    fontSize: 10
+                },
+                headStyles: {
+                    fillColor: [22, 160, 133], // Greenish header
+                    textColor: [255, 255, 255]
+                }
+            });
+
+            // --- Footer ---
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`পৃষ্ঠা ${getBengaliNumber(i)} / ${getBengaliNumber(pageCount)}`, 
+                         doc.internal.pageSize.width / 2, 
+                         doc.internal.pageSize.height - 10, 
+                         { align: 'center' });
+            }
+
+            // --- Save ---
+            doc.save(`${member.id}_${member.name}_transactions.pdf`);
+            showMessage('PDF ডাউনলোড শুরু হয়েছে।', 'success');
+
+        } catch (error) {
+            console.error('PDF generation failed:', error);
+            showMessage('PDF তৈরি করতে সমস্যা হয়েছে।', 'error');
+        }
+    };
+    */
+    // END: PDF Download Request
+
 
     // --- FIREBASE & DATA PERSISTENCE ---
 
@@ -1158,7 +1356,12 @@
           return;
       }
       
-      const newMember = { id: 'M' + Date.now(), name, photoUrl, employeeId, cardNumber, email, phone, transactions: [] };
+      const newMember = { 
+          id: 'M' + Date.now(), 
+          name, photoUrl, employeeId, cardNumber, email, phone, 
+          transactions: [],
+          notes: '' // START: Notes Request - Add default notes field
+      };
       try {
         await updateFirebaseData({ members: [...members, newMember], fundDistribution, notice });
         showMessage('সদস্য যোগ করা হয়েছে।', 'success');
@@ -1324,6 +1527,13 @@
         }
     });
 
+    // START: Search Request - Add listener for search input
+    document.getElementById('search-member-input').addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderUI(); // Re-render the list on every key press
+    });
+    // END: Search Request
+
     // General Click Handler
     document.addEventListener('click', async (e) => {
         const target = e.target.closest('button, svg'); // Include SVG for icon clicks
@@ -1458,6 +1668,7 @@
                 cardNumber: document.getElementById('profile-card-number-edit').value.trim(),
                 email: document.getElementById('profile-email-edit').value.trim(),
                 phone: document.getElementById('profile-phone-edit').value.trim(),
+                notes: document.getElementById('profile-notes-edit').value.trim() // START: Notes Request
             };
 
             if (!updatedData.name || !updatedData.phone) {
@@ -1493,9 +1704,14 @@
             sessionStorage.removeItem('justRegistered');
             signOut(auth);
             showMessage('লগ আউট সফল হয়েছে।', 'info');
-        }
+        } else if (target.matches('#download-pdf-btn')) { // START: PDF Download Request (REMOVED)
+            /*
+            if (activeMember) {
+                generateTransactionPDF(activeMember);
+            }
+            */
+        } // END: PDF Download Request
     });
   </script>
 </body>
 </html>
-
