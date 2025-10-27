@@ -3,20 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>সমিতি ম্যানেজমেন্ট ড্যাশবোর্ড</title>
+  <title>মেইন গেইট সমবায় সমিতি</title>
   <!-- Added typography plugin for better notice rendering -->
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
   
-  <!-- PDF Generation Libraries (REMOVED) -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script> -->
-  
-  <!-- Bangla Font for PDF (REMOVED) -->
-  <!-- <script src="https://cdn.jsdelivr.net/gh/ParagonPrivacy/font-repository@master/bangla-font-base64.js"></script> -->
-
   <style>
-    /* ফন্ট আপডেট: ব্যবহারকারীর অনুরোধ অনুযায়ী 'Noto Sans Bengali' প্রধান ফন্ট */
+    /* ফন্ট আপডেট: 'Noto Sans Bengali' প্রধান ফন্ট */
     body { font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif; }
     .spinner { border: 3px solid rgba(255,255,255,0.3); border-left-color: #ffffff; border-radius:50%; width:20px; height:20px; animation:spin 1s linear infinite;}
     .spinner-gray { border: 2px solid rgba(0,0,0,0.2); border-left-color: #4a5568; border-radius:50%; width:16px; height:16px; animation:spin 1s linear infinite;}
@@ -41,26 +34,43 @@
   <!-- Main Application Content (Hidden by default) -->
   <div id="main-app-content" class="hidden">
     
-    <!-- START: Modern Header Request -->
-    <header class="w-full bg-white shadow-md sticky top-0 z-40">
+    <!-- START: UPDATED Header Request -->
+    <header class="w-full bg-gradient-to-r from-pink-600 to-red-600 text-white p-4 shadow-lg sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-          <!-- Modern, Bold, Centered Title -->
-          <div class="flex-1 flex justify-center items-center">
-             <h1 class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 py-2">
-              সমিতি ম্যানেজমেন্ট ড্যাশবোর্ড
-            </h1>
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+          
+          <!-- Logo and Title Section -->
+          <div class="flex items-center gap-4">
+            <img id="header-logo-img" src="https://placehold.co/64x64/FFFFFF/F87171?text=লোগো" alt="লোগো" class="w-16 h-16 rounded-full border-2 border-white object-cover bg-white">
+            <div class="flex-grow">
+              <h1 class="text-3xl sm:text-4xl font-bold text-white py-1">
+                মেইন গেইট সমবায় সমিতি
+              </h1>
+              <p class="text-sm font-semibold text-pink-100">স্থাপিত: ২০২৫</p>
+              <p class="text-md font-bold text-white mt-1">★ বিশ্বাস ★ মানবিকতা ★ উন্নয়ন ★</p>
+            </div>
           </div>
-          <!-- Logout Button added to the header -->
-          <div class="flex-shrink-0">
-             <button id="logout-main-btn" class="bg-red-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-600 transition duration-200 text-sm">
-                লগ আউট
+
+          <!-- Logo Edit and Logout Section -->
+          <div class="flex flex-col gap-4 w-full md:w-auto">
+            <!-- Logo Edit -->
+            <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <input id="logo-url-input" type="url" placeholder="লোগো লিংক এখানে দিন" class="flex-grow p-2 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-pink-300 focus:outline-none" style="min-width: 200px;">
+              <button id="save-logo-btn" class="bg-white text-pink-600 py-2 px-4 rounded-lg font-bold hover:bg-pink-100 transition duration-200 text-sm flex-shrink-0 flex justify-center items-center gap-2">
+                <span>লোগো সেভ</span>
+                <div class="spinner-gray hidden"></div>
               </button>
+            </div>
+            <!-- Logout -->
+            <button id="logout-main-btn" class="bg-red-700 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-800 transition duration-200 text-sm w-full">
+              লগ আউট
+            </button>
           </div>
+
         </div>
       </div>
     </header>
-    <!-- END: Modern Header Request -->
+    <!-- END: UPDATED Header Request -->
 
     <!-- The rest of the dashboard -->
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -69,17 +79,24 @@
       <div class="bg-white p-6 rounded-xl shadow-lg mb-6 prose max-w-none">
         <!-- UPDATE: Removed "নোটিশ বোর্ড" title and changed justify-between to justify-end -->
         <div class="flex justify-end items-center mb-4 not-prose">
-            <!-- <h3 class="text-2xl font-bold text-gray-800">নোটিশ বোর্ড</h3> -->
             <button id="edit-notice-btn" class="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm">
                 সম্পাদনা
             </button>
         </div>
+        <!-- This div will display the content -->
         <div id="notice-display" class="text-gray-700">
             <!-- JS will populate -->
         </div>
+        <!-- This div is for editing -->
         <div id="notice-edit" class="hidden space-y-3 not-prose">
-            <textarea id="notice-textarea" rows="5" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="নোটিশ লিখুন..."></textarea>
+            <textarea id="notice-textarea" rows="4" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="নোটিশ লিখুন..."></textarea>
             <input id="notice-image-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="ছবির লিংক (ঐচ্ছিক)">
+            
+            <!-- START: New Link Boxes Request -->
+            <input id="notice-link-text" type="text" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="লিংকের নাম (যেমন: 'বিস্তারিত দেখুন')">
+            <input id="notice-link-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="সম্পূর্ণ লিংক (https://...)">
+            <!-- END: New Link Boxes Request -->
+
             <div class="flex gap-3">
                 <button id="save-notice-btn" class="bg-green-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-700 transition flex items-center gap-2">
                     <span>সেভ</span>
@@ -138,24 +155,41 @@
         </div>
         <!-- END: Search Bar Request -->
 
-        <div class="overflow-x-auto">
-          <table class="min-w-full">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">নাম</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">কার্ড</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ফোন</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">মোট জমা</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">বর্তমান ঋণ</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">অ্যাকশন</th>
-              </tr>
-            </thead>
-            <tbody id="member-list" class="divide-y divide-gray-200">
-              <!-- JS will populate this -->
-            </tbody>
-          </table>
+        <!-- START: New Card View Request -->
+        <div id="member-list-cards" class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- JS will populate this with cards -->
+            <!-- Example Card Structure (for reference, will be generated by JS)
+            <div class="bg-gray-50 rounded-lg shadow-md border border-gray-200 p-4 flex flex-col transition-transform hover:scale-[1.02]">
+                <div class="flex items-center gap-4 mb-4">
+                    <img class="h-16 w-16 rounded-full object-cover border-2 border-indigo-200" src="https" alt="নাম">
+                    <div>
+                        <h4 class="text-lg font-bold text-gray-900">সদস্যের নাম</h4>
+                        <p class="text-sm text-gray-600">কার্ড: ১২৩৪৫</p>
+                        <p class="text-sm text-gray-600">ফোন: ০১৭...</p>
+                    </div>
+                </div>
+                <div class="space-y-2 flex-grow">
+                    <div class="flex justify-between items-center bg-green-50 p-2 rounded">
+                        <span class="text-sm font-medium text-green-700">মোট জমা:</span>
+                        <span class="text-lg font-bold text-green-600">৳ ১০,০০০</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-red-50 p-2 rounded">
+                        <span class="text-sm font-medium text-red-700">বর্তমান ঋণ:</span>
+                        <span class="text-lg font-bold text-red-600">৳ ৫,০০০</span>
+                    </div>
+                </div>
+                <button class="view-profile-btn mt-4 w-full bg-indigo-500 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-600 transition shadow">
+                    বিস্তারিত দেখুন
+                </button>
+            </div>
+            -->
         </div>
+        <!-- This div will be populated by JS if no members are found -->
+        <div id="member-list-placeholder" class="hidden p-6 text-center text-gray-500">
+            <!-- JS will set text content -->
+        </div>
+        <!-- END: New Card View Request -->
+
       </div>
       
     </main>
@@ -358,17 +392,6 @@
             <div id="profile-content-transactions" class="hidden h-full">
                 <!-- Add Transaction Button (moved here for better context) -->
                 <div class="flex justify-end mb-4 gap-2">
-                    <!-- START: PDF Download Request (REMOVED) -->
-                    <!--
-                    <button id="download-pdf-btn" class="bg-green-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-700 transition flex items-center gap-2">
-                        <span>PDF ডাউনলোড</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                    </button>
-                    -->
-                    <!-- END: PDF Download Request -->
-
                     <button id="open-transaction-modal-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 transition flex items-center gap-2">
                         <span>নতুন লেনদেন</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
@@ -511,17 +534,23 @@
     let app, db, auth;
     let members = [];
     let fundDistribution = {};
-    let notice = { text: '', imageUrl: '' }; // নোটিশের জন্য ভেরিয়েবল
+    // START: Updated notice and new logoUrl state
+    let notice = { text: '', imageUrl: '', linkText: '', linkUrl: '' }; // নোটিশের জন্য ভেরিয়েবল
+    let logoUrl = ''; // লোগোর জন্য ভেরিয়েবল
+    // END: Updated notice state
     let activeMember = null;
     let isSaving = false;
     let verificationCheckInterval = null;
-    let searchQuery = ''; // START: Search Query Request
+    let searchQuery = '';
     
     // UI Elements
     const mainAppContent = document.getElementById('main-app-content');
     const authModal = document.getElementById('auth-modal');
     const verifyEmailModal = document.getElementById('verify-email-modal');
-    const memberListContainer = document.getElementById('member-list');
+    // START: Updated member list elements
+    const memberListCardContainer = document.getElementById('member-list-cards');
+    const memberListPlaceholder = document.getElementById('member-list-placeholder');
+    // END: Updated member list elements
     const profileModal = document.getElementById('profile-modal');
     const transactionModal = document.getElementById('transaction-modal');
     const fundModal = document.getElementById('fund-modal');
@@ -549,29 +578,8 @@
         if (format === 'monthYear') {
             return date.toLocaleString('bn-BD', { month: 'long', year: 'numeric'});
         }
-        // START: PDF Request - Added short format for PDF date (REMOVED)
-        /*
-        if (format === 'short') {
-            const day = new Intl.NumberFormat('bn-BD').format(date.getDate());
-            const month = new Intl.NumberFormat('bn-BD').format(date.getMonth() + 1);
-            const year = new Intl.NumberFormat('bn-BD').format(date.getFullYear());
-            return `${day}/${month}/${year}`;
-        }
-        */
-        // END: PDF Request
         return '';
     };
-
-    // START: PDF Request - Added transaction type translator (REMOVED)
-    /*
-    const getTransactionTypeBengali = (type) => {
-        if (type === 'deposit') return 'কিস্তি/জমা';
-        if (type === 'loanTaken') return 'ঋণ গ্রহণ';
-        if (type === 'loanRepayment') return 'ঋণ পরিশোধ';
-        return 'অন্যান্য';
-    }
-    */
-    // END: PDF Request
 
     const showMessage = (message, type = 'success') => {
       const messageBox = document.getElementById('message-box');
@@ -650,6 +658,19 @@
     
     // --- UI RENDERING FUNCTIONS ---
     
+    // START: New function to render header logo
+    const renderHeaderLogo = () => {
+      const logoImg = document.getElementById('header-logo-img');
+      const logoInput = document.getElementById('logo-url-input');
+      const placeholder = 'https://placehold.co/64x64/FFFFFF/F87171?text=লোগো';
+
+      const currentLogoUrl = logoUrl || '';
+      logoImg.src = currentLogoUrl || placeholder;
+      logoImg.onerror = () => { logoImg.src = placeholder; };
+      logoInput.value = currentLogoUrl;
+    };
+    // END: New function
+
     const renderUI = () => {
         let totalDeposit = 0;
         let totalLoanTaken = 0;
@@ -663,94 +684,90 @@
         document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(totalDeposit)}`;
         document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(totalLoanTaken)}`;
 
-        memberListContainer.innerHTML = ''; 
+        // START: Updated to render cards
+        memberListCardContainer.innerHTML = ''; 
+        memberListPlaceholder.classList.add('hidden');
         
-        // START: Search Filter Request
         const filteredMembers = members.filter(member => {
             const query = searchQuery.toLowerCase().trim();
-            if (!query) return true; // Show all if search is empty
-
+            if (!query) return true;
             const name = (member.name || '').toLowerCase();
             const id = (member.id || '').toLowerCase();
-            const employeeId = (member.employeeId || '').toLowerCase(); // User called it NID, using this
-            const cardNumber = (member.cardNumber || '').toLowerCase(); // User called it NID, using this
-
-            return name.includes(query) || 
-                   id.includes(query) || 
-                   employeeId.includes(query) || 
-                   cardNumber.includes(query);
+            const employeeId = (member.employeeId || '').toLowerCase();
+            const cardNumber = (member.cardNumber || '').toLowerCase();
+            return name.includes(query) || id.includes(query) || employeeId.includes(query) || cardNumber.includes(query);
         });
-        // END: Search Filter Request
-
 
         if (filteredMembers.length === 0) {
+            memberListPlaceholder.classList.remove('hidden');
             if (searchQuery) {
-                 memberListContainer.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">"${searchQuery}" এর সাথে মিলে এমন কোনো সদস্য পাওয়া যায়নি।</td></tr>`;
+                 memberListPlaceholder.textContent = `"${searchQuery}" এর সাথে মিলে এমন কোনো সদস্য পাওয়া যায়নি।`;
             } else {
-                 memberListContainer.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-gray-500">এখনও কোনো সদস্য যোগ করা হয়নি।</td></tr>`;
+                 memberListPlaceholder.textContent = `এখনও কোনো সদস্য যোগ করা হয়নি।`;
             }
         } else {
-            // Sort the filtered members
             const sortedMembers = [...filteredMembers].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'bn'));
             
-            sortedMembers.forEach((member, index) => {
+            sortedMembers.forEach((member) => {
                 const totals = calculateMemberTotals(member);
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-indigo-50 transition duration-150';
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md border border-gray-200 p-4 flex flex-col transition-transform hover:scale-[1.02] duration-200';
                 
-                const placeholderUrl = `https://placehold.co/40x40/EFEFEF/AAAAAA?text=${encodeURIComponent(member.name.charAt(0))}`;
+                const placeholderUrl = `https://placehold.co/64x64/EFEFEF/AAAAAA?text=${encodeURIComponent(member.name.charAt(0))}`;
 
-                row.innerHTML = `
-                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-600">${getBengaliNumber(index + 1)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10">
-                                <img class="h-10 w-10 rounded-full object-cover" src="${member.photoUrl || placeholderUrl}" onerror="this.onerror=null;this.src='${placeholderUrl}';" alt="${member.name}">
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${member.name}</div>
-                            </div>
+                card.innerHTML = `
+                    <div class="flex items-center gap-4 mb-4">
+                        <img class="h-16 w-16 rounded-full object-cover border-2 border-indigo-200 flex-shrink-0" src="${member.photoUrl || placeholderUrl}" onerror="this.onerror=null;this.src='${placeholderUrl}';" alt="${member.name}">
+                        <div class="overflow-hidden">
+                            <h4 class="text-lg font-bold text-gray-900 truncate" title="${member.name}">${member.name}</h4>
+                            <p class="text-sm text-gray-600 truncate">কার্ড: ${member.cardNumber || 'N/A'}</p>
+                            <p class="text-sm text-gray-600 truncate">ফোন: ${member.phone}</p>
                         </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${member.cardNumber || 'N/A'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${member.phone}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">৳ ${getBengaliNumber(totals.totalDeposit)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">৳ ${getBengaliNumber(totals.currentLoan)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                        <button class="view-profile-btn" data-id="${member.id}">বিস্তারিত</button>
-                    </td>
+                    </div>
+                    <div class="space-y-2 flex-grow">
+                        <div class="flex justify-between items-center bg-green-50 p-2 rounded-md">
+                            <span class="text-sm font-medium text-green-700">মোট জমা:</span>
+                            <span class="text-lg font-bold text-green-600">৳ ${getBengaliNumber(totals.totalDeposit)}</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-red-50 p-2 rounded-md">
+                            <span class="text-sm font-medium text-red-700">বর্তমান ঋণ:</span>
+                            <span class="text-lg font-bold text-red-600">৳ ${getBengaliNumber(totals.currentLoan)}</span>
+                        </div>
+                    </div>
+                    <button class="view-profile-btn mt-4 w-full bg-indigo-500 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-600 transition shadow" data-id="${member.id}">
+                        বিস্তারিত দেখুন
+                    </button>
                 `;
-                row.querySelector('.view-profile-btn').className = 'view-profile-btn bg-indigo-500 text-white px-3 py-1 rounded-full text-xs font-bold hover:bg-indigo-600 transition shadow';
-                memberListContainer.appendChild(row);
+                memberListCardContainer.appendChild(card);
             });
         }
+        // END: Updated to render cards
         
         if (activeMember) {
-            // Refresh profile if open, but only if the active member is still in the main 'members' list
             const latestData = members.find(m => m.id === activeMember.id);
             if (latestData) {
-                // Check if the currently active member is no longer in the filtered list
                 const stillInFilteredList = filteredMembers.some(m => m.id === activeMember.id);
                 if (stillInFilteredList) {
-                    showProfile(latestData.id, false); // Refresh data
+                    showProfile(latestData.id, false);
                 } else {
-                    // Member is filtered out, but profile is open. Close it.
                     closeProfileModal();
                 }
             } else {
-                 closeProfileModal(); // Member was deleted
+                 closeProfileModal();
             }
         }
     };
     
+    // START: Updated Notice Board Rendering
     const renderNoticeBoard = () => {
         const noticeDisplay = document.getElementById('notice-display');
         noticeDisplay.innerHTML = ''; // Clear previous content
 
         const hasImage = notice && notice.imageUrl && notice.imageUrl.trim() !== '';
         const hasText = notice && notice.text && notice.text.trim() !== '';
+        const hasLink = notice && notice.linkText && notice.linkUrl && notice.linkText.trim() !== '' && notice.linkUrl.trim() !== '';
 
-        if (!hasImage && !hasText) {
+        if (!hasImage && !hasText && !hasLink) {
             noticeDisplay.innerHTML = '<p class="text-gray-500">আপাতত কোনো নতুন নোটিশ নেই।</p>';
             return;
         }
@@ -769,19 +786,29 @@
 
         if (hasText) {
             const textContainer = document.createElement('div');
-            // Markdown-like conversion for newlines
             const formattedNotice = notice.text
                 .split('\n')
                 .filter(line => line.trim() !== '')
-                .map(line => `<p>${line.replace(/ /g, ' &nbsp;')}</p>`) // Preserve spaces and create paragraphs
+                .map(line => `<p>${line.replace(/ /g, ' &nbsp;')}</p>`)
                 .join('');
             textContainer.innerHTML = formattedNotice;
             noticeDisplay.appendChild(textContainer);
         }
+
+        if (hasLink) {
+            const linkElement = document.createElement('a');
+            linkElement.href = notice.linkUrl;
+            linkElement.textContent = notice.linkText;
+            linkElement.target = '_blank';
+            linkElement.rel = 'noopener noreferrer';
+            // Style as a button
+            linkElement.className = 'inline-block bg-indigo-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-indigo-700 transition duration-200 mt-4 no-underline';
+            noticeDisplay.appendChild(linkElement);
+        }
     };
+    // END: Updated Notice Board Rendering
 
     const toggleProfileEditMode = (isEditing) => {
-        // শুধুমাত্র "সদস্য বিস্তারিত" ট্যাবের ভিতরের উপাদানগুলো টগল করুন
         const viewElements = document.querySelectorAll('#profile-content-details [id$="-view"]');
         const editElements = document.querySelectorAll('#profile-content-details [id$="-edit"]');
         
@@ -798,19 +825,15 @@
         activeMember = member;
         if (!member) return;
         
-        // Reset view to non-edit mode
         toggleProfileEditMode(false);
-
         const totals = calculateMemberTotals(member);
 
-        // Populate new profile header
         const placeholderUrl = `https://placehold.co/96x96/EFEFEF/AAAAAA?text=${encodeURIComponent(member.name ? member.name.charAt(0) : '?')}`;
         const profileImg = document.getElementById('profile-header-img');
         profileImg.src = member.photoUrl || placeholderUrl;
         profileImg.onerror = () => { profileImg.src = placeholderUrl; };
         document.getElementById('profile-header-name').textContent = member.name || 'N/A';
 
-        // Populate view elements (Details Tab)
         document.getElementById('profile-name-view').textContent = member.name || 'N/A';
         document.getElementById('profile-id').textContent = member.id;
         document.getElementById('profile-photo-url-view').textContent = member.photoUrl || 'N/A';
@@ -818,24 +841,21 @@
         document.getElementById('profile-card-number-view').textContent = member.cardNumber || 'N/A';
         document.getElementById('profile-email-view').textContent = member.email || 'N/A';
         document.getElementById('profile-phone-view').textContent = member.phone || 'N/A';
-        document.getElementById('profile-notes-view').textContent = member.notes || 'N/A'; // START: Notes Request
+        document.getElementById('profile-notes-view').textContent = member.notes || 'N/A';
         
-        // Populate edit elements (Details Tab)
         document.getElementById('profile-name-edit').value = member.name || '';
         document.getElementById('profile-photo-url-edit').value = member.photoUrl || '';
         document.getElementById('profile-employee-id-edit').value = member.employeeId || '';
         document.getElementById('profile-card-number-edit').value = member.cardNumber || '';
         document.getElementById('profile-email-edit').value = member.email || '';
         document.getElementById('profile-phone-edit').value = member.phone || '';
-        document.getElementById('profile-notes-edit').value = member.notes || ''; // START: Notes Request
+        document.getElementById('profile-notes-edit').value = member.notes || '';
 
-        // Populate summary elements (Summary Tab)
         document.getElementById('paid-total').textContent = `৳ ${getBengaliNumber(totals.totalDeposit)}`;
         document.getElementById('loan-taken').textContent = `৳ ${getBengaliNumber(totals.totalLoanTaken)}`;
         document.getElementById('loan-repaid').textContent = `৳ ${getBengaliNumber(totals.totalLoanRepaid)}`;
         document.getElementById('current-loan').textContent = `৳ ${getBengaliNumber(totals.currentLoan)}`;
 
-        // Populate transactions table (Transactions Tab)
         const transactionsTableBody = document.getElementById('transactions-table-body');
                 transactionsTableBody.innerHTML = !member.transactions || member.transactions.length === 0 
             ? '<tr><td colspan="4" class="py-4 text-center text-gray-500">কোনো লেনদেন নেই।</td></tr>'
@@ -845,7 +865,6 @@
                 else if (t.type === 'loanTaken') { typeText = 'ঋণ গ্রহণ'; amountColor = 'text-blue-600'; }
                 else if (t.type === 'loanRepayment') { typeText = 'ঋণ পরিশোধ'; amountColor = 'text-yellow-700'; }
                 
-                // স্বয়ংক্রিয় পরিশোধ হলে বিশেষ চিহ্ন দেখান
                 const description = t.description ? `<br><span class="text-xs text-gray-500">${t.description}</span>` : '';
                 const linked = t.linkedDepositId ? ' 🔗' : ''; 
 
@@ -860,25 +879,20 @@
                 </tr>`;
             }).join('');
         
-        // --- Reset to default tab ---
         const tabs = document.querySelectorAll('.profile-tab');
         const contents = document.querySelectorAll('#profile-content-container > div');
         tabs.forEach(t => t.classList.remove('tab-active', 'text-gray-500'));
-        tabs[0].classList.add('tab-active'); // Details tab
-        tabs[1].classList.add('text-gray-500'); // Transactions tab
-        tabs[2].classList.add('text-gray-500'); // Summary tab
+        tabs[0].classList.add('tab-active');
+        tabs[1].classList.add('text-gray-500');
+        tabs[2].classList.add('text-gray-500');
         
         contents.forEach(c => c.classList.add('hidden'));
         document.getElementById('profile-content-details').classList.remove('hidden');
 
-
-        // --- অ্যানিমেশন লজিক আপডেট ---
-        const profileModalBox = document.getElementById('profile-modal-box'); // Get the box
+        const profileModalBox = document.getElementById('profile-modal-box');
         if (animate) {
             profileModal.classList.remove('hidden');
             profileModal.classList.add('flex');
-            
-            // Clean up exit class from box, add entry class to box
             profileModalBox.classList.remove('modal-exit-active');
             profileModalBox.classList.add('modal-enter-active');
         }
@@ -890,8 +904,8 @@
         profileModalBox.classList.add('modal-exit-active');
         setTimeout(() => { 
             profileModal.classList.add('hidden'); 
-            profileModal.classList.remove('flex'); // Clean up flex
-            profileModalBox.classList.remove('modal-exit-active'); // Clean up animation class
+            profileModal.classList.remove('flex');
+            profileModalBox.classList.remove('modal-exit-active');
             activeMember = null; 
         }, 300);
     };
@@ -903,7 +917,7 @@
         document.getElementById('transaction-id').value = transactionId || '';
         document.getElementById('transaction-date').valueAsDate = new Date();
         const typeSelect = document.getElementById('transaction-type');
-        typeSelect.disabled = !!transactionId; // Disable type change when editing
+        typeSelect.disabled = !!transactionId;
 
         if (transactionId) {
             const t = activeMember.transactions.find(t => t.id === transactionId);
@@ -915,12 +929,9 @@
             }
         }
         
-        // --- অ্যানিমেশন লজিক আপডেট ---
         const transactionModalBox = document.getElementById('transaction-modal-box');
         transactionModal.classList.remove('hidden');
         transactionModal.classList.add('flex');
-        
-        // Clean up exit class from box, add entry class to box
         transactionModalBox.classList.remove('modal-exit-active');
         transactionModalBox.classList.add('modal-enter-active');
     };
@@ -931,20 +942,16 @@
         transactionModalBox.classList.add('modal-exit-active');
         setTimeout(() => { 
             transactionModal.classList.add('hidden');
-            transactionModal.classList.remove('flex'); // Clean up flex
-            transactionModalBox.classList.remove('modal-exit-active'); // Clean up animation class
+            transactionModal.classList.remove('flex');
+            transactionModalBox.classList.remove('modal-exit-active');
         }, 300);
     };
 
     const openFundModal = () => {
         renderFundModal();
-        
-        // --- অ্যানিমেশন লজিক আপডেট ---
         const fundModalBox = document.getElementById('fund-modal-box');
         fundModal.classList.remove('hidden');
         fundModal.classList.add('flex');
-        
-        // Clean up exit class from box, add entry class to box
         fundModalBox.classList.remove('modal-exit-active');
         fundModalBox.classList.add('modal-enter-active');
     };
@@ -955,8 +962,7 @@
         fundModalBox.classList.add('modal-exit-active');
         setTimeout(() => {
             fundModal.classList.add('hidden');
-            fundModal.classList.remove('flex'); // Clean up flex
-            fundModalBox.classList.remove('modal-exit-active'); // Clean up animation class
+            fundModal.classList.remove('flex');
         }, 300);
     };
 
@@ -980,16 +986,13 @@
                 const receiver = distribution ? members.find(m => m.id === distribution.receiverId) : null;
                 const availableFund = calculateAvailableFund();
                 
-                // START: Define placeholderUrl for receiver
                 const placeholderUrl = receiver ? `https://placehold.co/40x40/EFEFEF/AAAAAA?text=${encodeURIComponent(receiver.name ? receiver.name.charAt(0) : '?')}` : '';
-                // END: Define placeholderUrl
                 
                 return `<div class="p-4 border rounded-lg shadow-sm">
                     <h4 class="text-lg font-semibold text-blue-700">${formatDate(monthKey + '-01', 'monthYear')}</h4>
                     <p>এই মাসে মোট জমা: <span class="font-bold">৳ ${getBengaliNumber(monthlyDeposits[monthKey])}</span></p>
                     ${receiver
-                        ? `<!-- START: Updated Fund Receiver Display -->
-                           <div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center gap-4">
+                        ? `<div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center gap-4">
                                <img 
                                  src="${receiver.photoUrl || placeholderUrl}" 
                                  onerror="this.onerror=null;this.src='${placeholderUrl}';"
@@ -1001,8 +1004,7 @@
                                  <p class="text-xs text-gray-500 font-mono select-all">${receiver.id}</p>
                                  <p class="text-md font-semibold text-green-600 mt-1">৳ ${getBengaliNumber(distribution.amount)}</p>
                                </div>
-                           </div>
-                           <!-- END: Updated Fund Receiver Display -->`
+                           </div>`
                         : `<form class="assign-fund-form mt-3 space-y-2" data-month="${monthKey}">
                             <p class="text-xs">সর্বোচ্চ ঋণযোগ্য: ৳ ${getBengaliNumber(availableFund)}</p>
                             <select required class="w-full p-2 border rounded-lg bg-white"><option value="">সদস্য নির্বাচন</option>${members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}</select>
@@ -1013,95 +1015,6 @@
                 </div>`;
             }).join('');
     };
-
-    // START: PDF Download Request (REMOVED)
-    /*
-    const generateTransactionPDF = (member) => {
-        if (!member) return;
-
-        try {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Add the Bangla font
-            // The font `notoSansBengaliBase64` is loaded from the script tag in <head>
-            // *** FIX: Access the global variable via window object ***
-            doc.addFileToVFS('NotoSansBengali-Regular.ttf', window.notoSansBengaliBase64);
-            doc.addFont('NotoSansBengali-Regular.ttf', 'NotoSansBengali', 'normal');
-            doc.setFont('NotoSansBengali');
-
-            // --- Header ---
-            doc.setFontSize(20);
-            doc.text(member.name, 14, 22);
-            doc.setFontSize(14);
-            doc.text('লেনদেন বিবরণী', 14, 30);
-            doc.setFontSize(10);
-            doc.text(`তারিখ: ${formatDate(new Date().toISOString(), 'long')}`, 14, 36);
-
-            // --- Summary ---
-            const totals = calculateMemberTotals(member);
-            const summaryText = [
-                `মোট জমা: ৳ ${getBengaliNumber(totals.totalDeposit)}`,
-                `মোট ঋণ গ্রহণ: ৳ ${getBengaliNumber(totals.totalLoanTaken)}`,
-                `মোট ঋণ পরিশোধ: ৳ ${getBengaliNumber(totals.totalLoanRepaid)}`,
-                `বর্তমান ঋণ: ৳ ${getBengaliNumber(totals.currentLoan)}`
-            ];
-            doc.setFontSize(12);
-            doc.text(summaryText, 14, 48);
-
-            // --- Transactions Table ---
-            const head = [['তারিখ', 'বিবরণ', 'মন্তব্য', 'পরিমাণ (৳)']];
-            const body = [...(member.transactions || [])]
-                .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort by date ascending for PDF
-                .map(t => {
-                    const amount = t.type === 'deposit' ? `+ ${getBengaliNumber(t.amount)}` : `- ${getBengaliNumber(t.amount)}`;
-                    return [
-                        formatDate(t.date, 'short'),
-                        getTransactionTypeBengali(t.type),
-                        t.description || '',
-                        getBengaliNumber(t.amount) // Using Bengali number for consistency
-                    ];
-                });
-
-            doc.autoTable({
-                head: head,
-                body: body,
-                startY: 65,
-                theme: 'grid',
-                styles: {
-                    font: 'NotoSansBengali',
-                    fontStyle: 'normal',
-                    fontSize: 10
-                },
-                headStyles: {
-                    fillColor: [22, 160, 133], // Greenish header
-                    textColor: [255, 255, 255]
-                }
-            });
-
-            // --- Footer ---
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                doc.setFontSize(8);
-                doc.text(`পৃষ্ঠা ${getBengaliNumber(i)} / ${getBengaliNumber(pageCount)}`, 
-                         doc.internal.pageSize.width / 2, 
-                         doc.internal.pageSize.height - 10, 
-                         { align: 'center' });
-            }
-
-            // --- Save ---
-            doc.save(`${member.id}_${member.name}_transactions.pdf`);
-            showMessage('PDF ডাউনলোড শুরু হয়েছে।', 'success');
-
-        } catch (error) {
-            console.error('PDF generation failed:', error);
-            showMessage('PDF তৈরি করতে সমস্যা হয়েছে।', 'error');
-        }
-    };
-    */
-    // END: PDF Download Request
-
 
     // --- FIREBASE & DATA PERSISTENCE ---
 
@@ -1117,13 +1030,21 @@
         }
     };
 
+    // START: Updated to save logoUrl
     const updateFirebaseData = async (dataToSave) => {
         if (isSaving || !db) return;
         isSaving = true;
         showSyncStatus("সিঙ্ক করা হচ্ছে...", true);
         try {
             const docRef = doc(db, 'artifacts', appId, 'public-data', 'main');
-            await setDoc(docRef, dataToSave);
+            // Ensure all parts of the state are included, even if not changing
+            const fullData = {
+                members: dataToSave.members !== undefined ? dataToSave.members : members,
+                fundDistribution: dataToSave.fundDistribution !== undefined ? dataToSave.fundDistribution : fundDistribution,
+                notice: dataToSave.notice !== undefined ? dataToSave.notice : notice,
+                logoUrl: dataToSave.logoUrl !== undefined ? dataToSave.logoUrl : logoUrl,
+            };
+            await setDoc(docRef, fullData);
             showSyncStatus("সব পরিবর্তন সেভ হয়েছে");
         } catch (e) {
             console.error("Error writing to Firestore: ", e);
@@ -1134,35 +1055,38 @@
             hideSyncStatus();
         }
     };
+    // END: Updated to save logoUrl
 
+    // START: Updated to read logoUrl and new notice structure
     const startDataListener = () => {
         const docRef = doc(db, 'artifacts', appId, 'public-data', 'main');
         onSnapshot(docRef, (doc) => {
             const data = doc.data();
             members = data?.members || [];
             fundDistribution = data?.fundDistribution || {};
+            logoUrl = data?.logoUrl || ''; // Read logoUrl
             
             const dbNotice = data?.notice;
-            if (typeof dbNotice === 'string') {
-                notice = { text: dbNotice, imageUrl: '' }; // Convert old format
+            if (typeof dbNotice === 'string') { // Backward compatibility
+                notice = { text: dbNotice, imageUrl: '', linkText: '', linkUrl: '' };
             } else {
-                notice = dbNotice || { text: '', imageUrl: '' }; // Use new format or default
+                notice = dbNotice || { text: '', imageUrl: '', linkText: '', linkUrl: '' };
             }
 
             renderUI();
             renderNoticeBoard();
+            renderHeaderLogo(); // Render the logo
 
-            // --- নতুন আপডেট: মাসিক তহবিল মডাল খোলা থাকলে তা রিফ্রেশ করুন ---
             if (!fundModal.classList.contains('hidden')) {
                 renderFundModal();
             }
-            // --- আপডেট শেষ ---
 
         }, (error) => {
             console.error("Firestore listener error:", error);
             showMessage("রিয়েল-টাইম ডেটা লোড করতে সমস্যা হয়েছে।", 'error');
         });
     };
+    // END: Updated listener
     
     // --- APP INITIALIZATION ---
     
@@ -1178,15 +1102,13 @@
 
         if (user) {
             if (user.emailVerified) {
-                sessionStorage.removeItem('justRegistered'); // Cleanup flag
+                sessionStorage.removeItem('justRegistered');
                 authModal.classList.add('hidden');
                 verifyEmailModal.classList.add('hidden');
                 mainAppContent.classList.remove('hidden');
                 startDataListener();
             } else {
-                // User is logged in but not verified
                 if (sessionStorage.getItem('justRegistered')) {
-                    // They just registered, show verify modal
                     document.getElementById('user-email-info').textContent = user.email;
                     authModal.classList.add('hidden');
                     mainAppContent.classList.add('hidden');
@@ -1194,15 +1116,13 @@
                     verifyEmailModal.classList.add('flex');
                     
                     verificationCheckInterval = setInterval(async () => {
-                        await user.reload(); // onAuthStateChanged will re-trigger on change
+                        await user.reload();
                     }, 5000);
                 } else {
-                    // Existing unverified user, log them out to show login screen
                     signOut(auth);
                 }
             }
         } else {
-            // No user logged in, show login modal
             authModal.classList.remove('hidden');
             authModal.classList.add('flex');
             requestAnimationFrame(() => {
@@ -1329,7 +1249,7 @@
         signOut(auth);
     });
 
-    // Add Member Form Submission (Stays on page)
+    // Add Member Form Submission
     document.getElementById('add-member-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
@@ -1360,12 +1280,12 @@
           id: 'M' + Date.now(), 
           name, photoUrl, employeeId, cardNumber, email, phone, 
           transactions: [],
-          notes: '' // START: Notes Request - Add default notes field
+          notes: ''
       };
       try {
-        await updateFirebaseData({ members: [...members, newMember], fundDistribution, notice });
+        await updateFirebaseData({ members: [...members, newMember] });
         showMessage('সদস্য যোগ করা হয়েছে।', 'success');
-        form.reset(); // Reset form for next entry
+        form.reset();
       } catch (error) {
         showMessage('সদস্য যোগ করতে সমস্যা হয়েছে।', 'error');
       } finally {
@@ -1375,7 +1295,7 @@
       }
     });
     
-    // Transaction Form Submission (Stays open for new, closes for edit)
+    // Transaction Form Submission
     document.getElementById('transaction-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!activeMember) return;
@@ -1384,7 +1304,7 @@
         const button = form.querySelector('button[type="submit"]');
         const spinner = button.querySelector('.spinner');
         const buttonText = button.querySelector('span');
-
+amountamount
         button.disabled = true;
         spinner.classList.remove('hidden');
         buttonText.textContent = 'সেভ হচ্ছে...';
@@ -1412,7 +1332,6 @@
                   const updatedTx = { ...oldTx, ...data, amount: Number(data.amount) };
                   memberToUpdate.transactions[txIndex] = updatedTx;
 
-                  // Update linked repayment if necessary
                   if (updatedTx.type === 'deposit') {
                     const linkedRepaymentIndex = memberToUpdate.transactions.findIndex(t => t.linkedDepositId === updatedTx.id);
                     const otherTransactions = memberToUpdate.transactions.filter(t => t.id !== updatedTx.id && t.linkedDepositId !== updatedTx.id);
@@ -1440,7 +1359,6 @@
                 const newTx = { id: 'T' + Date.now(), ...data, amount: Number(data.amount) };
                 memberToUpdate.transactions.push(newTx);
 
-                // Add auto-repayment if needed
                 if (newTx.type === 'deposit' && outstandingLoanBeforeTx > 0) {
                     const repaymentAmount = Math.min(newTx.amount, outstandingLoanBeforeTx);
                     if (repaymentAmount > 0) {
@@ -1452,31 +1370,30 @@
                     }
                 }
             }
-            await updateFirebaseData({ members: updatedMembers, fundDistribution, notice });
+            await updateFirebaseData({ members: updatedMembers });
             showMessage(id ? 'লেনদেন আপডেট হয়েছে।' : 'লেনদেন যোগ হয়েছে।', 'success');
-            success = true; // Mark as successful
+            success = true;
         } catch (error) {
              showMessage('লেনদেন সেভ করতে সমস্যা হয়েছে।', 'error');
         } finally {
             button.disabled = false;
             spinner.classList.add('hidden');
-            buttonText.textContent = 'লেনদেন সেভ করুন'; // Reset button text
+            buttonText.textContent = 'লেনদেন সেভ করুন';
 
             if (success) {
                 if (id) {
-                    closeTransactionModal(); // Close modal only if editing was successful
+                    closeTransactionModal();
                 } else {
-                    form.reset(); // Reset form for next entry if adding was successful
-                    document.getElementById('transaction-date').valueAsDate = new Date(); // Reset date
-                    // Ensure type dropdown is enabled again if it was somehow disabled
+                    form.reset();
+                    document.getElementById('transaction-date').valueAsDate = new Date();
                     document.getElementById('transaction-type').disabled = false;
-                    document.getElementById('transaction-modal-title').textContent = "নতুন লেনদেন"; // Reset title
+                    document.getElementById('transaction-modal-title').textContent = "নতুন লেনদেন";
                 }
             }
         }
     });
     
-    // Assign Fund Form Submission (Stays on modal, content updates automatically)
+    // Assign Fund Form Submission
     document.getElementById('fund-list-container').addEventListener('submit', async (e) => {
         if (e.target.classList.contains('assign-fund-form')) {
             e.preventDefault();
@@ -1512,31 +1429,50 @@
                         description: `${formatDate(monthKey + '-01', 'monthYear')} মাসের তহবিল প্রাপ্তি।`
                     });
                     const updatedFundDist = { ...fundDistribution, [monthKey]: { receiverId, amount } };
-                    await updateFirebaseData({ members: updatedMembers, fundDistribution: updatedFundDist, notice });
+                    await updateFirebaseData({ members: updatedMembers, fundDistribution: updatedFundDist });
                     showMessage('তহবিল প্রদান করা হয়েছে।');
-                    // No need to reset form, onSnapshot will update UI removing the form
                 } catch(error) {
                     showMessage('তহবিল প্রদানে সমস্যা হয়েছে।', 'error');
-                    button.disabled = false; // Re-enable button on error
+                    button.disabled = false;
                     button.textContent = 'ঋণ প্রদান করুন';
                 }
             } else {
-                 button.disabled = false; // Re-enable if confirmation is cancelled
+                 button.disabled = false;
                  button.textContent = 'ঋণ প্রদান করুন';
             }
         }
     });
 
-    // START: Search Request - Add listener for search input
+    // Search Input
     document.getElementById('search-member-input').addEventListener('input', (e) => {
         searchQuery = e.target.value;
-        renderUI(); // Re-render the list on every key press
+        renderUI();
     });
-    // END: Search Request
+
+    // START: Save Logo Button
+    document.getElementById('save-logo-btn').addEventListener('click', async () => {
+        const button = document.getElementById('save-logo-btn');
+        const spinner = button.querySelector('.spinner-gray'); // Note: spinner class is spinner-gray
+        const newLogoUrl = document.getElementById('logo-url-input').value.trim();
+
+        button.disabled = true;
+        if(spinner) spinner.classList.remove('hidden');
+
+        try {
+            await updateFirebaseData({ logoUrl: newLogoUrl });
+            showMessage('লোগো সেভ করা হয়েছে।', 'success');
+        } catch (error) {
+            showMessage('লোগো সেভ করতে সমস্যা হয়েছে।', 'error');
+        } finally {
+            button.disabled = false;
+            if(spinner) spinner.classList.add('hidden');
+        }
+    });
+    // END: Save Logo Button
 
     // General Click Handler
     document.addEventListener('click', async (e) => {
-        const target = e.target.closest('button, svg'); // Include SVG for icon clicks
+        const target = e.target.closest('button, svg');
         if (!target) return;
         
         // --- Profile Tab Switching ---
@@ -1561,7 +1497,6 @@
             }
         }
         
-        // --- Profile Icon Clicks ---
         if (target.matches('#details-edit-icon-btn')) {
             document.getElementById('edit-profile-btn').click();
         }
@@ -1569,18 +1504,18 @@
             document.getElementById('open-transaction-modal-btn').click();
         }
 
-        // --- Other Button Logic ---
+        // START: Updated to look for button inside cards
         if (target.matches('.view-profile-btn')) {
             showProfile(target.dataset.id);
-        // UPDATE: Combined .delete-member-btn (from dashboard, now removed) and #delete-member-btn (from modal) logic
+        // END: Updated selector
         } else if (target.matches('#delete-member-btn')) { 
-            const memberId = activeMember?.id; // Only rely on activeMember
+            const memberId = activeMember?.id;
             const member = members.find(m => m.id === memberId);
             if (member && await showConfirmation(`আপনি কি "${member.name}"-কে মুছে ফেলতে নিশ্চিত? এর সাথে যুক্ত সকল লেনদেনও মুছে ফেলা হবে।`)) {
                 const updatedMembers = members.filter(m => m.id !== memberId);
-                await updateFirebaseData({ members: updatedMembers, fundDistribution, notice });
+                await updateFirebaseData({ members: updatedMembers });
                 showMessage('সদস্যকে ডিলেট করা হয়েছে।');
-                closeProfileModal(); // Always close modal after delete
+                closeProfileModal();
             }
         } else if (target.matches('.delete-transaction-btn')) {
             if (target.disabled) return; 
@@ -1592,14 +1527,13 @@
                 if (!txToDelete) return; 
 
                 let transactionsToKeep = memberToUpdate.transactions.filter(t => t.id !== txIdToDelete);
-                if (txToDelete.type === 'deposit') { // Also remove linked repayment
+                if (txToDelete.type === 'deposit') {
                     transactionsToKeep = transactionsToKeep.filter(t => t.linkedDepositId !== txIdToDelete);
                 }
                 
                 memberToUpdate.transactions = transactionsToKeep;
-                await updateFirebaseData({ members: updatedMembers, fundDistribution, notice });
+                await updateFirebaseData({ members: updatedMembers });
                 showMessage('লেনদেন মুছে ফেলা হয়েছে।');
-                // The onSnapshot listener will automatically refresh the profile modal view
             }
         } else if (target.matches('.edit-transaction-btn')) {
             if (target.disabled) return; 
@@ -1607,7 +1541,7 @@
         } else if (target.matches('#close-profile')) {
             closeProfileModal();
         } else if (target.matches('#open-transaction-modal-btn')) {
-            openTransactionModal(); // Open with no ID for new transaction
+            openTransactionModal();
         } else if (target.matches('#close-transaction-modal')) {
             closeTransactionModal();
         } else if (target.matches('#open-fund-modal-btn')) {
@@ -1619,8 +1553,12 @@
             target.classList.add('hidden');
             const noticeEditDiv = document.getElementById('notice-edit');
             noticeEditDiv.classList.remove('hidden');
+            // START: Populate new link fields
             document.getElementById('notice-textarea').value = notice.text || '';
             document.getElementById('notice-image-url').value = notice.imageUrl || '';
+            document.getElementById('notice-link-text').value = notice.linkText || '';
+            document.getElementById('notice-link-url').value = notice.linkUrl || '';
+            // END: Populate new link fields
             document.getElementById('notice-textarea').focus();
         } else if (target.matches('#cancel-notice-btn')) {
             document.getElementById('notice-edit').classList.add('hidden');
@@ -1629,15 +1567,26 @@
         } else if (target.matches('#save-notice-btn')) {
             const button = target;
             const spinner = button.querySelector('.spinner');
+            // START: Read new link fields
             const newNoticeText = document.getElementById('notice-textarea').value;
             const newImageUrl = document.getElementById('notice-image-url').value;
+            const newNoticeLinkText = document.getElementById('notice-link-text').value;
+            const newNoticeLinkUrl = document.getElementById('notice-link-url').value;
+            // END: Read new link fields
             
             button.disabled = true;
             spinner.classList.remove('hidden');
             
-            const newNoticeObject = { text: newNoticeText, imageUrl: newImageUrl };
+            // START: Save new notice object structure
+            const newNoticeObject = { 
+                text: newNoticeText, 
+                imageUrl: newImageUrl, 
+                linkText: newNoticeLinkText, 
+                linkUrl: newNoticeLinkUrl 
+            };
+            // END: Save new notice object structure
             try {
-                await updateFirebaseData({ members, fundDistribution, notice: newNoticeObject });
+                await updateFirebaseData({ notice: newNoticeObject });
                 document.getElementById('notice-edit').classList.add('hidden');
                 document.getElementById('notice-display').classList.remove('hidden');
                 document.getElementById('edit-notice-btn').classList.remove('hidden');
@@ -1652,12 +1601,12 @@
             toggleProfileEditMode(true);
         } else if (target.matches('#cancel-edit-btn')) {
             if (activeMember) {
-                showProfile(activeMember.id, false); // Reload original data
+                showProfile(activeMember.id, false);
             }
             toggleProfileEditMode(false);
         } else if (target.matches('#save-profile-btn')) {
             const button = target;
-            const spinner = document.getElementById('save-profile-spinner'); // Use dedicated spinner ID
+            const spinner = document.getElementById('save-profile-spinner');
             button.disabled = true;
             spinner.classList.remove('hidden');
 
@@ -1668,7 +1617,7 @@
                 cardNumber: document.getElementById('profile-card-number-edit').value.trim(),
                 email: document.getElementById('profile-email-edit').value.trim(),
                 phone: document.getElementById('profile-phone-edit').value.trim(),
-                notes: document.getElementById('profile-notes-edit').value.trim() // START: Notes Request
+                notes: document.getElementById('profile-notes-edit').value.trim()
             };
 
             if (!updatedData.name || !updatedData.phone) {
@@ -1684,11 +1633,11 @@
             if (memberToUpdate) {
                 try {
                     Object.assign(memberToUpdate, updatedData);
-                    await updateFirebaseData({ members: updatedMembers, fundDistribution, notice });
+                    await updateFirebaseData({ members: updatedMembers });
                     showMessage('সদস্যের তথ্য আপডেট করা হয়েছে।', 'success');
-                    activeMember = memberToUpdate; // Update local active member data
-                    showProfile(activeMember.id, false); // Re-render profile with updated data
-                    toggleProfileEditMode(false); // Switch back to view mode
+                    activeMember = memberToUpdate;
+                    showProfile(activeMember.id, false);
+                    toggleProfileEditMode(false);
                 } catch (error) {
                      showMessage('সদস্যের তথ্য আপডেট করতে সমস্যা হয়েছে।', 'error');
                 } finally {
@@ -1700,18 +1649,14 @@
                 button.disabled = false;
                 spinner.classList.add('hidden');
             }
-        } else if (target.matches('#logout-main-btn')) { // Main logout button handler
+        } else if (target.matches('#logout-main-btn')) {
             sessionStorage.removeItem('justRegistered');
             signOut(auth);
             showMessage('লগ আউট সফল হয়েছে।', 'info');
-        } else if (target.matches('#download-pdf-btn')) { // START: PDF Download Request (REMOVED)
-            /*
-            if (activeMember) {
-                generateTransactionPDF(activeMember);
-            }
-            */
-        } // END: PDF Download Request
+        }
     });
   </script>
 </body>
 </html>
+
+
