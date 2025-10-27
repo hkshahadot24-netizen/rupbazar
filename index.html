@@ -34,38 +34,28 @@
   <!-- Main Application Content (Hidden by default) -->
   <div id="main-app-content" class="hidden">
     
-    <!-- START: UPDATED Header Request -->
-    <header class="w-full bg-gradient-to-r from-pink-600 to-red-600 text-white p-4 shadow-lg sticky top-0 z-40">
+    <!-- START: UPDATED Header Request (More Compact) -->
+    <header class="w-full bg-gradient-to-r from-pink-600 to-red-600 text-white p-3 shadow-lg sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <!-- Changed to flex-row and justify-between -->
+        <div class="flex flex-row justify-between items-center gap-4">
           
           <!-- Logo and Title Section -->
-          <div class="flex items-center gap-4">
-            <img id="header-logo-img" src="https://placehold.co/64x64/FFFFFF/F87171?text=লোগো" alt="লোগো" class="w-16 h-16 rounded-full border-2 border-white object-cover bg-white">
+          <div class="flex items-center gap-3">
+            <!-- Made logo smaller -->
+            <img id="header-logo-img" src="https://placehold.co/48x48/FFFFFF/F87171?text=লোগো" alt="লোগো" class="w-12 h-12 rounded-full border-2 border-white object-cover bg-white">
             <div class="flex-grow">
-              <h1 class="text-3xl sm:text-4xl font-bold text-white py-1">
+              <!-- Made text smaller -->
+              <h1 class="text-2xl sm:text-3xl font-bold text-white py-0">
                 মেইন গেইট সমবায় সমিতি
               </h1>
-              <p class="text-sm font-semibold text-pink-100">স্থাপিত: ২০২৫</p>
-              <p class="text-md font-bold text-white mt-1">★ বিশ্বাস ★ মানবিকতা ★ উন্নয়ন ★</p>
+              <p class="text-xs font-semibold text-pink-100">স্থাপিত: ২০২৫</p>
+              <p class="text-sm font-bold text-white mt-1">★ বিশ্বাস ★ মানবিকতা ★ উন্নয়ন ★</p>
             </div>
           </div>
 
-          <!-- Logo Edit and Logout Section -->
-          <div class="flex flex-col gap-4 w-full md:w-auto">
-            <!-- Logo Edit -->
-            <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              <input id="logo-url-input" type="url" placeholder="লোগো লিংক এখানে দিন" class="flex-grow p-2 rounded-lg text-gray-800 text-sm focus:ring-2 focus:ring-pink-300 focus:outline-none" style="min-width: 200px;">
-              <button id="save-logo-btn" class="bg-white text-pink-600 py-2 px-4 rounded-lg font-bold hover:bg-pink-100 transition duration-200 text-sm flex-shrink-0 flex justify-center items-center gap-2">
-                <span>লোগো সেভ</span>
-                <div class="spinner-gray hidden"></div>
-              </button>
-            </div>
-            <!-- Logout -->
-            <button id="logout-main-btn" class="bg-red-700 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-800 transition duration-200 text-sm w-full">
-              লগ আউট
-            </button>
-          </div>
+          <!-- Logo Edit and Logout Section (REMOVED FROM HEADER) -->
+          <!-- This content is now in the sidebar card in <main> -->
 
         </div>
       </div>
@@ -73,128 +63,147 @@
     <!-- END: UPDATED Header Request -->
 
     <!-- The rest of the dashboard -->
-    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- START: New Grid Layout (Main Content + Sidebar) -->
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
       
-      <!-- Notice Board (Moved to Top as requested) -->
-      <div class="bg-white p-6 rounded-xl shadow-lg mb-6 prose max-w-none">
-        <!-- UPDATE: Removed "নোটিশ বোর্ড" title and changed justify-between to justify-end -->
-        <div class="flex justify-end items-center mb-4 not-prose">
-            <button id="edit-notice-btn" class="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm">
-                সম্পাদনা
-            </button>
-        </div>
-        <!-- This div will display the content -->
-        <div id="notice-display" class="text-gray-700">
-            <!-- JS will populate -->
-        </div>
-        <!-- This div is for editing -->
-        <div id="notice-edit" class="hidden space-y-3 not-prose">
-            <textarea id="notice-textarea" rows="4" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="নোটিশ লিখুন..."></textarea>
-            <input id="notice-image-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="ছবির লিংক (ঐচ্ছিক)">
-            
-            <!-- START: New Link Boxes Request -->
-            <input id="notice-link-text" type="text" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="লিংকের নাম (যেমন: 'বিস্তারিত দেখুন')">
-            <input id="notice-link-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="সম্পূর্ণ লিংক (https://...)">
-            <!-- END: New Link Boxes Request -->
-
-            <div class="flex gap-3">
-                <button id="save-notice-btn" class="bg-green-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-700 transition flex items-center gap-2">
-                    <span>সেভ</span>
-                    <div class="spinner hidden"></div>
-                </button>
-                <button id="cancel-notice-btn" class="bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600 transition">বাতিল</button>
-            </div>
-        </div>
-      </div>
-
-      <!-- Stats (from script refs) -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
-          <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট সদস্য</h3>
-          <p id="total-members" class="text-4xl font-bold text-indigo-600">০</p>
-        </div>
-        <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
-          <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট জমা</h3>
-          <p id="total-paid" class="text-4xl font-bold text-green-600">৳ ০</p>
-        </div>
-        <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
-          <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট ঋণ প্রদান</h3>
-          <p id="total-loan-given" class="text-4xl font-bold text-red-600">৳ ০</p>
-        </div>
-      </div>
-
-      <!-- Add Member Form (from script ref) -->
-      <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
-        <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-3">নতুন সদস্য যোগ করুন</h3>
-        <form id="add-member-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input id="member-name" type="text" placeholder="সদস্যের নাম (আবশ্যক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required>
-          <input id="member-phone" type="text" placeholder="ফোন নম্বর (আবশ্যক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required>
-          <input id="member-photo-url" type="url" placeholder="ছবির লিংক (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-          <input id="member-employee-id" type="text" placeholder="এমপ্লয়ি আইডি (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-          <input id="member-card-number" type="text" placeholder="কার্ড নম্বর (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-          <input id="member-email" type="email" placeholder="ইমেইল (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-          <button type="submit" class="md:col-span-2 w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-md disabled:opacity-50 flex justify-center items-center gap-2">
-            <span>সদস্য যোগ করুন</span>
-            <div class="spinner hidden"></div>
-          </button>
-        </form>
-      </div>
-
-      <!-- Member List (from script ref) -->
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-        <div class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b">
-           <h3 class="text-2xl font-bold text-gray-800">সদস্য তালিকা</h3>
-           <div class="space-x-2">
-              <button id="open-fund-modal-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-blue-700 transition duration-200 shadow-sm">মাসিক তহবিল</button>
-           </div>
-        </div>
+      <!-- Main Content Column -->
+      <div class="lg:col-span-3 space-y-6">
         
-        <!-- START: Search Bar Request -->
-        <div class="p-4 border-b">
-            <input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন (নাম, আইডি, কার্ড নম্বর...)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" autocomplete="off">
-        </div>
-        <!-- END: Search Bar Request -->
+        <!-- Notice Board -->
+        <div class="bg-white p-6 rounded-xl shadow-lg prose max-w-none">
+          <!-- START: New Important Links Display -->
+          <div id="important-links-display" class="mb-4">
+              <!-- JS will populate this -->
+          </div>
+          <!-- END: New Important Links Display -->
 
-        <!-- START: New Card View Request -->
-        <div id="member-list-cards" class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- JS will populate this with cards -->
-            <!-- Example Card Structure (for reference, will be generated by JS)
-            <div class="bg-gray-50 rounded-lg shadow-md border border-gray-200 p-4 flex flex-col transition-transform hover:scale-[1.02]">
-                <div class="flex items-center gap-4 mb-4">
-                    <img class="h-16 w-16 rounded-full object-cover border-2 border-indigo-200" src="https" alt="নাম">
-                    <div>
-                        <h4 class="text-lg font-bold text-gray-900">সদস্যের নাম</h4>
-                        <p class="text-sm text-gray-600">কার্ড: ১২৩৪৫</p>
-                        <p class="text-sm text-gray-600">ফোন: ০১৭...</p>
-                    </div>
-                </div>
-                <div class="space-y-2 flex-grow">
-                    <div class="flex justify-between items-center bg-green-50 p-2 rounded">
-                        <span class="text-sm font-medium text-green-700">মোট জমা:</span>
-                        <span class="text-lg font-bold text-green-600">৳ ১০,০০০</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-red-50 p-2 rounded">
-                        <span class="text-sm font-medium text-red-700">বর্তমান ঋণ:</span>
-                        <span class="text-lg font-bold text-red-600">৳ ৫,০০০</span>
-                    </div>
-                </div>
-                <button class="view-profile-btn mt-4 w-full bg-indigo-500 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-600 transition shadow">
-                    বিস্তারিত দেখুন
-                </button>
+          <!-- Notice Board Edit/Display -->
+          <div class="flex justify-end items-center mb-4 not-prose">
+              <button id="edit-notice-btn" class="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm">
+                  সম্পাদনা
+              </button>
+          </div>
+          <div id="notice-display" class="text-gray-700">
+              <!-- JS will populate -->
+          </div>
+          <div id="notice-edit" class="hidden space-y-3 not-prose">
+              <textarea id="notice-textarea" rows="4" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="নোটিশ লিখুন..."></textarea>
+              <input id="notice-image-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="ছবির লিংক (ঐচ্ছিক)">
+              <input id="notice-link-text" type="text" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="লিংকের নাম (যেমন: 'বিস্তারিত দেখুন')">
+              <input id="notice-link-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="সম্পূর্ণ লিংক (https://...)">
+
+              <!-- START: New Link Boxes Request (Add Important Link) -->
+              <div class="pt-4 border-t mt-4">
+                  <h5 class="text-md font-semibold text-gray-700 mb-2">নতুন গুরুত্বপূর্ণ লিংক যুক্ত করুন</h5>
+                  <div class="space-y-2">
+                      <input id="new-link-name" type="text" class="w-full p-2 border rounded-lg" placeholder="লিংকের নাম (যেমন: 'ফেসবুক গ্রুপ')">
+                      <input id="new-link-url" type="url" class="w-full p-2 border rounded-lg" placeholder="সম্পূর্ণ লিংক (https://...)">
+                      <button id="save-new-link-btn" type="button" class="bg-blue-600 text-white py-2 px-3 rounded-lg font-bold hover:bg-blue-700 transition text-sm flex items-center gap-2">
+                          <span>লিংক সেভ</span>
+                          <div class="spinner hidden"></div>
+                      </button>
+                  </div>
+              </div>
+              <!-- END: New Link Boxes Request -->
+
+              <div class="flex gap-3 pt-4 border-t">
+                  <button id="save-notice-btn" class="bg-green-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-700 transition flex items-center gap-2">
+                      <span>নোটিশ সেভ</span>
+                      <div class="spinner hidden"></div>
+                  </button>
+                  <button id="cancel-notice-btn" class="bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600 transition">বাতিল</button>
+              </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
+            <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট সদস্য</h3>
+            <p id="total-members" class="text-4xl font-bold text-indigo-600">০</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
+            <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট জমা</h3>
+            <p id="total-paid" class="text-4xl font-bold text-green-600">৳ ০</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
+            <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট ঋণ প্রদান</h3>
+            <p id="total-loan-given" class="text-4xl font-bold text-red-600">৳ ০</p>
+          </div>
+        </div>
+
+        <!-- Add Member Form -->
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+          <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-3">নতুন সদস্য যোগ করুন</h3>
+          <form id="add-member-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input id="member-name" type="text" placeholder="সদস্যের নাম (আবশ্যক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required>
+            <input id="member-phone" type="text" placeholder="ফোন নম্বর (আবশ্যক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required>
+            <input id="member-photo-url" type="url" placeholder="ছবির লিংক (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <input id="member-employee-id" type="text" placeholder="এমপ্লয়ি আইডি (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <input id="member-card-number" type="text" placeholder="কার্ড নম্বর (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <input id="member-email" type="email" placeholder="ইমেইল (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <button type="submit" class="md:col-span-2 w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-md disabled:opacity-50 flex justify-center items-center gap-2">
+              <span>সদস্য যোগ করুন</span>
+              <div class="spinner hidden"></div>
+            </button>
+          </form>
+        </div>
+
+        <!-- Member List -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b">
+            <h3 class="text-2xl font-bold text-gray-800">সদস্য তালিকা</h3>
+            <div class="space-x-2">
+                <button id="open-fund-modal-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-blue-700 transition duration-200 shadow-sm">মাসিক তহবিল</button>
             </div>
-            -->
+          </div>
+          
+          <div class="p-4 border-b">
+              <input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন (নাম, আইডি, কার্ড নম্বর...)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" autocomplete="off">
+          </div>
+
+          <div id="member-list-cards" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- JS will populate this with cards -->
+          </div>
+          <div id="member-list-placeholder" class="hidden p-6 text-center text-gray-500">
+              <!-- JS will set text content -->
+          </div>
         </div>
-        <!-- This div will be populated by JS if no members are found -->
-        <div id="member-list-placeholder" class="hidden p-6 text-center text-gray-500">
-            <!-- JS will set text content -->
-        </div>
-        <!-- END: New Card View Request -->
+
+      </div> <!-- End Main Content Column -->
+
+      <!-- START: New Sidebar Column -->
+      <div class="lg:col-span-1 space-y-6 lg:sticky lg:top-24 h-fit">
+          
+          <!-- New Admin Card -->
+          <div class="bg-white p-5 rounded-xl shadow-lg space-y-4">
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2">অ্যাডমিন প্যানেল</h3>
+            
+            <!-- Logo Edit -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">লোগো সম্পাদনা</label>
+              <input id="logo-url-input" type="url" placeholder="লোগো লিংক এখানে দিন" class="w-full p-2 rounded-lg text-gray-800 text-sm border border-gray-300 focus:ring-2 focus:ring-pink-300 focus:outline-none">
+              <button id="save-logo-btn" class="mt-2 w-full bg-white text-pink-600 py-2 px-4 rounded-lg font-bold hover:bg-pink-100 transition duration-200 text-sm flex-shrink-0 flex justify-center items-center gap-2 border border-pink-300">
+                <span>লোগো সেভ</span>
+                <div class="spinner-gray hidden"></div>
+              </button>
+            </div>
+            
+            <!-- Logout -->
+            <div class="pt-4 border-t">
+              <button id="logout-main-btn" class="w-full bg-red-700 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-800 transition duration-200 text-sm">
+                লগ আউট
+              </button>
+            </div>
+          </div>
 
       </div>
+      <!-- END: New Sidebar Column -->
       
     </main>
+    <!-- END: New Grid Layout -->
 
-    <!-- Sync Status (from script ref) -->
+    <!-- Sync Status -->
     <div id="sync-status" class="fixed bottom-4 right-4 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-xl transition-opacity duration-300 opacity-0 z-50">
       <div class="flex items-center gap-2">
           <div id="sync-spinner" class="spinner-gray hidden"></div>
@@ -202,7 +211,7 @@
       </div>
     </div>
     
-    <!-- Message Box (from script ref) -->
+    <!-- Message Box -->
     <div id="message-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-[300] transition-opacity duration-300 opacity-0">
         <div id="message-content"></div>
     </div>
@@ -234,8 +243,6 @@
               <button id="login-tab" class="flex-1 py-2 text-center font-semibold border-b-2 tab-active">প্রবেশ করুন</button>
               <button id="register-tab" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-gray-500">নিবন্ধন করুন</button>
           </div>
-          
-          <!-- START: Added Missing Login/Register Forms -->
           
           <!-- Login View -->
           <div id="login-view">
@@ -278,25 +285,20 @@
               </button>
             </form>
           </div>
-          <!-- END: Added Missing Forms -->
-
       </div>
   </div>
 
-  <!-- প্রোফাইল মডাল (Profile Modal) - সম্পূর্ণ নতুন লেআউট -->
+  <!-- প্রোফাইল মডাল (Profile Modal) -->
   <div id="profile-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 justify-center items-center p-4">
-    <!-- MODAL BOX: Made wider and taller, flex column -->
     <div id="profile-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-7xl p-6 relative h-[90vh] flex flex-col">
       <button id="close-profile" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold" title="বন্ধ করুন">&times;</button>
       
       <div id="profile-modal-content" class="flex flex-col h-full">
         
-        <!-- START: New Profile Header Request -->
         <div class="flex flex-col items-center justify-center pt-2 pb-6 border-b">
             <img id="profile-header-img" src="https://placehold.co/96x96/EFEFEF/AAAAAA?text=?" alt="সদস্যের ছবি" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-200 shadow-lg mb-3">
             <h2 id="profile-header-name" class="text-3xl font-bold text-indigo-700 truncate">সদস্যের নাম</h2>
         </div>
-        <!-- END: New Profile Header Request -->
 
         <!-- 2. Tab Headers -->
         <div class="flex border-b border-gray-200 mb-6 flex-shrink-0">
@@ -371,16 +373,14 @@
                         <input id="profile-phone-edit" type="text" class="hidden border rounded-lg p-2">
                     </p>
 
-                    <!-- START: Notes Textbox Request -->
+                    <!-- Notes Textbox -->
                     <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">সদস্য সম্পর্কে নোট:</span>
                         <span id="profile-notes-view" class="text-gray-900 bg-gray-100 p-2 rounded min-h-[50px] whitespace-pre-wrap"></span>
                         <textarea id="profile-notes-edit" rows="3" class="hidden border rounded-lg p-2"></textarea>
                     </p>
-                    <!-- END: Notes Textbox Request -->
-
                 </div>
 
-                <!-- UPDATE: Moved Delete Member Button Here -->
+                <!-- Delete Member Button -->
                 <div class="mt-8 pt-6 border-t text-center">
                     <button id="delete-member-btn" class="bg-red-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-red-700 transition duration-200 shadow-md">
                         🗑️ সদস্য ডিলেট করুন
@@ -390,14 +390,12 @@
 
             <!-- Panel 2: Transactions -->
             <div id="profile-content-transactions" class="hidden h-full">
-                <!-- Add Transaction Button (moved here for better context) -->
                 <div class="flex justify-end mb-4 gap-2">
                     <button id="open-transaction-modal-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 transition flex items-center gap-2">
                         <span>নতুন লেনদেন</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                     </button>
                 </div>
-                <!-- Transaction Table: Made height larger -->
                 <div class="overflow-y-auto border rounded-lg shadow-inner h-full">
                     <table class="min-w-full bg-gray-50">
                         <thead class="bg-indigo-100 sticky top-0">
@@ -436,7 +434,6 @@
                         <p id="current-loan" class="text-2xl font-bold text-red-600">৳ ০</p>
                     </div>
                 </div>
-                <!-- UPDATE: Removed Delete Member Button From Here -->
             </div>
 
         </div> <!-- End of tab content container -->
@@ -534,10 +531,11 @@
     let app, db, auth;
     let members = [];
     let fundDistribution = {};
-    // START: Updated notice and new logoUrl state
+    // START: Updated notice and new logoUrl/importantLinks state
     let notice = { text: '', imageUrl: '', linkText: '', linkUrl: '' }; // নোটিশের জন্য ভেরিয়েবল
     let logoUrl = ''; // লোগোর জন্য ভেরিয়েবল
-    // END: Updated notice state
+    let importantLinks = []; // গুরুত্বপূর্ণ লিংকের জন্য ভেরিয়েবল
+    // END: Updated state
     let activeMember = null;
     let isSaving = false;
     let verificationCheckInterval = null;
@@ -547,10 +545,8 @@
     const mainAppContent = document.getElementById('main-app-content');
     const authModal = document.getElementById('auth-modal');
     const verifyEmailModal = document.getElementById('verify-email-modal');
-    // START: Updated member list elements
     const memberListCardContainer = document.getElementById('member-list-cards');
     const memberListPlaceholder = document.getElementById('member-list-placeholder');
-    // END: Updated member list elements
     const profileModal = document.getElementById('profile-modal');
     const transactionModal = document.getElementById('transaction-modal');
     const fundModal = document.getElementById('fund-modal');
@@ -658,18 +654,16 @@
     
     // --- UI RENDERING FUNCTIONS ---
     
-    // START: New function to render header logo
     const renderHeaderLogo = () => {
       const logoImg = document.getElementById('header-logo-img');
       const logoInput = document.getElementById('logo-url-input');
-      const placeholder = 'https://placehold.co/64x64/FFFFFF/F87171?text=লোগো';
+      const placeholder = 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; // Updated placeholder size
 
       const currentLogoUrl = logoUrl || '';
       logoImg.src = currentLogoUrl || placeholder;
       logoImg.onerror = () => { logoImg.src = placeholder; };
       logoInput.value = currentLogoUrl;
     };
-    // END: New function
 
     const renderUI = () => {
         let totalDeposit = 0;
@@ -684,7 +678,6 @@
         document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(totalDeposit)}`;
         document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(totalLoanTaken)}`;
 
-        // START: Updated to render cards
         memberListCardContainer.innerHTML = ''; 
         memberListPlaceholder.classList.add('hidden');
         
@@ -741,7 +734,6 @@
                 memberListCardContainer.appendChild(card);
             });
         }
-        // END: Updated to render cards
         
         if (activeMember) {
             const latestData = members.find(m => m.id === activeMember.id);
@@ -758,7 +750,33 @@
         }
     };
     
-    // START: Updated Notice Board Rendering
+    // START: New Function to render important links
+    const renderImportantLinks = () => {
+        const container = document.getElementById('important-links-display');
+        if (!container) return;
+
+        if (importantLinks.length === 0) {
+            container.innerHTML = ''; // Clear if no links
+            return;
+        }
+
+        const linksHtml = importantLinks.map(link => `
+            <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="bg-indigo-100 text-indigo-700 text-sm font-medium px-3 py-1 rounded-full hover:bg-indigo-200 transition duration-200 flex items-center gap-2">
+                <span>${link.name}</span>
+                <button class="delete-link-btn text-indigo-400 hover:text-indigo-600 font-bold" data-id="${link.id}" title="লিংক মুছুন">&times;</button>
+            </a>
+        `).join('');
+
+        container.innerHTML = `
+            <h4 class="text-lg font-semibold text-gray-800 mb-2 not-prose">🔗 গুরুত্বপূর্ণ লিংকসমূহ</h4>
+            <div class="flex flex-wrap gap-2 not-prose">
+                ${linksHtml}
+            </div>
+            <hr class="my-4">
+        `;
+    };
+    // END: New function
+
     const renderNoticeBoard = () => {
         const noticeDisplay = document.getElementById('notice-display');
         noticeDisplay.innerHTML = ''; // Clear previous content
@@ -801,12 +819,10 @@
             linkElement.textContent = notice.linkText;
             linkElement.target = '_blank';
             linkElement.rel = 'noopener noreferrer';
-            // Style as a button
             linkElement.className = 'inline-block bg-indigo-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-indigo-700 transition duration-200 mt-4 no-underline';
             noticeDisplay.appendChild(linkElement);
         }
     };
-    // END: Updated Notice Board Rendering
 
     const toggleProfileEditMode = (isEditing) => {
         const viewElements = document.querySelectorAll('#profile-content-details [id$="-view"]');
@@ -1030,7 +1046,7 @@
         }
     };
 
-    // START: Updated to save logoUrl
+    // START: Updated to save logoUrl and importantLinks
     const updateFirebaseData = async (dataToSave) => {
         if (isSaving || !db) return;
         isSaving = true;
@@ -1043,6 +1059,7 @@
                 fundDistribution: dataToSave.fundDistribution !== undefined ? dataToSave.fundDistribution : fundDistribution,
                 notice: dataToSave.notice !== undefined ? dataToSave.notice : notice,
                 logoUrl: dataToSave.logoUrl !== undefined ? dataToSave.logoUrl : logoUrl,
+                importantLinks: dataToSave.importantLinks !== undefined ? dataToSave.importantLinks : importantLinks,
             };
             await setDoc(docRef, fullData);
             showSyncStatus("সব পরিবর্তন সেভ হয়েছে");
@@ -1055,9 +1072,9 @@
             hideSyncStatus();
         }
     };
-    // END: Updated to save logoUrl
+    // END: Updated to save logoUrl and importantLinks
 
-    // START: Updated to read logoUrl and new notice structure
+    // START: Updated to read logoUrl, new notice structure, and importantLinks
     const startDataListener = () => {
         const docRef = doc(db, 'artifacts', appId, 'public-data', 'main');
         onSnapshot(docRef, (doc) => {
@@ -1065,6 +1082,7 @@
             members = data?.members || [];
             fundDistribution = data?.fundDistribution || {};
             logoUrl = data?.logoUrl || ''; // Read logoUrl
+            importantLinks = data?.importantLinks || []; // Read importantLinks
             
             const dbNotice = data?.notice;
             if (typeof dbNotice === 'string') { // Backward compatibility
@@ -1076,6 +1094,7 @@
             renderUI();
             renderNoticeBoard();
             renderHeaderLogo(); // Render the logo
+            renderImportantLinks(); // Render important links
 
             if (!fundModal.classList.contains('hidden')) {
                 renderFundModal();
@@ -1304,7 +1323,7 @@
         const button = form.querySelector('button[type="submit"]');
         const spinner = button.querySelector('.spinner');
         const buttonText = button.querySelector('span');
-amountamount
+
         button.disabled = true;
         spinner.classList.remove('hidden');
         buttonText.textContent = 'সেভ হচ্ছে...';
@@ -1449,10 +1468,10 @@ amountamount
         renderUI();
     });
 
-    // START: Save Logo Button
+    // Save Logo Button
     document.getElementById('save-logo-btn').addEventListener('click', async () => {
         const button = document.getElementById('save-logo-btn');
-        const spinner = button.querySelector('.spinner-gray'); // Note: spinner class is spinner-gray
+        const spinner = button.querySelector('.spinner-gray');
         const newLogoUrl = document.getElementById('logo-url-input').value.trim();
 
         button.disabled = true;
@@ -1468,11 +1487,50 @@ amountamount
             if(spinner) spinner.classList.add('hidden');
         }
     });
-    // END: Save Logo Button
+
+    // START: Save New Important Link Button
+    document.getElementById('save-new-link-btn').addEventListener('click', async (e) => {
+        const button = e.currentTarget;
+        const spinner = button.querySelector('.spinner');
+        const nameInput = document.getElementById('new-link-name');
+        const urlInput = document.getElementById('new-link-url');
+        const linkName = nameInput.value.trim();
+        const linkUrl = urlInput.value.trim();
+
+        if (!linkName || !linkUrl) {
+            showMessage('লিংকের নাম এবং ইউআরএল উভয়ই আবশ্যক।', 'error');
+            return;
+        }
+        // Basic URL validation
+        try {
+            new URL(linkUrl);
+        } catch (_) {
+            showMessage('অনুগ্রহ করে একটি বৈধ ইউআরএল দিন (যেমন: https://...)।', 'error');
+            return;
+        }
+
+        button.disabled = true;
+        spinner.classList.remove('hidden');
+
+        const newLink = { id: 'L' + Date.now(), name: linkName, url: linkUrl };
+        try {
+            await updateFirebaseData({ importantLinks: [...importantLinks, newLink] });
+            showMessage('লিংক সেভ করা হয়েছে।', 'success');
+            nameInput.value = '';
+            urlInput.value = '';
+        } catch (error) {
+            showMessage('লিংক সেভ করতে সমস্যা হয়েছে।', 'error');
+        } finally {
+            button.disabled = false;
+            spinner.classList.add('hidden');
+        }
+    });
+    // END: Save New Important Link Button
 
     // General Click Handler
     document.addEventListener('click', async (e) => {
-        const target = e.target.closest('button, svg');
+        // Use e.target.closest to handle clicks on nested elements (like the 'x' in the delete button)
+        const target = e.target.closest('button, svg'); 
         if (!target) return;
         
         // --- Profile Tab Switching ---
@@ -1504,10 +1562,8 @@ amountamount
             document.getElementById('open-transaction-modal-btn').click();
         }
 
-        // START: Updated to look for button inside cards
         if (target.matches('.view-profile-btn')) {
             showProfile(target.dataset.id);
-        // END: Updated selector
         } else if (target.matches('#delete-member-btn')) { 
             const memberId = activeMember?.id;
             const member = members.find(m => m.id === memberId);
@@ -1535,6 +1591,21 @@ amountamount
                 await updateFirebaseData({ members: updatedMembers });
                 showMessage('লেনদেন মুছে ফেলা হয়েছে।');
             }
+        // START: Delete Important Link
+        } else if (target.matches('.delete-link-btn')) {
+            e.preventDefault(); // Prevent link navigation
+            const linkId = target.dataset.id;
+            const link = importantLinks.find(l => l.id === linkId);
+            if (link && await showConfirmation(`আপনি কি "${link.name}" লিংকটি মুছে ফেলতে নিশ্চিত?`)) {
+                const updatedLinks = importantLinks.filter(l => l.id !== linkId);
+                try {
+                    await updateFirebaseData({ importantLinks: updatedLinks });
+                    showMessage('লিংক মুছে ফেলা হয়েছে।', 'success');
+                } catch (error) {
+                    showMessage('লিংক মুছতে সমস্যা হয়েছে।', 'error');
+                }
+            }
+        // END: Delete Important Link
         } else if (target.matches('.edit-transaction-btn')) {
             if (target.disabled) return; 
             openTransactionModal(target.dataset.tid);
@@ -1553,12 +1624,13 @@ amountamount
             target.classList.add('hidden');
             const noticeEditDiv = document.getElementById('notice-edit');
             noticeEditDiv.classList.remove('hidden');
-            // START: Populate new link fields
             document.getElementById('notice-textarea').value = notice.text || '';
             document.getElementById('notice-image-url').value = notice.imageUrl || '';
             document.getElementById('notice-link-text').value = notice.linkText || '';
             document.getElementById('notice-link-url').value = notice.linkUrl || '';
-            // END: Populate new link fields
+            // Clear new link fields when opening
+            document.getElementById('new-link-name').value = '';
+            document.getElementById('new-link-url').value = '';
             document.getElementById('notice-textarea').focus();
         } else if (target.matches('#cancel-notice-btn')) {
             document.getElementById('notice-edit').classList.add('hidden');
@@ -1567,25 +1639,23 @@ amountamount
         } else if (target.matches('#save-notice-btn')) {
             const button = target;
             const spinner = button.querySelector('.spinner');
-            // START: Read new link fields
             const newNoticeText = document.getElementById('notice-textarea').value;
             const newImageUrl = document.getElementById('notice-image-url').value;
             const newNoticeLinkText = document.getElementById('notice-link-text').value;
             const newNoticeLinkUrl = document.getElementById('notice-link-url').value;
-            // END: Read new link fields
             
             button.disabled = true;
             spinner.classList.remove('hidden');
             
-            // START: Save new notice object structure
             const newNoticeObject = { 
                 text: newNoticeText, 
                 imageUrl: newImageUrl, 
                 linkText: newNoticeLinkText, 
                 linkUrl: newNoticeLinkUrl 
             };
-            // END: Save new notice object structure
             try {
+                // Note: This only saves the notice, not the important links.
+                // Links are saved separately by their own button.
                 await updateFirebaseData({ notice: newNoticeObject });
                 document.getElementById('notice-edit').classList.add('hidden');
                 document.getElementById('notice-display').classList.remove('hidden');
@@ -1658,5 +1728,3 @@ amountamount
   </script>
 </body>
 </html>
-
-
