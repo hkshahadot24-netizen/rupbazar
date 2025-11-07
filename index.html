@@ -49,7 +49,7 @@
               <h1 class="text-2xl sm:text-3xl font-bold text-white py-0">
                 মেইন গেইট সমবায় সমিতি
               </h1>
-              <p class="text-xs font-semibold text-pink-100">স্থাপিত: ২০২৫</p>
+              <p class="text-xs font-semibold text-pink-100"> স্থাপিত: ২০২৫</p>
               <p class="text-sm font-bold text-white mt-1">★ বিশ্বাস ★ মানবিকতা ★ উন্নয়ন ★</p>
             </div>
           </div>
@@ -646,11 +646,23 @@
         return totals;
     };
     
+    // <!-- START: UPDATED FUNCTION -->
     const calculateAvailableFund = () => {
-        let totalDeposit = members.reduce((sum, member) => sum + calculateMemberTotals(member).totalDeposit, 0);
-        let totalDistributed = Object.values(fundDistribution).reduce((sum, dist) => sum + (dist.amount || 0), 0);
-        return totalDeposit - totalDistributed;
+        let totalDeposit = 0;
+        let totalLoanTaken = 0;
+        let totalLoanRepaid = 0;
+        
+        members.forEach(member => {
+            const totals = calculateMemberTotals(member);
+            totalDeposit += totals.totalDeposit;
+            totalLoanTaken += totals.totalLoanTaken;
+            totalLoanRepaid += totals.totalLoanRepaid;
+        });
+        
+        // উপলভ্য তহবিল = মোট জমা + মোট ঋণ পরিশোধ - মোট ঋণ প্রদান
+        return totalDeposit + totalLoanRepaid - totalLoanTaken;
     };
+    // <!-- END: UPDATED FUNCTION -->
     
     // --- UI RENDERING FUNCTIONS ---
     
@@ -982,6 +994,7 @@
         }, 300);
     };
 
+    // <!-- START: MODIFIED renderFundModal() -->
     const renderFundModal = () => {
         const container = document.getElementById('fund-list-container');
         const monthlyDeposits = members.reduce((acc, member) => {
@@ -995,18 +1008,25 @@
         }, {});
 
         const sortedMonths = Object.keys(monthlyDeposits).sort().reverse();
+        
+        // Get global pool once
+        const globalAvailableFund = calculateAvailableFund(); 
+            
         container.innerHTML = sortedMonths.length === 0
             ? '<div class="text-center text-gray-500">কোনো মাসের জমার হিসাব নেই।</div>'
             : sortedMonths.map(monthKey => {
                 const distribution = fundDistribution[monthKey];
                 const receiver = distribution ? members.find(m => m.id === distribution.receiverId) : null;
-                const availableFund = calculateAvailableFund();
+                const monthlyDepositAmount = monthlyDeposits[monthKey] || 0; // Get this month's collection
                 
+                // NEW LOGIC: The max loan is the smaller of the global pool or this month's collection
+                const maxLoanForThisMonth = Math.min(globalAvailableFund, monthlyDepositAmount);
+
                 const placeholderUrl = receiver ? `https://placehold.co/40x40/EFEFEF/AAAAAA?text=${encodeURIComponent(receiver.name ? receiver.name.charAt(0) : '?')}` : '';
                 
                 return `<div class="p-4 border rounded-lg shadow-sm">
                     <h4 class="text-lg font-semibold text-blue-700">${formatDate(monthKey + '-01', 'monthYear')}</h4>
-                    <p>এই মাসে মোট জমা: <span class="font-bold">৳ ${getBengaliNumber(monthlyDeposits[monthKey])}</span></p>
+                    <p>এই মাসে মোট জমা: <span class="font-bold">৳ ${getBengaliNumber(monthlyDepositAmount)}</span></p>
                     ${receiver
                         ? `<div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center gap-4">
                                <img 
@@ -1022,15 +1042,20 @@
                                </div>
                            </div>`
                         : `<form class="assign-fund-form mt-3 space-y-2" data-month="${monthKey}">
-                            <p class="text-xs">সর্বোচ্চ ঋণযোগ্য: ৳ ${getBengaliNumber(availableFund)}</p>
+                            <!-- UPDATED to show monthly max -->
+                            <p class="text-xs">এই মাসের জমা থেকে সর্বোচ্চ ঋণযোগ্য: <span class="font-bold">৳ ${getBengaliNumber(maxLoanForThisMonth)}</span></p>
+                            <p class="text-xs text-gray-500">(মোট তহবিলে অবশিষ্ট আছে: ৳ ${getBengaliNumber(globalAvailableFund)})</p>
                             <select required class="w-full p-2 border rounded-lg bg-white"><option value="">সদস্য নির্বাচন</option>${members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}</select>
-                            <input type="number" placeholder="ঋণের পরিমাণ" required class="w-full p-2 border rounded-lg" max="${availableFund}">
+                            <!-- UPDATED to add max and data-max-loan -->
+                            <input type="number" placeholder="ঋণের পরিমাণ" required class="w-full p-2 border rounded-lg" min="0" 
+                                   max="${maxLoanForThisMonth}" data-max-loan="${maxLoanForThisMonth}">
                             <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm disabled:opacity-50">ঋণ প্রদান করুন</button>
                         </form>`
                     }
                 </div>`;
             }).join('');
     };
+    // <!-- END: MODIFIED renderFundModal() -->
 
     // --- FIREBASE & DATA PERSISTENCE ---
 
@@ -1412,7 +1437,7 @@
         }
     });
     
-    // Assign Fund Form Submission
+    // <!-- START: MODIFIED Assign Fund Form Submission -->
     document.getElementById('fund-list-container').addEventListener('submit', async (e) => {
         if (e.target.classList.contains('assign-fund-form')) {
             e.preventDefault();
@@ -1422,21 +1447,38 @@
             button.textContent = 'প্রদান করা হচ্ছে...';
 
             const monthKey = form.dataset.month;
-            const amount = parseFloat(form.querySelector('input[type="number"]').value);
+            const amountInput = form.querySelector('input[type="number"]');
+            const amount = parseFloat(amountInput.value);
             const receiverId = form.querySelector('select').value;
             
+            // NEW: Get max loan from the input's data attribute
+            const maxLoanForThisMonth = parseFloat(amountInput.dataset.maxLoan); 
+
             if (!receiverId || isNaN(amount) || amount <= 0) {
                 showMessage('সঠিক সদস্য ও পরিমাণ লিখুন।', 'error');
                 button.disabled = false;
                 button.textContent = 'ঋণ প্রদান করুন';
                 return;
             }
-            if (amount > calculateAvailableFund()) {
-                showMessage(`ঋণের পরিমাণ সর্বোচ্চ ঋণযোগ্য পরিমাণের চেয়ে বেশি।`, 'error');
+            
+            // --- UPDATED VALIDATION ---
+            // 1. Check against the month's specific limit
+            if (amount > maxLoanForThisMonth) {
+                showMessage(`ঋণের পরিমাণ এই মাসের সর্বোচ্চ ঋণযোগ্য পরিমাণের (৳ ${getBengaliNumber(maxLoanForThisMonth)}) চেয়ে বেশি।`, 'error');
                 button.disabled = false;
                 button.textContent = 'ঋণ প্রদান করুন';
                 return;
             }
+
+            // 2. Double-check against the *global* available fund (in case it changed since modal open)
+            const currentGlobalAvailable = calculateAvailableFund();
+            if (amount > currentGlobalAvailable) {
+                showMessage(`তহবিলে পর্যাপ্ত ব্যালেন্স নেই। বর্তমানে মোট অবশিষ্ট আছে ৳ ${getBengaliNumber(currentGlobalAvailable)}।`, 'error');
+                button.disabled = false;
+                button.textContent = 'ঋণ প্রদান করুন';
+                return;
+            }
+            // --- END UPDATED VALIDATION ---
 
             const receiver = members.find(m => m.id === receiverId);
             if (await showConfirmation(`আপনি কি ৳ ${getBengaliNumber(amount)} "${receiver.name}"-কে প্রদান করতে নিশ্চিত?`)) {
@@ -1461,6 +1503,7 @@
             }
         }
     });
+    // <!-- END: MODIFIED Assign Fund Form Submission -->
 
     // Search Input
     document.getElementById('search-member-input').addEventListener('input', (e) => {
@@ -1596,7 +1639,7 @@
             e.preventDefault(); // Prevent link navigation
             const linkId = target.dataset.id;
             const link = importantLinks.find(l => l.id === linkId);
-            if (link && await showConfirmation(`আপনি কি "${link.name}" লিংকটি মুছে ফেলতে নিশ্চিত?`)) {
+            if (link && await showConfirmation(` আপনি কি "${link.name}" লিংকটি মুছে ফেলতে নিশ্চিত?`)) {
                 const updatedLinks = importantLinks.filter(l => l.id !== linkId);
                 try {
                     await updateFirebaseData({ importantLinks: updatedLinks });
