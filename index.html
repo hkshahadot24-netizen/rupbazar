@@ -25,11 +25,11 @@
     #lottery-modal ::-webkit-scrollbar { width: 8px; }
     #lottery-modal ::-webkit-scrollbar-track { background: #1e293b; }
     #lottery-modal ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-    .winner-highlight { animation: pulse 1s infinite; background: linear-gradient(45deg, #facc15, #fbbf24); color: #000 !important; transform: scale(1.05); box-shadow: 0 0 20px rgba(250, 204, 21, 0.5); border-color: #facc15 !important; }
+    .winner-highlight { animation: pulse 1s infinite; background: linear-gradient(45deg, #facc15, #fbbf24); color: #000 !important; transform: scale(1.05); box-shadow: 0 0 30px rgba(250, 204, 21, 0.6); border-color: #facc15 !important; }
     @keyframes pulse { 0%, 100% { transform: scale(1.02); } 50% { transform: scale(1.08); } }
     .lottery-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
     #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
-    .active-highlight { background-color: #06b6d4; color: black; font-weight: bold; transform: scale(1.05); }
+    .active-highlight { background-color: #06b6d4; color: black; font-weight: bold; transform: scale(1.05); box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -149,7 +149,7 @@
     </div>
   </div>
 
-  <!-- Auth Modal (LOGIN PAGE - UPDATED: Full Screen Centered) -->
+  <!-- Auth Modal (LOGIN PAGE) -->
   <div id="auth-modal" class="hidden fixed inset-0 bg-gradient-to-br from-slate-900 to-slate-800 z-[200] justify-center items-center p-4">
       <div class="bg-white w-full max-w-sm p-6 sm:p-8 rounded-2xl shadow-2xl transform transition-all scale-100">
           <div class="text-center mb-6">
@@ -235,18 +235,37 @@
     </div>
   </div>
 
-  <!-- Transaction Modal -->
-  <div id="transaction-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-[60] justify-center items-center p-4">
-    <div id="transaction-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative modal-exit">
-        <button id="close-transaction-modal" class="absolute top-4 right-4 text-gray-400 text-2xl font-bold">&times;</button>
-        <h3 id="transaction-modal-title" class="text-2xl font-bold mb-6 text-center text-indigo-600"></h3>
-        <form id="transaction-form" class="space-y-4">
+  <!-- Transaction Modal (UPDATED: CENTERED) -->
+  <div id="transaction-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-80 z-[60] flex justify-center items-center p-4">
+    <div id="transaction-modal-box" class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative modal-exit m-auto">
+        <button id="close-transaction-modal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-3xl font-bold transition">&times;</button>
+        <h3 id="transaction-modal-title" class="text-2xl font-bold mb-6 text-center text-indigo-600 border-b pb-2">কিস্তি/লেনদেন এন্ট্রি</h3>
+        <form id="transaction-form" class="space-y-5">
             <input type="hidden" id="transaction-id" name="id">
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">তারিখ</label><input type="date" id="transaction-date" name="date" required class="w-full p-3 border border-gray-300 rounded-lg"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">লেনদেনের ধরন</label><select id="transaction-type" name="type" required class="w-full p-3 border border-gray-300 rounded-lg"><option value="deposit">কিস্তি/জমা</option><option value="loanTaken">ঋণ গ্রহণ</option><option value="loanRepayment">ঋণ পরিশোধ</option></select></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">পরিমাণ (৳)</label><input type="number" id="transaction-amount" name="amount" placeholder="0.00" required class="w-full p-3 border border-gray-300 rounded-lg"></div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1">মন্তব্য (ঐচ্ছিক)</label><textarea id="transaction-description" name="description" rows="2" class="w-full p-3 border border-gray-300 rounded-lg"></textarea></div>
-            <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 flex justify-center items-center gap-2"><span id="transaction-btn-text">সেভ করুন</span><div id="transaction-spinner" class="spinner hidden"></div></button>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1 text-center">তারিখ</label>
+                <input type="date" id="transaction-date" name="date" required class="w-full p-3 border border-gray-300 rounded-xl text-center bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1 text-center">লেনদেনের ধরন</label>
+                <select id="transaction-type" name="type" required class="w-full p-3 border border-gray-300 rounded-xl bg-white text-center focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+                    <option value="deposit">কিস্তি/জমা</option>
+                    <option value="loanTaken">ঋণ গ্রহণ</option>
+                    <option value="loanRepayment">ঋণ পরিশোধ</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1 text-center">পরিমাণ (৳)</label>
+                <input type="number" id="transaction-amount" name="amount" placeholder="০.০০" required class="w-full p-4 border-2 border-indigo-100 rounded-xl text-center text-2xl font-bold text-indigo-700 focus:border-indigo-500 outline-none shadow-inner">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1 text-center">মন্তব্য (ঐচ্ছিক)</label>
+                <textarea id="transaction-description" name="description" rows="2" class="w-full p-3 border border-gray-300 rounded-xl text-center focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="মন্তব্য লিখুন..."></textarea>
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:scale-[1.02] transition flex justify-center items-center gap-2">
+                <span id="transaction-btn-text">সেভ করুন</span>
+                <div id="transaction-spinner" class="spinner hidden"></div>
+            </button>
         </form>
     </div>
   </div>
@@ -271,19 +290,32 @@
         </div>
   </div>
 
-  <!-- Lottery Modal -->
+  <!-- Lottery Modal (UPDATED) -->
   <div id="lottery-modal" class="hidden fixed inset-0 z-[100] flex flex-col bg-[#0f172a]">
     <canvas id="confetti"></canvas>
     <div class="absolute top-4 left-4 z-50"><button id="close-lottery-btn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg border border-slate-500"><span>⬅ ফিরে যান</span></button></div>
     <div class="w-full max-w-[1800px] mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 grow mt-12 overflow-y-auto">
+        <!-- Left Sidebar -->
         <div class="lg:col-span-4 flex flex-col gap-6">
-            <div class="text-center lg:text-left"><h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 mb-2">মেইন গেইট সমবায় সমিতি মাসিক লটারি কার্যক্রম</h1><p class="text-slate-400">ভাগ্য পরীক্ষা করার সেরা মাধ্যম</p></div>
-            <div class="lottery-card p-5 rounded-xl shadow-lg"><form id="lotteryAddForm" class="flex flex-col gap-3"><label class="text-sm text-slate-400 font-semibold">নতুন অংশগ্রহণকারী যোগ করুন</label><div class="flex gap-2"><input id="lotteryNameInput" type="text" placeholder="নাম লিখুন..." class="flex-1 bg-slate-800 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-lg font-semibold">যোগ</button></div></form></div>
-            <div class="flex gap-3"><button id="lotteryDrawBtn" class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white py-4 rounded-xl font-bold text-xl shadow-lg">ড্র শুরু করুন 🎲</button><button id="lotteryClearListBtn" class="px-5 py-4 bg-slate-700 hover:bg-red-500/20 hover:text-red-400 text-slate-300 rounded-xl border border-slate-600">🗑️</button></div>
+            <div class="text-center"><h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 mb-2">মেইন গেইট সমবায় সমিতি মাসিক লটারি</h1><p class="text-slate-400">ভাগ্য পরীক্ষা করার সেরা মাধ্যম</p></div>
+            
+            <!-- Input Form Centered -->
+            <div class="lottery-card p-6 rounded-xl shadow-lg text-center">
+                <form id="lotteryAddForm" class="flex flex-col gap-4 items-center">
+                    <label class="text-lg text-slate-300 font-semibold">নতুন অংশগ্রহণকারী যোগ করুন</label>
+                    <div class="flex gap-2 w-full max-w-md">
+                        <input id="lotteryNameInput" type="text" placeholder="নাম লিখুন..." class="flex-1 bg-slate-800 border border-slate-600 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-500 text-center transition-all focus:scale-105">
+                        <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-cyan-500/50 transition-all">যোগ</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="flex gap-3"><button id="lotteryDrawBtn" class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white py-4 rounded-xl font-bold text-xl shadow-lg transition transform hover:scale-105 active:scale-95">ড্র শুরু করুন 🎲</button><button id="lotteryClearListBtn" class="px-5 py-4 bg-slate-700 hover:bg-red-500/20 hover:text-red-400 text-slate-300 rounded-xl border border-slate-600 transition" title="সব নাম মুছুন">🗑️</button></div>
             <div class="lottery-card p-4 rounded-xl flex-1 min-h-[200px]"><div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2"><h2 class="text-lg font-semibold text-slate-300">📜 পূর্ববর্তী ইতিহাস</h2><button id="lotteryClearHistoryBtn" class="text-xs text-red-400 hover:text-red-300">ইতিহাস মুছুন</button></div><ul id="lotteryHistory" class="space-y-2 max-h-[300px] overflow-y-auto pr-2 text-sm"></ul></div>
         </div>
+        <!-- Right/Main Display -->
         <div class="lg:col-span-8 flex flex-col gap-6 h-full">
-            <div id="lotteryWinnerSection" class="hidden w-full"><div class="lottery-card p-8 rounded-2xl border-2 border-yellow-500/50 shadow-[0_0_50px_rgba(234,179,8,0.3)] text-center bg-gradient-to-b from-slate-800/80 to-slate-900/90"><h3 class="text-2xl text-yellow-400 mb-4 font-semibold animate-pulse">🎉 অভিনন্দন! আজকের বিজয়ী 🎉</h3><div id="lotteryWinnerText" class="text-6xl md:text-7xl font-bold text-white break-words drop-shadow-lg"></div></div></div>
+            <div id="lotteryWinnerSection" class="hidden w-full transition-all duration-500"><div class="lottery-card p-10 rounded-3xl border-4 border-yellow-500/50 shadow-[0_0_80px_rgba(234,179,8,0.5)] text-center bg-gradient-to-b from-slate-800/90 to-slate-900/95 backdrop-blur-xl transform scale-105"><h3 class="text-3xl text-yellow-400 mb-6 font-bold animate-pulse">🎉 অভিনন্দন! আজকের বিজয়ী 🎉</h3><div id="lotteryWinnerText" class="text-6xl md:text-8xl font-extrabold text-white break-words drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] tracking-wide"></div></div></div>
             <div class="lottery-card p-6 rounded-xl flex-1 flex flex-col shadow-xl h-full min-h-[400px]"><div class="flex justify-between items-center mb-4 px-2"><h2 class="text-2xl font-semibold text-slate-200">অংশগ্রহণকারী <span class="text-base font-normal text-slate-400 ml-2">(মোট: <span id="lotteryCountBadge" class="text-cyan-400 font-bold">0</span>)</span></h2></div><ul id="lotteryParticipants" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 overflow-y-auto pr-2 flex-1 content-start"><li class="col-span-full text-center text-slate-500 italic py-10 text-lg">কোনো নাম যোগ করা হয়নি</li></ul></div>
         </div>
     </div>
@@ -300,7 +332,7 @@
     const firebaseConfig = { apiKey: "AIzaSyBdfxO5LL9KfzJe-PhvaRbhDhz9G-QH1aE", authDomain: "sg-loan-online.firebaseapp.com", projectId: "sg-loan-online", storageBucket: "sg-loan-online.firebasestorage.app", messagingSenderId: "933667418231", appId: "1:933667418231:web:11c24150426bf869381672" };
 
     let app, db, auth;
-    // Added lottery object to state
+    // State Variables
     let members = [], fundDistribution = {}, notice = { text: '', imageUrl: '', linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [] };
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
 
@@ -398,7 +430,6 @@
     // --- FIREBASE OPS ---
     const initFirebase = () => { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); } catch(e){ showMessage('ডাটাবেস সংযোগ ত্রুটি', 'error'); } };
     
-    // UPDATED: updateData to include lottery field
     const updateData = async (d) => { 
         if (isSaving) return; isSaving = true; showSyncStatus("সিঙ্ক...", true); 
         try { 
@@ -408,28 +439,21 @@
                 notice: d.notice!==undefined?d.notice:notice, 
                 logoUrl: d.logoUrl!==undefined?d.logoUrl:logoUrl, 
                 importantLinks: d.importantLinks!==undefined?d.importantLinks:importantLinks,
-                lottery: d.lottery!==undefined?d.lottery:lottery // Save lottery data
+                lottery: d.lottery!==undefined?d.lottery:lottery 
             }); 
             showSyncStatus("সেভ হয়েছে"); 
         } catch(e){ showMessage("সেভ ব্যর্থ", 'error'); } finally { isSaving=false; hideSyncStatus(); } 
     };
 
-    // UPDATED: listen to include lottery field
     const listen = () => onSnapshot(doc(db, 'artifacts', appId, 'public-data', 'main'), s => {
         const d = s.data(); if(!d) return;
         members = d.members || []; fundDistribution = d.fundDistribution || {}; logoUrl = d.logoUrl || ''; importantLinks = d.importantLinks || [];
         notice = typeof d.notice === 'string' ? {text: d.notice} : (d.notice || {});
-        
-        // Update lottery state from DB (handle missing fields gracefully)
         const dbLottery = d.lottery || { participants: [], history: [] };
         lottery.participants = dbLottery.participants || [];
         lottery.history = dbLottery.history || [];
-
-        // Render UI components
         renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); 
         if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal();
-        
-        // Only re-render lottery if not animating to prevent glitches
         if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
     });
 
@@ -437,15 +461,10 @@
     onAuthStateChanged(auth, u => {
         if (u && u.emailVerified) { document.getElementById('auth-modal').classList.add('hidden'); document.getElementById('verify-email-modal').classList.add('hidden'); document.getElementById('main-app-content').classList.remove('hidden'); listen(); }
         else if (u) { document.getElementById('user-email-info').textContent = u.email; document.getElementById('verify-email-modal').classList.remove('hidden'); document.getElementById('verify-email-modal').classList.add('flex'); document.getElementById('main-app-content').classList.add('hidden'); }
-        else { 
-            // Show Login Modal (it's centered now via CSS)
-            document.getElementById('auth-modal').classList.remove('hidden'); 
-            document.getElementById('auth-modal').classList.add('flex'); 
-            document.getElementById('main-app-content').classList.add('hidden'); 
-        }
+        else { document.getElementById('auth-modal').classList.remove('hidden'); document.getElementById('auth-modal').classList.add('flex'); document.getElementById('main-app-content').classList.add('hidden'); }
     });
 
-    // --- EVENT LISTENERS (SG LOAN) ---
+    // --- EVENT LISTENERS ---
     document.getElementById('login-form').addEventListener('submit', async e => { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); } catch(e){ document.getElementById('login-error').textContent='ভুল তথ্য।'; } });
     document.getElementById('register-form').addEventListener('submit', async e => { e.preventDefault(); const p = document.getElementById('register-password').value; if(p!==document.getElementById('confirm-password').value) return document.getElementById('register-error').textContent='পাসওয়ার্ড মিলছে না'; try { const c = await createUserWithEmailAndPassword(auth, document.getElementById('register-email').value, p); await sendEmailVerification(c.user); showMessage('ভেরিফিকেশন লিঙ্ক পাঠানো হয়েছে।'); } catch(e){ document.getElementById('register-error').textContent='নিবন্ধন ব্যর্থ।'; } });
     document.getElementById('logout-main-btn').addEventListener('click', () => signOut(auth));
@@ -478,13 +497,8 @@
         if (t.id==='save-notice-btn') { await updateData({ notice: { text: document.getElementById('notice-textarea').value, imageUrl: document.getElementById('notice-image-url').value, linkText: document.getElementById('notice-link-text').value, linkUrl: document.getElementById('notice-link-url').value } }); document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); showMessage('নোটিশ আপডেট হয়েছে'); }
         
         // --- LOTTERY BUTTONS ---
-        if (t.id === 'open-lottery-btn' || t.closest('#open-lottery-btn')) {
-            document.getElementById('lottery-modal').classList.remove('hidden');
-            initLottery(); 
-        }
-        if (t.id === 'close-lottery-btn' || t.closest('#close-lottery-btn')) {
-            document.getElementById('lottery-modal').classList.add('hidden');
-        }
+        if (t.id === 'open-lottery-btn' || t.closest('#open-lottery-btn')) { document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
+        if (t.id === 'close-lottery-btn' || t.closest('#close-lottery-btn')) { document.getElementById('lottery-modal').classList.add('hidden'); }
         if (t.id === 'lotteryClearListBtn') clearLotteryList();
         if (t.id === 'lotteryClearHistoryBtn') clearLotteryHistory();
     });
@@ -499,31 +513,17 @@
 
 
     // =====================================================================================
-    // UPDATED LOTTERY LOGIC (Connected to Firebase)
+    // LOTTERY LOGIC
     // =====================================================================================
     let l_isAnimating = false;
 
-    function initLottery() {
-        resizeCanvas();
-        renderLottery(); // Renders using global `lottery` variable synced from DB
-    }
-
-    // UPDATED: Helper to save lottery data to Firebase instead of LocalStorage
-    async function saveLotteryToFirebase() {
-        try {
-            await updateData({ lottery: lottery });
-        } catch (e) {
-            console.error("Lottery save error", e);
-            showMessage("লটারি ডাটা সেভ করতে সমস্যা হয়েছে।", "error");
-        }
-    }
+    function initLottery() { resizeCanvas(); renderLottery(); }
+    async function saveLotteryToFirebase() { try { await updateData({ lottery: lottery }); } catch (e) { console.error("Lottery save error", e); } }
 
     function renderLottery() {
         const listEl = document.getElementById("lotteryParticipants");
         const countBadge = document.getElementById("lotteryCountBadge");
         const historyEl = document.getElementById("lotteryHistory");
-        
-        // Use global lottery state
         const l_participants = lottery.participants;
         const l_history = lottery.history;
 
@@ -545,12 +545,7 @@
                 `;
                 listEl.appendChild(li);
             });
-            document.querySelectorAll('.lottery-delete-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    deleteParticipant(parseInt(btn.dataset.index));
-                });
-            });
+            document.querySelectorAll('.lottery-delete-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteParticipant(parseInt(btn.dataset.index)); }); });
         }
 
         historyEl.innerHTML = "";
@@ -571,57 +566,33 @@
         const input = document.getElementById("lotteryNameInput");
         const name = input.value.trim();
         if (!name) return;
-        
-        // Update global state and save to firebase
         lottery.participants.push(name);
         input.value = "";
         saveLotteryToFirebase();
-        
-        // NOTE: renderLottery() is called automatically by the listener when data returns
-        // But for instant feedback (before server trip), we can render now
         renderLottery();
         setTimeout(() => document.getElementById("lotteryParticipants").lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
     });
 
-    function deleteParticipant(index) {
-        if (l_isAnimating) return;
-        lottery.participants.splice(index, 1);
-        saveLotteryToFirebase();
-        renderLottery();
-    }
-
+    function deleteParticipant(index) { if (l_isAnimating) return; lottery.participants.splice(index, 1); saveLotteryToFirebase(); renderLottery(); }
     function clearLotteryList() {
         if (l_isAnimating) return;
         if (lottery.participants.length === 0) return;
         if (confirm("আপনি কি নিশ্চিত যে আপনি সব নাম মুছে ফেলতে চান?")) {
-            lottery.participants = [];
-            saveLotteryToFirebase();
-            renderLottery();
-            document.getElementById("lotteryWinnerSection").classList.add('hidden');
+            lottery.participants = []; saveLotteryToFirebase(); renderLottery(); document.getElementById("lotteryWinnerSection").classList.add('hidden');
         }
     }
-
-    function clearLotteryHistory() {
-        if (confirm("ইতিহাস মুছে ফেলতে চান?")) {
-            lottery.history = [];
-            saveLotteryToFirebase();
-            renderLottery();
-        }
-    }
+    function clearLotteryHistory() { if (confirm("ইতিহাস মুছে ফেলতে চান?")) { lottery.history = []; saveLotteryToFirebase(); renderLottery(); } }
 
     document.getElementById("lotteryDrawBtn").addEventListener("click", () => {
         const btn = document.getElementById("lotteryDrawBtn");
         const listEl = document.getElementById("lotteryParticipants");
         const winnerSection = document.getElementById("lotteryWinnerSection");
-
         if (l_isAnimating) return;
         if (lottery.participants.length < 2) { alert("লটারি করার জন্য অন্তত ২টি নাম প্রয়োজন!"); return; }
 
         l_isAnimating = true;
         winnerSection.classList.add('hidden');
-        btn.disabled = true;
-        btn.textContent = "ড্র হচ্ছে... 🎲";
-        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        btn.disabled = true; btn.textContent = "ড্র হচ্ছে... 🎲"; btn.classList.add('opacity-75', 'cursor-not-allowed');
 
         const listItems = listEl.querySelectorAll("li");
         let currentIndex = 0, cycles = 0;
@@ -631,27 +602,19 @@
             listItems.forEach(item => {
                 item.classList.remove('active-highlight', 'ring-2', 'ring-cyan-400', 'z-10');
                 item.classList.add('bg-slate-800/80');
-                const span = item.querySelector('.font-semibold');
-                if(span) span.classList.replace('text-black', 'text-slate-200');
+                const span = item.querySelector('.font-semibold'); if(span) span.classList.replace('text-black', 'text-slate-200');
             });
-
             const currentItem = listItems[currentIndex];
             if(currentItem) {
                 currentItem.classList.remove('bg-slate-800/80');
                 currentItem.classList.add('active-highlight', 'ring-2', 'ring-cyan-400', 'z-10', 'rounded-xl');
-                const span = currentItem.querySelector('.font-semibold');
-                if(span) span.classList.replace('text-slate-200', 'text-black');
+                const span = currentItem.querySelector('.font-semibold'); if(span) span.classList.replace('text-slate-200', 'text-black');
                 currentItem.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
             }
-
             currentIndex = (currentIndex + 1) % lottery.participants.length;
             cycles++;
-
-            if (cycles < minCycles + Math.random() * 20) {
-                setTimeout(animateHighlight, Math.min(speed + (cycles * 2), 350));
-            } else {
-                finishDraw((currentIndex - 1 + lottery.participants.length) % lottery.participants.length);
-            }
+            if (cycles < minCycles + Math.random() * 20) setTimeout(animateHighlight, Math.min(speed + (cycles * 2), 350));
+            else finishDraw((currentIndex - 1 + lottery.participants.length) % lottery.participants.length);
         }
         animateHighlight();
     });
@@ -674,23 +637,13 @@
         setTimeout(() => winnerSection.classList.remove('animate-bounce'), 1000);
 
         const date = new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'});
-        
-        // Update history in global state and save to firebase
         lottery.history.push({ winner: winnerName, date: date });
         saveLotteryToFirebase();
-        
-        // Note: renderLottery() will be triggered by DB update, but since l_isAnimating is true until next lines,
-        // we should manually render to update history view right now if we want immediate feedback, 
-        // but render wipes the DOM (and the highlight). So we wait for animation flag.
-        
         startConfetti();
         l_isAnimating = false;
-        btn.disabled = false;
-        btn.textContent = "ড্র শুরু করুন 🎲";
-        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        btn.disabled = false; btn.textContent = "ড্র শুরু করুন 🎲"; btn.classList.remove('opacity-75', 'cursor-not-allowed');
     }
 
-    // Confetti
     const canvas = document.getElementById("confetti");
     const ctx = canvas.getContext("2d");
     let confettiParticles = [];
