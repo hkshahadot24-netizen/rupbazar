@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>মেইন গেইট সমবায় সমিতি</title>
+  <!-- Added typography plugin for better notice rendering -->
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
-    /* General Styles */
+    /* ফন্ট আপডেট: 'Noto Sans Bengali' প্রধান ফন্ট */
     body { font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif; }
     .spinner { border: 3px solid rgba(255,255,255,0.3); border-left-color: #ffffff; border-radius:50%; width:20px; height:20px; animation:spin 1s linear infinite;}
     .spinner-gray { border: 2px solid rgba(0,0,0,0.2); border-left-color: #4a5568; border-radius:50%; width:16px; height:16px; animation:spin 1s linear infinite;}
@@ -17,10 +18,17 @@
     .modal-enter-active { opacity: 1; transform: scale(1); transition: all 300ms ease-out; }
     .modal-exit { opacity: 1; transform: scale(1); }
     .modal-exit-active { opacity: 0; transform: scale(0.95); transition: all 300ms ease-in; }
-    [type='date']::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.5) sepia(0.6) saturate(5) hue-rotate(200deg); }
-    .tab-active { border-color: #4f46e5; color: #4f46e5; background-color: #eef2ff; }
+    [type='date']::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        filter: invert(0.5) sepia(0.6) saturate(5) hue-rotate(200deg);
+    }
+    .tab-active {
+        border-color: #4f46e5;
+        color: #4f46e5;
+        background-color: #eef2ff;
+    }
 
-    /* Lottery Styles */
+    /* --- LOTTERY STYLES --- */
     #lottery-modal { font-family: 'Hind Siliguri', sans-serif; background-color: #0f172a; color: #f1f5f9; }
     #lottery-modal ::-webkit-scrollbar { width: 8px; }
     #lottery-modal ::-webkit-scrollbar-track { background: #1e293b; }
@@ -34,23 +42,33 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <!-- Main App Content -->
+  <!-- Main Application Content (Hidden by default) -->
   <div id="main-app-content" class="hidden">
+    
+    <!-- Header -->
     <header class="w-full bg-gradient-to-r from-pink-600 to-red-600 text-white p-3 shadow-lg sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center gap-4">
-        <div class="flex items-center gap-3">
-          <img id="header-logo-img" src="https://placehold.co/48x48/FFFFFF/F87171?text=লোগো" class="w-12 h-12 rounded-full border-2 border-white object-cover bg-white">
-          <div class="flex-grow">
-            <h1 class="text-2xl sm:text-3xl font-bold text-white py-0">মেইন গেইট সমবায় সমিতি</h1>
-            <p class="text-xs font-semibold text-pink-100"> স্থাপিত: ২০২৫</p>
-            <p class="text-sm font-bold text-white mt-1">★ বিশ্বাস ★ মানবিকতা ★ উন্নয়ন ★</p>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-3">
+            <img id="header-logo-img" src="https://placehold.co/48x48/FFFFFF/F87171?text=লোগো" alt="লোগো" class="w-12 h-12 rounded-full border-2 border-white object-cover bg-white">
+            <div class="flex-grow">
+              <h1 class="text-2xl sm:text-3xl font-bold text-white py-0">
+                মেইন গেইট সমবায় সমিতি
+              </h1>
+              <p class="text-xs font-semibold text-pink-100"> স্থাপিত: ২০২৫</p>
+              <p class="text-sm font-bold text-white mt-1">★ বিশ্বাস ★ মানবিকতা ★ উন্নয়ন ★</p>
+            </div>
           </div>
         </div>
       </div>
     </header>
 
+    <!-- Main Content Grid -->
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+      
+      <!-- Content Column -->
       <div class="lg:col-span-3 space-y-6">
+        
         <!-- Notice Board -->
         <div class="bg-white p-6 rounded-xl shadow-lg prose max-w-none">
           <div id="important-links-display" class="mb-4"></div>
@@ -59,43 +77,63 @@
           </div>
           <div id="notice-display" class="text-gray-700"></div>
           <div id="notice-edit" class="hidden space-y-3 not-prose">
-              <textarea id="notice-textarea" rows="4" class="w-full p-2 border rounded-lg focus:ring-indigo-500" placeholder="নোটিশ লিখুন..."></textarea>
-              <input id="notice-image-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500" placeholder="ছবির লিংক">
-              <input id="notice-link-text" type="text" class="w-full p-2 border rounded-lg focus:ring-indigo-500" placeholder="লিংকের নাম">
-              <input id="notice-link-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500" placeholder="লিংক URL">
+              <textarea id="notice-textarea" rows="4" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="নোটিশ লিখুন..."></textarea>
+              <input id="notice-image-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="ছবির লিংক (ঐচ্ছিক)">
+              <input id="notice-link-text" type="text" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="লিংকের নাম (যেমন: 'বিস্তারিত দেখুন')">
+              <input id="notice-link-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="সম্পূর্ণ লিংক (https://...)">
+
               <div class="pt-4 border-t mt-4">
-                  <h5 class="text-md font-semibold text-gray-700 mb-2">নতুন লিংক যুক্ত করুন</h5>
+                  <h5 class="text-md font-semibold text-gray-700 mb-2">নতুন গুরুত্বপূর্ণ লিংক যুক্ত করুন</h5>
                   <div class="space-y-2">
-                      <input id="new-link-name" type="text" class="w-full p-2 border rounded-lg" placeholder="লিংকের নাম">
-                      <input id="new-link-url" type="url" class="w-full p-2 border rounded-lg" placeholder="লিংক URL">
-                      <button id="save-new-link-btn" type="button" class="bg-blue-600 text-white py-2 px-3 rounded-lg font-bold hover:bg-blue-700 text-sm flex items-center gap-2"><span>লিংক সেভ</span><div class="spinner hidden"></div></button>
+                      <input id="new-link-name" type="text" class="w-full p-2 border rounded-lg" placeholder="লিংকের নাম (যেমন: 'ফেসবুক গ্রুপ')">
+                      <input id="new-link-url" type="url" class="w-full p-2 border rounded-lg" placeholder="সম্পূর্ণ লিংক (https://...)">
+                      <button id="save-new-link-btn" type="button" class="bg-blue-600 text-white py-2 px-3 rounded-lg font-bold hover:bg-blue-700 transition text-sm flex items-center gap-2">
+                          <span>লিংক সেভ</span>
+                          <div class="spinner hidden"></div>
+                      </button>
                   </div>
               </div>
+
               <div class="flex gap-3 pt-4 border-t">
-                  <button id="save-notice-btn" class="bg-green-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-700 flex items-center gap-2"><span>নোটিশ সেভ</span><div class="spinner hidden"></div></button>
-                  <button id="cancel-notice-btn" class="bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600">বাতিল</button>
+                  <button id="save-notice-btn" class="bg-green-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-700 transition flex items-center gap-2">
+                      <span>নোটিশ সেভ</span>
+                      <div class="spinner hidden"></div>
+                  </button>
+                  <button id="cancel-notice-btn" class="bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600 transition">বাতিল</button>
               </div>
           </div>
         </div>
 
         <!-- Stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="bg-white p-6 rounded-xl shadow-lg text-center hover:scale-105 transition-transform"><h3 class="text-lg font-semibold text-gray-500 mb-2">মোট সদস্য</h3><p id="total-members" class="text-4xl font-bold text-indigo-600">০</p></div>
-          <div class="bg-white p-6 rounded-xl shadow-lg text-center hover:scale-105 transition-transform"><h3 class="text-lg font-semibold text-gray-500 mb-2">মোট জমা</h3><p id="total-paid" class="text-4xl font-bold text-green-600">৳ ০</p></div>
-          <div class="bg-white p-6 rounded-xl shadow-lg text-center hover:scale-105 transition-transform"><h3 class="text-lg font-semibold text-gray-500 mb-2">মোট ঋণ প্রদান</h3><p id="total-loan-given" class="text-4xl font-bold text-red-600">৳ ০</p></div>
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
+            <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট সদস্য</h3>
+            <p id="total-members" class="text-4xl font-bold text-indigo-600">০</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
+            <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট জমা</h3>
+            <p id="total-paid" class="text-4xl font-bold text-green-600">৳ ০</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
+            <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট ঋণ প্রদান</h3>
+            <p id="total-loan-given" class="text-4xl font-bold text-red-600">৳ ০</p>
+          </div>
         </div>
 
-        <!-- Add Member -->
+        <!-- Add Member Form -->
         <div class="bg-white p-6 rounded-xl shadow-lg">
           <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-3">নতুন সদস্য যোগ করুন</h3>
           <form id="add-member-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input id="member-name" type="text" placeholder="নাম (আবশ্যক)" class="p-3 border rounded-lg focus:ring-indigo-500" required>
-            <input id="member-phone" type="text" placeholder="ফোন (আবশ্যক)" class="p-3 border rounded-lg focus:ring-indigo-500" required>
-            <input id="member-photo-url" type="url" placeholder="ছবির লিংক" class="p-3 border rounded-lg focus:ring-indigo-500">
-            <input id="member-employee-id" type="text" placeholder="এমপ্লয়ি আইডি" class="p-3 border rounded-lg focus:ring-indigo-500">
-            <input id="member-card-number" type="text" placeholder="কার্ড নম্বর" class="p-3 border rounded-lg focus:ring-indigo-500">
-            <input id="member-email" type="email" placeholder="ইমেইল" class="p-3 border rounded-lg focus:ring-indigo-500">
-            <button type="submit" class="md:col-span-2 w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 shadow-md flex justify-center items-center gap-2"><span>সদস্য যোগ করুন</span><div class="spinner hidden"></div></button>
+            <input id="member-name" type="text" placeholder="সদস্যের নাম (আবশ্যক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required>
+            <input id="member-phone" type="text" placeholder="ফোন নম্বর (আবশ্যক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required>
+            <input id="member-photo-url" type="url" placeholder="ছবির লিংক (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <input id="member-employee-id" type="text" placeholder="এমপ্লয়ি আইডি (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <input id="member-card-number" type="text" placeholder="কার্ড নম্বর (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <input id="member-email" type="email" placeholder="ইমেইল (ঐচ্ছিক)" class="p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <button type="submit" class="md:col-span-2 w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-md disabled:opacity-50 flex justify-center items-center gap-2">
+              <span>সদস্য যোগ করুন</span>
+              <div class="spinner hidden"></div>
+            </button>
           </form>
         </div>
 
@@ -104,77 +142,95 @@
           <div class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b">
             <h3 class="text-2xl font-bold text-gray-800">সদস্য তালিকা</h3>
             <div class="space-x-2">
-                <button id="open-fund-modal-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-blue-700 shadow-sm">মাসিক তহবিল</button>
+                <button id="open-fund-modal-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-blue-700 transition duration-200 shadow-sm">মাসিক তহবিল</button>
             </div>
           </div>
-          <div class="p-4 border-b"><input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন..." class="w-full p-3 border rounded-lg focus:ring-indigo-500"></div>
+          <div class="p-4 border-b">
+              <input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন (নাম, আইডি, কার্ড নম্বর...)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" autocomplete="off">
+          </div>
           <div id="member-list-cards" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
           <div id="member-list-placeholder" class="hidden p-6 text-center text-gray-500"></div>
         </div>
-      </div>
+      </div> 
 
-      <!-- Sidebar -->
+      <!-- Sidebar Column -->
       <div class="lg:col-span-1 space-y-6 lg:sticky lg:top-24 h-fit">
           <div class="bg-white p-5 rounded-xl shadow-lg space-y-4">
             <h3 class="text-xl font-bold text-gray-800 border-b pb-2">অ্যাডমিন প্যানেল</h3>
+            
+            <!-- Logo Edit -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">লোগো সম্পাদনা</label>
-              <input id="logo-url-input" type="url" placeholder="লোগো লিংক" class="w-full p-2 rounded-lg border text-sm focus:ring-pink-300">
-              <button id="save-logo-btn" class="mt-2 w-full bg-white text-pink-600 py-2 px-4 rounded-lg font-bold border border-pink-300 hover:bg-pink-100 text-sm flex justify-center items-center gap-2"><span>লোগো সেভ</span><div class="spinner-gray hidden"></div></button>
+              <input id="logo-url-input" type="url" placeholder="লোগো লিংক এখানে দিন" class="w-full p-2 rounded-lg text-gray-800 text-sm border border-gray-300 focus:ring-2 focus:ring-pink-300 focus:outline-none">
+              <button id="save-logo-btn" class="mt-2 w-full bg-white text-pink-600 py-2 px-4 rounded-lg font-bold hover:bg-pink-100 transition duration-200 text-sm flex-shrink-0 flex justify-center items-center gap-2 border border-pink-300">
+                <span>লোগো সেভ</span>
+                <div class="spinner-gray hidden"></div>
+              </button>
             </div>
+            
+            <!-- Lottery Button (Added) -->
             <div class="pt-2">
                <button id="open-lottery-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 px-4 rounded-xl font-bold hover:scale-105 transition shadow-md flex justify-center items-center gap-2"><span>🎲 লাকি লটারি</span></button>
             </div>
+
+            <!-- Logout -->
             <div class="pt-4 border-t">
-              <button id="logout-main-btn" class="w-full bg-red-700 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-800 text-sm">লগ আউট</button>
+              <button id="logout-main-btn" class="w-full bg-red-700 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-800 transition duration-200 text-sm">
+                লগ আউট
+              </button>
             </div>
           </div>
       </div>
     </main>
 
-    <!-- Status/Messages -->
-    <div id="sync-status" class="fixed bottom-4 right-4 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-xl opacity-0 transition-opacity z-50 flex items-center gap-2"><div id="sync-spinner" class="spinner-gray hidden"></div><span id="sync-text">সিঙ্ক হচ্ছে...</span></div>
-    <div id="message-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-[300] opacity-0 transition-opacity"><div id="message-content"></div></div>
+    <!-- Sync Status -->
+    <div id="sync-status" class="fixed bottom-4 right-4 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-xl transition-opacity duration-300 opacity-0 z-50">
+      <div class="flex items-center gap-2">
+          <div id="sync-spinner" class="spinner-gray hidden"></div>
+          <span id="sync-text">সিঙ্ক হচ্ছে...</span>
+      </div>
+    </div>
+    
+    <!-- Message Box -->
+    <div id="message-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-[300] transition-opacity duration-300 opacity-0">
+        <div id="message-content"></div>
+    </div>
   </div>
   
   <!-- Verify Email Modal -->
   <div id="verify-email-modal" class="hidden fixed inset-0 bg-gray-100 z-[150] justify-center items-center p-4">
     <div class="bg-white w-full max-w-md p-8 rounded-xl shadow-2xl text-center">
       <h2 class="text-2xl font-bold text-gray-800 mb-4">আপনার ইমেইল ভেরিফাই করুন</h2>
-      <p class="text-gray-600 mb-6">আমরা আপনার <strong id="user-email-info" class="text-indigo-600">...</strong> ঠিকানায় ভেরিফিকেশন লিঙ্ক পাঠিয়েছি।</p>
+      <p class="text-gray-600 mb-6">আমরা আপনার <strong id="user-email-info" class="text-indigo-600">...</strong> ঠিকানায় একটি ভেরিফিকেশন লিঙ্ক পাঠিয়েছি।</p>
       <div class="flex flex-col sm:flex-row gap-4">
-        <button id="resend-verification-btn" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold">লিঙ্কটি আবার পাঠান</button>
-        <button id="logout-btn" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-bold">লগ আউট</button>
+        <button id="resend-verification-btn" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200">লিঙ্কটি আবার পাঠান</button>
+        <button id="logout-btn" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition duration-200">লগ আউট</button>
       </div>
     </div>
   </div>
 
-  <!-- Auth Modal (LOGIN PAGE) -->
-  <div id="auth-modal" class="hidden fixed inset-0 bg-gradient-to-br from-slate-900 to-slate-800 z-[200] justify-center items-center p-4">
-      <div class="bg-white w-full max-w-sm p-6 sm:p-8 rounded-2xl shadow-2xl transform transition-all scale-100">
-          <div class="text-center mb-6">
-            <h2 class="text-3xl font-bold text-indigo-700">স্বাগতম</h2>
-            <p class="text-gray-500 text-sm">মেইন গেইট সমবায় সমিতি</p>
-          </div>
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-[200] justify-center items-center p-4 transition-opacity duration-300">
+      <div class="bg-white w-full max-w-sm p-6 sm:p-8 rounded-xl shadow-2xl transition-transform duration-300 transform scale-95">
           <div class="flex border-b mb-6">
-              <button id="login-tab" class="flex-1 py-2 text-center font-semibold border-b-2 tab-active transition-colors">প্রবেশ করুন</button>
-              <button id="register-tab" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-gray-500 transition-colors">নিবন্ধন করুন</button>
+              <button id="login-tab" class="flex-1 py-2 text-center font-semibold border-b-2 tab-active">প্রবেশ করুন</button>
+              <button id="register-tab" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-gray-500">নিবন্ধন করুন</button>
           </div>
           <div id="login-view">
             <form id="login-form" class="space-y-4">
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label><input type="email" id="login-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label><input type="password" id="login-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
+              <div><label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label><input type="email" id="login-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
+              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label><input type="password" id="login-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
               <p id="login-error" class="text-red-500 text-sm h-4"></p>
-              <button id="login-button" type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition shadow-lg flex justify-center items-center gap-2"><span>প্রবেশ করুন</span><div class="spinner hidden"></div></button>
+              <button id="login-button" type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-md disabled:opacity-50 flex justify-center items-center gap-2"><span>প্রবেশ করুন</span><div class="spinner hidden"></div></button>
             </form>
           </div>
           <div id="register-view" class="hidden">
             <form id="register-form" class="space-y-4">
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label><input type="email" id="register-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"></div>
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড (৬+ অক্ষর)</label><input type="password" id="register-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"></div>
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড নিশ্চিত করুন</label><input type="password" id="confirm-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"></div>
+              <div><label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label><input type="email" id="register-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
+              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label><input type="password" id="register-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
+              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড নিশ্চিত করুন</label><input type="password" id="confirm-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
               <p id="register-error" class="text-red-500 text-sm h-4"></p>
-              <button id="register-button" type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg flex justify-center items-center gap-2"><span>নিবন্ধন করুন</span><div class="spinner hidden"></div></button>
+              <button id="register-button" type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition duration-200 shadow-md disabled:opacity-50 flex justify-center items-center gap-2"><span>নিবন্ধন করুন</span><div class="spinner hidden"></div></button>
             </form>
           </div>
       </div>
@@ -183,46 +239,50 @@
   <!-- Profile Modal -->
   <div id="profile-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 justify-center items-center p-4">
     <div id="profile-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-7xl p-6 relative h-[90vh] flex flex-col">
-      <button id="close-profile" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+      <button id="close-profile" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold" title="বন্ধ করুন">&times;</button>
       <div id="profile-modal-content" class="flex flex-col h-full">
         <div class="flex flex-col items-center justify-center pt-2 pb-6 border-b">
-            <img id="profile-header-img" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-200 shadow-lg mb-3">
-            <h2 id="profile-header-name" class="text-3xl font-bold text-indigo-700 truncate"></h2>
+            <img id="profile-header-img" src="https://placehold.co/96x96/EFEFEF/AAAAAA?text=?" alt="সদস্যের ছবি" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-200 shadow-lg mb-3">
+            <h2 id="profile-header-name" class="text-3xl font-bold text-indigo-700 truncate">সদস্যের নাম</h2>
         </div>
         <div class="flex border-b border-gray-200 mb-6 flex-shrink-0">
-            <button id="profile-tab-details" class="profile-tab tab-active flex items-center justify-center gap-2 py-3 px-6 font-semibold"><span>👤</span> <span class="hidden sm:inline">সদস্য বিস্তারিত</span></button>
-            <button id="profile-tab-transactions" class="profile-tab text-gray-500 flex items-center justify-center gap-2 py-3 px-6 font-semibold"><span>🧾</span> <span class="hidden sm:inline">লেনদেন</span></button>
-            <button id="profile-tab-summary" class="profile-tab text-gray-500 flex items-center justify-center gap-2 py-3 px-6 font-semibold"><span>📈</span> <span class="hidden sm:inline">সার-সংক্ষেপ</span></button>
+            <button id="profile-tab-details" class="profile-tab tab-active flex items-center justify-center gap-2 py-3 px-6 font-semibold"><span class="hidden sm:inline">👤</span><span>সদস্য বিস্তারিত</span></button>
+            <button id="profile-tab-transactions" class="profile-tab text-gray-500 flex items-center justify-center gap-2 py-3 px-6 font-semibold"><span class="hidden sm:inline">🧾</span><span>লেনদেন</span></button>
+            <button id="profile-tab-summary" class="profile-tab text-gray-500 flex items-center justify-center gap-2 py-3 px-6 font-semibold"><span class="hidden sm:inline">📈</span><span>সার-সংক্ষেপ</span></button>
         </div>
         <div id="profile-content-container" class="overflow-y-auto flex-grow">
+            <!-- Details Panel -->
             <div id="profile-content-details">
                 <div class="flex justify-end space-x-2 mb-4">
-                    <button id="edit-profile-btn" class="bg-yellow-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-yellow-600">সম্পাদনা</button>
-                    <button id="save-profile-btn" class="hidden bg-green-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-600 flex gap-2"><span>সেভ</span><div id="save-profile-spinner" class="spinner hidden"></div></button>
-                    <button id="cancel-edit-btn" class="hidden bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600">বাতিল</button>
+                    <button id="edit-profile-btn" class="bg-yellow-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-yellow-600 transition flex items-center gap-2"><span>সম্পাদনা</span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>
+                    <button id="save-profile-btn" class="hidden bg-green-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-600 transition flex items-center gap-2"><span>সেভ</span><div id="save-profile-spinner" class="spinner hidden"></div></button>
+                    <button id="cancel-edit-btn" class="hidden bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600 transition">বাতিল</button>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-                    <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">নাম:</span><span id="profile-name-view" class="bg-gray-100 p-2 rounded"></span><input id="profile-name-edit" type="text" class="hidden border rounded-lg p-2"></p>
-                    <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">ইউজার আইডি:</span> <span id="profile-id" class="text-xs text-indigo-500 bg-gray-100 p-2 rounded"></span></p>
-                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">ছবির লিংক:</span><span id="profile-photo-url-view" class="bg-gray-100 p-2 rounded break-all"></span><input id="profile-photo-url-edit" type="url" class="hidden border rounded-lg p-2"></p>
-                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">এমপ্লয়ি আইডি:</span><span id="profile-employee-id-view" class="bg-gray-100 p-2 rounded"></span><input id="profile-employee-id-edit" type="text" class="hidden border rounded-lg p-2"></p>
-                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">কার্ড নম্বর:</span><span id="profile-card-number-view" class="bg-gray-100 p-2 rounded"></span><input id="profile-card-number-edit" type="text" class="hidden border rounded-lg p-2"></p>
-                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">ইমেইল:</span><span id="profile-email-view" class="bg-gray-100 p-2 rounded break-all"></span><input id="profile-email-edit" type="email" class="hidden border rounded-lg p-2"></p>
-                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">ফোন:</span><span id="profile-phone-view" class="bg-gray-100 p-2 rounded"></span><input id="profile-phone-edit" type="text" class="hidden border rounded-lg p-2"></p>
-                    <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">নোট:</span><span id="profile-notes-view" class="bg-gray-100 p-2 rounded min-h-[50px]"></span><textarea id="profile-notes-edit" rows="3" class="hidden border rounded-lg p-2"></textarea></p>
+                    <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">নাম:</span><span id="profile-name-view" class="text-gray-900 bg-gray-100 p-2 rounded"></span><input id="profile-name-edit" type="text" class="hidden border rounded-lg p-2"></p>
+                    <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">ইউজার আইডি:</span> <span id="profile-id" class="text-xs text-indigo-500 bg-gray-100 p-2 rounded select-all"></span></p>
+                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">ছবির লিংক:</span><span id="profile-photo-url-view" class="text-gray-900 bg-gray-100 p-2 rounded break-all"></span><input id="profile-photo-url-edit" type="url" class="hidden border rounded-lg p-2"></p>
+                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">এমপ্লয়ি আইডি:</span><span id="profile-employee-id-view" class="text-gray-900 bg-gray-100 p-2 rounded"></span><input id="profile-employee-id-edit" type="text" class="hidden border rounded-lg p-2"></p>
+                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">কার্ড নম্বর:</span><span id="profile-card-number-view" class="text-gray-900 bg-gray-100 p-2 rounded"></span><input id="profile-card-number-edit" type="text" class="hidden border rounded-lg p-2"></p>
+                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">ইমেইল:</span><span id="profile-email-view" class="text-gray-900 bg-gray-100 p-2 rounded break-all"></span><input id="profile-email-edit" type="email" class="hidden border rounded-lg p-2"></p>
+                    <p class="text-gray-600 flex flex-col"><span class="font-semibold text-gray-800 mb-1">ফোন:</span><span id="profile-phone-view" class="text-gray-900 bg-gray-100 p-2 rounded"></span><input id="profile-phone-edit" type="text" class="hidden border rounded-lg p-2"></p>
+                    <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">নোট:</span><span id="profile-notes-view" class="text-gray-900 bg-gray-100 p-2 rounded min-h-[50px] whitespace-pre-wrap"></span><textarea id="profile-notes-edit" rows="3" class="hidden border rounded-lg p-2"></textarea></p>
                 </div>
-                <div class="mt-8 pt-6 border-t text-center"><button id="delete-member-btn" class="bg-red-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-red-700 shadow-md">🗑️ সদস্য ডিলেট করুন</button></div>
+                <div class="mt-8 pt-6 border-t text-center"><button id="delete-member-btn" class="bg-red-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-red-700 transition duration-200 shadow-md">🗑️ সদস্য ডিলেট করুন</button></div>
             </div>
+            <!-- Transactions Panel -->
             <div id="profile-content-transactions" class="hidden h-full">
-                <div class="flex justify-end mb-4 gap-2"><button id="open-transaction-modal-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 flex items-center gap-2"><span>নতুন লেনদেন</span></button></div>
+                <div class="flex justify-end mb-4 gap-2"><button id="open-transaction-modal-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 transition flex items-center gap-2"><span>নতুন লেনদেন</span><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></button></div>
                 <div class="overflow-y-auto border rounded-lg shadow-inner h-full">
                     <table class="min-w-full bg-gray-50">
-                        <thead class="bg-indigo-100 sticky top-0"><tr><th class="py-2 px-4 text-left">তারিখ</th><th class="py-2 px-4 text-left">বিবরণ</th><th class="py-2 px-4 text-right">পরিমাণ</th><th class="py-2 px-4 text-center">অ্যাকশন</th></tr></thead>
+                        <thead class="bg-indigo-100 sticky top-0"><tr><th class="py-2 px-4 text-left text-xs font-medium text-gray-600 uppercase">তারিখ</th><th class="py-2 px-4 text-left text-xs font-medium text-gray-600 uppercase">বিবরণ</th><th class="py-2 px-4 text-right text-xs font-medium text-gray-600 uppercase">পরিমাণ (৳)</th><th class="py-2 px-4 text-center text-xs font-medium text-gray-600 uppercase">অ্যাকশন</th></tr></thead>
                         <tbody id="transactions-table-body" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
+            <!-- Summary Panel -->
             <div id="profile-content-summary" class="hidden">
+                 <h3 class="text-2xl font-semibold text-green-600 border-b pb-2 pt-4 mb-6">📈 সারসংক্ষেপ</h3>
                 <div class="grid grid-cols-2 gap-4 text-center py-4">
                     <div><p class="text-sm text-gray-500">মোট জমা</p><p id="paid-total" class="text-2xl font-bold text-green-600">৳ ০</p></div>
                     <div><p class="text-sm text-gray-500">মোট ঋণ গ্রহণ</p><p id="loan-taken" class="text-2xl font-bold text-blue-600">৳ ০</p></div>
@@ -235,7 +295,7 @@
     </div>
   </div>
 
-  <!-- Transaction Modal (UPDATED: CENTERED) -->
+  <!-- Transaction Modal (CENTERED & UPDATED) -->
   <div id="transaction-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-80 z-[60] flex justify-center items-center p-4">
     <div id="transaction-modal-box" class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative modal-exit m-auto">
         <button id="close-transaction-modal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-3xl font-bold transition">&times;</button>
@@ -273,7 +333,7 @@
   <!-- Fund Modal -->
   <div id="fund-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 justify-center items-start p-4 pt-16">
       <div id="fund-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 relative modal-exit">
-          <button id="close-fund-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+          <button id="close-fund-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold" title="বন্ধ করুন">&times;</button>
           <h3 class="text-2xl font-bold mb-6 text-center text-blue-600">মাসিক তহবিল ব্যবস্থাপনা</h3>
           <div id="fund-list-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2"></div>
       </div>
@@ -290,7 +350,7 @@
         </div>
   </div>
 
-  <!-- Lottery Modal (UPDATED) -->
+  <!-- Lottery Modal (Included) -->
   <div id="lottery-modal" class="hidden fixed inset-0 z-[100] flex flex-col bg-[#0f172a]">
     <canvas id="confetti"></canvas>
     <div class="absolute top-4 left-4 z-50"><button id="close-lottery-btn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg border border-slate-500"><span>⬅ ফিরে যান</span></button></div>
@@ -332,7 +392,6 @@
     const firebaseConfig = { apiKey: "AIzaSyBdfxO5LL9KfzJe-PhvaRbhDhz9G-QH1aE", authDomain: "sg-loan-online.firebaseapp.com", projectId: "sg-loan-online", storageBucket: "sg-loan-online.firebasestorage.app", messagingSenderId: "933667418231", appId: "1:933667418231:web:11c24150426bf869381672" };
 
     let app, db, auth;
-    // State Variables
     let members = [], fundDistribution = {}, notice = { text: '', imageUrl: '', linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [] };
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
 
@@ -349,8 +408,7 @@
     // --- UI RENDERING ---
     const renderHeaderLogo = () => { const img = document.getElementById('header-logo-img'); img.src = logoUrl || 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; img.onerror = () => img.src = 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; document.getElementById('logo-url-input').value = logoUrl || ''; };
     const renderImportantLinks = () => {
-        const c = document.getElementById('important-links-display');
-        if (importantLinks.length === 0) { c.innerHTML = ''; return; }
+        const c = document.getElementById('important-links-display'); if (importantLinks.length === 0) { c.innerHTML = ''; return; }
         c.innerHTML = `<h4 class="text-lg font-semibold text-gray-800 mb-2 not-prose">🔗 গুরুত্বপূর্ণ লিংকসমূহ</h4><div class="flex flex-wrap gap-2 not-prose">${importantLinks.map(l => `<a href="${l.url}" target="_blank" class="bg-indigo-100 text-indigo-700 text-sm font-medium px-3 py-1 rounded-full hover:bg-indigo-200 transition duration-200 flex items-center gap-2"><span>${l.name}</span><button class="delete-link-btn text-indigo-400 hover:text-indigo-600 font-bold" data-id="${l.id}">&times;</button></a>`).join('')}</div><hr class="my-4">`;
     };
     const renderNoticeBoard = () => {
@@ -361,12 +419,10 @@
         if (notice.linkUrl) d.innerHTML += `<a href="${notice.linkUrl}" target="_blank" class="inline-block bg-indigo-600 text-white font-bold py-2 px-5 rounded-lg mt-4 no-underline">${notice.linkText||'বিস্তারিত'}</a>`;
     };
     const renderUI = () => {
-        let td = 0, tlt = 0;
-        members.forEach(m => { const t = calculateMemberTotals(m); td += t.totalDeposit; tlt += t.totalLoanTaken; });
+        let td = 0, tlt = 0; members.forEach(m => { const t = calculateMemberTotals(m); td += t.totalDeposit; tlt += t.totalLoanTaken; });
         document.getElementById('total-members').textContent = getBengaliNumber(members.length);
         document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(td)}`;
         document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(tlt)}`;
-        
         const c = document.getElementById('member-list-cards'), p = document.getElementById('member-list-placeholder'); c.innerHTML = '';
         const fm = members.filter(m => { const q = searchQuery.toLowerCase(); return (m.name||'').toLowerCase().includes(q) || (m.id||'').includes(q) || (m.cardNumber||'').includes(q); });
         if (fm.length === 0) { p.classList.remove('hidden'); p.textContent = searchQuery ? 'কোনো সদস্য পাওয়া যায়নি।' : 'কোনো সদস্য নেই।'; }
@@ -384,14 +440,22 @@
         else if (activeMember) showProfile(activeMember.id, false);
     };
     
+    const toggleProfileEditMode = (isEditing) => {
+        document.querySelectorAll('#profile-content-details [id$="-view"]').forEach(el => el.classList.toggle('hidden', isEditing));
+        document.querySelectorAll('#profile-content-details [id$="-edit"]').forEach(el => el.classList.toggle('hidden', !isEditing));
+        document.getElementById('edit-profile-btn').classList.toggle('hidden', isEditing);
+        document.getElementById('save-profile-btn').classList.toggle('hidden', !isEditing);
+        document.getElementById('cancel-edit-btn').classList.toggle('hidden', !isEditing);
+    };
+
     const showProfile = (id, anim=true) => {
         const m = members.find(x => x.id === id); activeMember = m; if (!m) return;
+        toggleProfileEditMode(false);
         const t = calculateMemberTotals(m);
         document.getElementById('profile-header-img').src = m.photoUrl || `https://placehold.co/96x96/EFEFEF/AAAAAA?text=${m.name[0]}`;
         document.getElementById('profile-header-name').textContent = m.name;
         ['name','id','photo-url','employee-id','card-number','email','phone','notes'].forEach(k => {
-            const v = document.getElementById(`profile-${k}-view`);
-            const e = document.getElementById(`profile-${k}-edit`);
+            const v = document.getElementById(`profile-${k}-view`); const e = document.getElementById(`profile-${k}-edit`);
             const val = m[k.replace(/-/g,'')] || m[k==='photo-url'?'photoUrl':k==='employee-id'?'employeeId':k==='card-number'?'cardNumber':k] || 'N/A';
             if(v) v.textContent = val; if(e) e.value = val === 'N/A' ? '' : val;
         });
@@ -411,8 +475,26 @@
         document.getElementById('profile-modal').classList.add('flex');
         if (anim) { document.getElementById('profile-modal-box').classList.add('modal-enter-active'); }
     };
-
     const closeProfileModal = () => { document.getElementById('profile-modal').classList.add('hidden'); activeMember = null; };
+    
+    const openTransactionModal = (tid=null) => {
+        document.getElementById('transaction-form').reset();
+        document.getElementById('transaction-id').value = tid || '';
+        document.getElementById('transaction-date').valueAsDate = new Date();
+        document.getElementById('transaction-type').disabled = !!tid;
+        document.getElementById('transaction-modal-title').textContent = tid ? "লেনদেন সম্পাদনা" : "নতুন লেনদেন";
+        if(tid) {
+            const tx = activeMember.transactions.find(t=>t.id===tid);
+            if(tx) {
+                const f = document.getElementById('transaction-form');
+                f.id.value=tx.id; f.date.value=tx.date; f.type.value=tx.type; f.amount.value=tx.amount; f.description.value=tx.description||'';
+            }
+        }
+        document.getElementById('transaction-modal').classList.remove('hidden');
+        document.getElementById('transaction-modal').classList.add('flex');
+    };
+    const closeTransactionModal = () => document.getElementById('transaction-modal').classList.add('hidden');
+
     const renderFundModal = () => {
         const c = document.getElementById('fund-list-container');
         const md = {}; members.forEach(m => (m.transactions||[]).forEach(t => { if(t.type==='deposit') { const k = t.date.substring(0,7); md[k]=(md[k]||0)+Number(t.amount); } }));
@@ -423,7 +505,7 @@
             const max = Math.min(g, md[k]);
             return `<div class="p-4 border rounded-lg shadow-sm"><h4 class="text-lg font-semibold text-blue-700">${formatDate(k+'-01','monthYear')}</h4><p>মোট জমা: <b>৳ ${getBengaliNumber(md[k])}</b></p>
             ${r ? `<div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center gap-4"><img src="${r.photoUrl||`https://placehold.co/40x40?text=${r.name[0]}`}" class="w-12 h-12 rounded-full border-2 border-green-200"><div><p class="text-sm font-semibold text-green-700">✅ তহবিল প্রাপ্ত:</p><p class="text-lg font-bold">${r.name}</p><p class="text-md font-semibold text-green-600">৳ ${getBengaliNumber(dist.amount)}</p></div></div>` 
-            : `<form class="assign-fund-form mt-3 space-y-2" data-month="${k}"><p class="text-xs">সর্বোচ্চ ঋণযোগ্য: <b>৳ ${getBengaliNumber(max)}</b></p><select required class="w-full p-2 border rounded-lg bg-white"><option value="">সদস্য নির্বাচন</option>${members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select><input type="number" required class="w-full p-2 border rounded-lg" min="0" max="${max}" data-max="${max}"><button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">ঋণ প্রদান করুন</button></form>`}</div>`;
+            : `<form class="assign-fund-form mt-3 space-y-2" data-month="${k}"><p class="text-xs">সর্বোচ্চ ঋণযোগ্য: <b>৳ ${getBengaliNumber(max)}</b></p><p class="text-xs text-gray-500">(তহবিলে অবশিষ্ট: ৳ ${getBengaliNumber(g)})</p><select required class="w-full p-2 border rounded-lg bg-white"><option value="">সদস্য নির্বাচন</option>${members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select><input type="number" required class="w-full p-2 border rounded-lg" min="0" max="${max}" data-max="${max}"><button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">ঋণ প্রদান করুন</button></form>`}</div>`;
         }).join('');
     };
 
@@ -449,9 +531,12 @@
         const d = s.data(); if(!d) return;
         members = d.members || []; fundDistribution = d.fundDistribution || {}; logoUrl = d.logoUrl || ''; importantLinks = d.importantLinks || [];
         notice = typeof d.notice === 'string' ? {text: d.notice} : (d.notice || {});
+        
+        // Lottery Sync
         const dbLottery = d.lottery || { participants: [], history: [] };
         lottery.participants = dbLottery.participants || [];
         lottery.history = dbLottery.history || [];
+
         renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); 
         if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal();
         if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
@@ -472,200 +557,143 @@
     document.getElementById('resend-verification-btn').addEventListener('click', async () => { if(auth.currentUser) await sendEmailVerification(auth.currentUser); showMessage('পাঠানো হয়েছে।'); });
     
     document.getElementById('add-member-form').addEventListener('submit', async e => { e.preventDefault(); const n = document.getElementById('member-name').value, p = document.getElementById('member-phone').value; if(!n||!p) return showMessage('নাম ও ফোন আবশ্যক', 'error'); await updateData({ members: [...members, { id: 'M'+Date.now(), name: n, phone: p, transactions: [], photoUrl: document.getElementById('member-photo-url').value, employeeId: document.getElementById('member-employee-id').value, cardNumber: document.getElementById('member-card-number').value, email: document.getElementById('member-email').value, notes: '' }] }); e.target.reset(); showMessage('সদস্য যোগ হয়েছে'); });
+    document.getElementById('search-member-input').addEventListener('input', (e) => { searchQuery = e.target.value; renderUI(); });
 
-    // Global Clicks
     document.addEventListener('click', async e => {
         const t = e.target.closest('button, svg'); if (!t) return;
+        
+        // Profile Tabs
+        if (t.classList.contains('profile-tab')) {
+            document.querySelectorAll('.profile-tab').forEach(x=>x.classList.remove('tab-active', 'text-indigo-600')); t.classList.add('tab-active', 'text-indigo-600');
+            document.getElementById('profile-content-details').classList.toggle('hidden', t.id!=='profile-tab-details');
+            document.getElementById('profile-content-transactions').classList.toggle('hidden', t.id!=='profile-tab-transactions');
+            document.getElementById('profile-content-summary').classList.toggle('hidden', t.id!=='profile-tab-summary');
+        }
+
         if (t.id==='login-tab' || t.id==='register-tab') { document.getElementById('login-tab').classList.toggle('tab-active'); document.getElementById('register-tab').classList.toggle('tab-active'); document.getElementById('login-view').classList.toggle('hidden'); document.getElementById('register-view').classList.toggle('hidden'); }
         if (t.id==='save-logo-btn') await updateData({ logoUrl: document.getElementById('logo-url-input').value });
         if (t.id==='save-new-link-btn') { const n = document.getElementById('new-link-name').value, u = document.getElementById('new-link-url').value; if(n&&u) { await updateData({ importantLinks: [...importantLinks, {id:'L'+Date.now(), name:n, url:u}] }); document.getElementById('new-link-name').value=''; document.getElementById('new-link-url').value=''; showMessage('লিংক সেভ হয়েছে'); } }
         if (t.classList.contains('delete-link-btn')) { if(await showConfirmation('লিংক মুছবেন?')) await updateData({ importantLinks: importantLinks.filter(l => l.id !== t.dataset.id) }); }
+        
         if (t.classList.contains('view-profile-btn')) showProfile(t.dataset.id);
         if (t.id==='close-profile') closeProfileModal();
-        if (t.id==='edit-profile-btn') { document.querySelectorAll('[id$="-view"]').forEach(x=>x.classList.add('hidden')); document.querySelectorAll('[id$="-edit"]').forEach(x=>x.classList.remove('hidden')); t.classList.add('hidden'); document.getElementById('save-profile-btn').classList.remove('hidden'); document.getElementById('cancel-edit-btn').classList.remove('hidden'); }
-        if (t.id==='cancel-edit-btn') showProfile(activeMember.id, false);
+        if (t.id==='edit-profile-btn') toggleProfileEditMode(true);
+        if (t.id==='cancel-edit-btn') { showProfile(activeMember.id, false); toggleProfileEditMode(false); }
+        
         if (t.id==='save-profile-btn') { const u = { name: document.getElementById('profile-name-edit').value, phone: document.getElementById('profile-phone-edit').value, photoUrl: document.getElementById('profile-photo-url-edit').value, employeeId: document.getElementById('profile-employee-id-edit').value, cardNumber: document.getElementById('profile-card-number-edit').value, email: document.getElementById('profile-email-edit').value, notes: document.getElementById('profile-notes-edit').value }; const mm = JSON.parse(JSON.stringify(members)); Object.assign(mm.find(m=>m.id===activeMember.id), u); await updateData({ members: mm }); showMessage('আপডেট হয়েছে'); activeMember = mm.find(m=>m.id===activeMember.id); showProfile(activeMember.id, false); }
         if (t.id==='delete-member-btn') { if(await showConfirmation('সদস্য মুছবেন?')) { await updateData({ members: members.filter(m=>m.id!==activeMember.id) }); closeProfileModal(); showMessage('মুছে ফেলা হয়েছে'); } }
-        if (t.id==='open-transaction-modal-btn') { document.getElementById('transaction-form').reset(); document.getElementById('transaction-date').valueAsDate = new Date(); document.getElementById('transaction-modal').classList.remove('hidden'); }
-        if (t.id==='close-transaction-modal') document.getElementById('transaction-modal').classList.add('hidden');
-        if (t.classList.contains('edit-transaction-btn')) { const tx = activeMember.transactions.find(x=>x.id===t.dataset.tid); if(tx){ const f = document.getElementById('transaction-form'); f.id.value=tx.id; f.date.value=tx.date; f.type.value=tx.type; f.amount.value=tx.amount; f.description.value=tx.description||''; document.getElementById('transaction-modal').classList.remove('hidden'); } }
-        if (t.classList.contains('delete-transaction-btn')) { if(await showConfirmation('লেনদেন মুছবেন?')) { const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); m.transactions = m.transactions.filter(x=>x.id!==t.dataset.tid && x.linkedDepositId!==t.dataset.tid); await updateData({ members: mm }); showMessage('লেনদেন মুছে ফেলা হয়েছে'); showProfile(m.id, false); } }
-        if (t.id==='open-fund-modal-btn') { renderFundModal(); document.getElementById('fund-modal').classList.remove('hidden'); }
+        
+        if (t.id==='open-transaction-modal-btn') openTransactionModal();
+        if (t.id==='close-transaction-modal') closeTransactionModal();
+        if (t.classList.contains('edit-transaction-btn')) openTransactionModal(t.dataset.tid);
+        if (t.classList.contains('delete-transaction-btn')) { 
+             if(await showConfirmation('লেনদেন মুছবেন?')) { 
+                const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); 
+                m.transactions = m.transactions.filter(x => x.id !== t.dataset.tid && x.linkedDepositId !== t.dataset.tid); 
+                await updateData({ members: mm }); showMessage('লেনদেন মুছে ফেলা হয়েছে'); showProfile(m.id, false); 
+            } 
+        }
+
+        if (t.id==='open-fund-modal-btn') { renderFundModal(); document.getElementById('fund-modal').classList.remove('hidden'); document.getElementById('fund-modal').classList.add('flex'); }
         if (t.id==='close-fund-modal') document.getElementById('fund-modal').classList.add('hidden');
-        if (t.id==='edit-notice-btn') { document.getElementById('notice-display').classList.add('hidden'); t.classList.add('hidden'); document.getElementById('notice-edit').classList.remove('hidden'); document.getElementById('notice-textarea').value=notice.text||''; document.getElementById('notice-image-url').value=notice.imageUrl||''; document.getElementById('notice-link-text').value=notice.linkText||''; document.getElementById('notice-link-url').value=notice.linkUrl||''; }
+        
+        if (t.id==='edit-notice-btn') { document.getElementById('notice-display').classList.add('hidden'); t.classList.add('hidden'); document.getElementById('notice-edit').classList.remove('hidden'); document.getElementById('notice-textarea').value=notice.text||''; document.getElementById('notice-image-url').value=notice.imageUrl||''; document.getElementById('notice-link-text').value=notice.linkText||''; document.getElementById('notice-link-url').value=notice.linkUrl||''; document.getElementById('new-link-name').value=''; document.getElementById('new-link-url').value=''; }
         if (t.id==='cancel-notice-btn') { document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); }
         if (t.id==='save-notice-btn') { await updateData({ notice: { text: document.getElementById('notice-textarea').value, imageUrl: document.getElementById('notice-image-url').value, linkText: document.getElementById('notice-link-text').value, linkUrl: document.getElementById('notice-link-url').value } }); document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); showMessage('নোটিশ আপডেট হয়েছে'); }
         
-        // --- LOTTERY BUTTONS ---
+        // Lottery Triggers
         if (t.id === 'open-lottery-btn' || t.closest('#open-lottery-btn')) { document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
         if (t.id === 'close-lottery-btn' || t.closest('#close-lottery-btn')) { document.getElementById('lottery-modal').classList.add('hidden'); }
         if (t.id === 'lotteryClearListBtn') clearLotteryList();
         if (t.id === 'lotteryClearHistoryBtn') clearLotteryHistory();
     });
 
-    document.getElementById('transaction-form').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; const amt = Number(f.amount.value); if(amt<0) return; const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); const d = { date: f.date.value, type: f.type.value, amount: amt, description: f.description.value }; 
-        if(f.id.value) { const idx = m.transactions.findIndex(x=>x.id===f.id.value); m.transactions[idx] = { ...m.transactions[idx], ...d }; } 
-        else { const nid = 'T'+Date.now(); m.transactions.push({ id: nid, ...d }); if(d.type==='deposit') { const cur = calculateMemberTotals(m).currentLoan; if(cur>0) m.transactions.push({ id: 'T'+(Date.now()+1), date: d.date, type: 'loanRepayment', amount: Math.min(amt, cur), description: 'অটো', linkedDepositId: nid }); } }
-        await updateData({ members: mm }); document.getElementById('transaction-modal').classList.add('hidden'); showProfile(m.id, false); showMessage('লেনদেন সেভ হয়েছে'); 
-    });
-
-    document.getElementById('fund-list-container').addEventListener('submit', async e => { if(e.target.classList.contains('assign-fund-form')) { e.preventDefault(); const amt = Number(e.target.querySelector('input').value), rid = e.target.querySelector('select').value, mk = e.target.dataset.month; if(amt>Number(e.target.querySelector('input').dataset.max)) return showMessage('তহবিল সীমা অতিক্রম করেছে', 'error'); if(await showConfirmation('তহবিল প্রদান করবেন?')) { const mm = JSON.parse(JSON.stringify(members)); mm.find(m=>m.id===rid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: amt, description: 'তহবিল' }); await updateData({ members: mm, fundDistribution: { ...fundDistribution, [mk]: { receiverId: rid, amount: amt } } }); renderFundModal(); showMessage('প্রদান করা হয়েছে'); } } });
-
-
-    // =====================================================================================
-    // LOTTERY LOGIC
-    // =====================================================================================
-    let l_isAnimating = false;
-
-    function initLottery() { resizeCanvas(); renderLottery(); }
-    async function saveLotteryToFirebase() { try { await updateData({ lottery: lottery }); } catch (e) { console.error("Lottery save error", e); } }
-
-    function renderLottery() {
-        const listEl = document.getElementById("lotteryParticipants");
-        const countBadge = document.getElementById("lotteryCountBadge");
-        const historyEl = document.getElementById("lotteryHistory");
-        const l_participants = lottery.participants;
-        const l_history = lottery.history;
-
-        countBadge.textContent = l_participants.length;
-        listEl.innerHTML = "";
-        
-        if (l_participants.length === 0) {
-            listEl.innerHTML = `<li class="col-span-full text-center text-slate-500 italic py-10 text-lg">এখনো কোনো নাম যোগ করা হয়নি</li>`;
-        } else {
-            l_participants.forEach((name, index) => {
-                const li = document.createElement("li");
-                li.className = "group relative flex flex-col justify-center items-center bg-slate-800/80 border border-slate-700 p-4 rounded-xl transition-all duration-200 hover:border-slate-500 hover:shadow-lg hover:bg-slate-700/50 select-none";
-                li.innerHTML = `
-                    <span class="absolute top-2 left-2 text-xs text-slate-500 font-mono">#${index + 1}</span>
-                    <span class="font-semibold text-lg text-slate-200 truncate w-full text-center mt-2">${name}</span>
-                    <button class="lottery-delete-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-red-400 hover:bg-red-500/20 p-1.5 rounded-full transition-all" data-index="${index}" title="ডিলিট">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                    </button>
-                `;
-                listEl.appendChild(li);
-            });
-            document.querySelectorAll('.lottery-delete-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteParticipant(parseInt(btn.dataset.index)); }); });
-        }
-
-        historyEl.innerHTML = "";
-        if (l_history.length === 0) {
-            historyEl.innerHTML = `<li class="text-center text-slate-600 text-xs py-4">কোনো ইতিহাস নেই</li>`;
-        } else {
-            l_history.slice().reverse().forEach(h => {
-                const li = document.createElement("li");
-                li.className = "flex justify-between items-center bg-slate-900/50 p-3 rounded border-l-4 border-cyan-500 hover:bg-slate-800 transition-colors";
-                li.innerHTML = `<span class="text-cyan-400 font-medium text-base">${h.winner}</span><span class="text-slate-500 text-xs font-mono">${h.date}</span>`;
-                historyEl.appendChild(li);
-            });
-        }
-    }
-
-    document.getElementById("lotteryAddForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const input = document.getElementById("lotteryNameInput");
-        const name = input.value.trim();
-        if (!name) return;
-        lottery.participants.push(name);
-        input.value = "";
-        saveLotteryToFirebase();
-        renderLottery();
-        setTimeout(() => document.getElementById("lotteryParticipants").lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-    });
-
-    function deleteParticipant(index) { if (l_isAnimating) return; lottery.participants.splice(index, 1); saveLotteryToFirebase(); renderLottery(); }
-    function clearLotteryList() {
-        if (l_isAnimating) return;
-        if (lottery.participants.length === 0) return;
-        if (confirm("আপনি কি নিশ্চিত যে আপনি সব নাম মুছে ফেলতে চান?")) {
-            lottery.participants = []; saveLotteryToFirebase(); renderLottery(); document.getElementById("lotteryWinnerSection").classList.add('hidden');
-        }
-    }
-    function clearLotteryHistory() { if (confirm("ইতিহাস মুছে ফেলতে চান?")) { lottery.history = []; saveLotteryToFirebase(); renderLottery(); } }
-
-    document.getElementById("lotteryDrawBtn").addEventListener("click", () => {
-        const btn = document.getElementById("lotteryDrawBtn");
-        const listEl = document.getElementById("lotteryParticipants");
-        const winnerSection = document.getElementById("lotteryWinnerSection");
-        if (l_isAnimating) return;
-        if (lottery.participants.length < 2) { alert("লটারি করার জন্য অন্তত ২টি নাম প্রয়োজন!"); return; }
-
-        l_isAnimating = true;
-        winnerSection.classList.add('hidden');
-        btn.disabled = true; btn.textContent = "ড্র হচ্ছে... 🎲"; btn.classList.add('opacity-75', 'cursor-not-allowed');
-
-        const listItems = listEl.querySelectorAll("li");
-        let currentIndex = 0, cycles = 0;
-        const minCycles = 30, speed = 100;
-        
-        function animateHighlight() {
-            listItems.forEach(item => {
-                item.classList.remove('active-highlight', 'ring-2', 'ring-cyan-400', 'z-10');
-                item.classList.add('bg-slate-800/80');
-                const span = item.querySelector('.font-semibold'); if(span) span.classList.replace('text-black', 'text-slate-200');
-            });
-            const currentItem = listItems[currentIndex];
-            if(currentItem) {
-                currentItem.classList.remove('bg-slate-800/80');
-                currentItem.classList.add('active-highlight', 'ring-2', 'ring-cyan-400', 'z-10', 'rounded-xl');
-                const span = currentItem.querySelector('.font-semibold'); if(span) span.classList.replace('text-slate-200', 'text-black');
-                currentItem.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    document.getElementById('transaction-form').addEventListener('submit', async e => { 
+        e.preventDefault(); const f = e.target; const amt = Number(f.amount.value); if(amt<0) return; 
+        const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); 
+        const d = { date: f.date.value, type: f.type.value, amount: amt, description: f.description.value };
+        if(f.id.value) { 
+            const idx = m.transactions.findIndex(x=>x.id===f.id.value); 
+            const oldTx = m.transactions[idx]; m.transactions[idx] = { ...oldTx, ...d };
+            if(d.type==='deposit') {
+                const linkedIdx = m.transactions.findIndex(t=>t.linkedDepositId===f.id.value);
+                const cur = calculateMemberTotals({ transactions: m.transactions.filter(t=>t.id!==f.id.value && t.linkedDepositId!==f.id.value) }).currentLoan;
+                const rep = Math.min(amt, cur);
+                if(linkedIdx>-1) { if(rep>0) { m.transactions[linkedIdx].amount=rep; m.transactions[linkedIdx].date=d.date; } else m.transactions.splice(linkedIdx,1); }
+                else if(rep>0) m.transactions.push({ id:'T'+(Date.now()+1), date:d.date, type:'loanRepayment', amount:rep, description:'কিস্তি থেকে স্বয়ংক্রিয় পরিশোধ', linkedDepositId:f.id.value });
             }
-            currentIndex = (currentIndex + 1) % lottery.participants.length;
-            cycles++;
-            if (cycles < minCycles + Math.random() * 20) setTimeout(animateHighlight, Math.min(speed + (cycles * 2), 350));
-            else finishDraw((currentIndex - 1 + lottery.participants.length) % lottery.participants.length);
+        } 
+        else { 
+            const nid = 'T'+Date.now(); m.transactions.push({ id: nid, ...d }); 
+            if(d.type==='deposit') { const cur = calculateMemberTotals(m).currentLoan; if(cur>0) m.transactions.push({ id: 'T'+(Date.now()+1), date: d.date, type: 'loanRepayment', amount: Math.min(amt, cur), description: 'কিস্তি থেকে স্বয়ংক্রিয় পরিশোধ', linkedDepositId: nid }); } 
         }
-        animateHighlight();
+        await updateData({ members: mm }); closeTransactionModal(); showProfile(m.id, false); showMessage('লেনদেন সেভ হয়েছে'); 
     });
 
-    function finishDraw(winnerIndex) {
-        const winnerName = lottery.participants[winnerIndex];
-        const listItems = document.getElementById("lotteryParticipants").querySelectorAll("li");
-        const winnerCard = listItems[winnerIndex];
-        const winnerSection = document.getElementById("lotteryWinnerSection");
-        const btn = document.getElementById("lotteryDrawBtn");
+    document.getElementById('fund-list-container').addEventListener('submit', async e => { 
+        if(e.target.classList.contains('assign-fund-form')) { 
+            e.preventDefault(); const amt = Number(e.target.querySelector('input').value), rid = e.target.querySelector('select').value, mk = e.target.dataset.month; 
+            const globalFund = calculateAvailableFund();
+            if(amt > globalFund) return showMessage('তহবিলে পর্যাপ্ত টাকা নেই।', 'error');
+            if(await showConfirmation('তহবিল প্রদান করবেন?')) { 
+                const mm = JSON.parse(JSON.stringify(members)); mm.find(m=>m.id===rid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: amt, description: 'তহবিল' }); 
+                await updateData({ members: mm, fundDistribution: { ...fundDistribution, [mk]: { receiverId: rid, amount: amt } } }); renderFundModal(); showMessage('প্রদান করা হয়েছে'); 
+            } 
+        } 
+    });
 
-        winnerCard.classList.remove('active-highlight', 'bg-slate-800/80');
-        winnerCard.classList.add('winner-highlight');
-        const span = winnerCard.querySelector('.font-semibold');
-        if(span) { span.classList.remove('text-slate-200'); span.classList.add('text-black', 'font-bold'); }
-
-        document.getElementById("lotteryWinnerText").textContent = winnerName;
-        winnerSection.classList.remove('hidden');
-        winnerSection.classList.add('animate-bounce');
-        setTimeout(() => winnerSection.classList.remove('animate-bounce'), 1000);
-
-        const date = new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'});
-        lottery.history.push({ winner: winnerName, date: date });
-        saveLotteryToFirebase();
-        startConfetti();
-        l_isAnimating = false;
-        btn.disabled = false; btn.textContent = "ড্র শুরু করুন 🎲"; btn.classList.remove('opacity-75', 'cursor-not-allowed');
-    }
-
-    const canvas = document.getElementById("confetti");
-    const ctx = canvas.getContext("2d");
-    let confettiParticles = [];
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas);
-    function startConfetti() {
-        confettiParticles = [];
-        for (let i = 0; i < 200; i++) {
-            confettiParticles.push({ x: window.innerWidth/2, y: window.innerHeight/2, w: Math.random()*10+5, h: Math.random()*10+5, vx: (Math.random()-0.5)*30, vy: (Math.random()-0.5)*30, c: `hsl(${Math.random()*360}, 70%, 50%)`, g: 0.2+Math.random()*0.1 });
-        }
-        requestAnimationFrame(updateConfetti);
-    }
-    function updateConfetti() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let active = false;
-        confettiParticles.forEach(p => {
-            p.x += p.vx; p.y += p.vy; p.vy += p.g; p.vx *= 0.95;
-            ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.w, p.h);
-            if (p.y < canvas.height) active = true;
+    // --- LOTTERY LOGIC ---
+    let l_isAnimating = false;
+    function initLottery() { resizeCanvas(); renderLottery(); }
+    async function saveLotteryToFirebase() { try { await updateData({ lottery: lottery }); } catch (e) { showMessage("লটারি সেভ সমস্যা", "error"); } }
+    function renderLottery() {
+        const listEl = document.getElementById("lotteryParticipants"), countBadge = document.getElementById("lotteryCountBadge"), historyEl = document.getElementById("lotteryHistory");
+        const lp = lottery.participants, lh = lottery.history;
+        countBadge.textContent = lp.length; listEl.innerHTML = "";
+        if (lp.length === 0) listEl.innerHTML = `<li class="col-span-full text-center text-slate-500 italic py-10 text-lg">নাম নেই</li>`;
+        else lp.forEach((n, i) => {
+            const li = document.createElement("li"); li.className = "group relative flex flex-col justify-center items-center bg-slate-800/80 border border-slate-700 p-4 rounded-xl hover:border-slate-500 hover:bg-slate-700/50";
+            li.innerHTML = `<span class="absolute top-2 left-2 text-xs text-slate-500">#${i+1}</span><span class="font-semibold text-lg text-slate-200 truncate w-full text-center mt-2">${n}</span><button class="lottery-delete-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-red-400" data-index="${i}">✖</button>`;
+            listEl.appendChild(li);
         });
-        if (active) requestAnimationFrame(updateConfetti);
-        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.querySelectorAll('.lottery-delete-btn').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); deleteParticipant(parseInt(b.dataset.index)); }));
+        historyEl.innerHTML = "";
+        if (lh.length === 0) historyEl.innerHTML = `<li class="text-center text-slate-600 text-xs py-4">ইতিহাস নেই</li>`;
+        else lh.slice().reverse().forEach(h => { historyEl.innerHTML += `<li class="flex justify-between items-center bg-slate-900/50 p-3 rounded border-l-4 border-cyan-500"><span class="text-cyan-400 font-medium">${h.winner}</span><span class="text-slate-500 text-xs">${h.date}</span></li>`; });
+    }
+    document.getElementById("lotteryAddForm").addEventListener("submit", e => { e.preventDefault(); const i = document.getElementById("lotteryNameInput"), n = i.value.trim(); if(!n) return; lottery.participants.push(n); i.value=""; saveLotteryToFirebase(); renderLottery(); });
+    function deleteParticipant(i) { if(l_isAnimating) return; lottery.participants.splice(i, 1); saveLotteryToFirebase(); renderLottery(); }
+    function clearLotteryList() { if(l_isAnimating || lottery.participants.length===0) return; if(confirm("সব নাম মুছবেন?")) { lottery.participants=[]; saveLotteryToFirebase(); renderLottery(); document.getElementById("lotteryWinnerSection").classList.add('hidden'); } }
+    function clearLotteryHistory() { if(confirm("ইতিহাস মুছবেন?")) { lottery.history=[]; saveLotteryToFirebase(); renderLottery(); } }
+    document.getElementById("lotteryDrawBtn").addEventListener("click", () => {
+        if (l_isAnimating || lottery.participants.length < 2) return alert("কমপক্ষে ২টি নাম প্রয়োজন!");
+        l_isAnimating = true; document.getElementById("lotteryWinnerSection").classList.add('hidden');
+        const btn = document.getElementById("lotteryDrawBtn"); btn.disabled=true; btn.textContent="ড্র হচ্ছে...";
+        const items = document.getElementById("lotteryParticipants").querySelectorAll("li");
+        let cur = 0, cyc = 0;
+        function anim() {
+            items.forEach(i => i.classList.remove('active-highlight'));
+            items[cur].classList.add('active-highlight'); items[cur].scrollIntoView({block:'center', behavior:'smooth'});
+            cur = (cur+1)%lottery.participants.length; cyc++;
+            if (cyc < 30 + Math.random()*20) setTimeout(anim, Math.min(100+cyc*2, 350));
+            else finish((cur-1+lottery.participants.length)%lottery.participants.length);
+        } anim();
+    });
+    function finish(i) {
+        const w = lottery.participants[i], ws = document.getElementById("lotteryWinnerSection");
+        document.getElementById("lotteryWinnerText").textContent = w;
+        ws.classList.remove('hidden', 'animate-bounce'); void ws.offsetWidth; ws.classList.add('animate-bounce');
+        lottery.history.push({ winner: w, date: new Date().toLocaleDateString('bn-BD') }); saveLotteryToFirebase(); startConfetti();
+        l_isAnimating = false; document.getElementById("lotteryDrawBtn").disabled=false; document.getElementById("lotteryDrawBtn").textContent="ড্র শুরু করুন 🎲"; renderLottery();
+    }
+    const canvas = document.getElementById("confetti"), ctx = canvas.getContext("2d");
+    let parts = []; function resize() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+    window.addEventListener('resize', resize);
+    function startConfetti() { parts=[]; for(let i=0;i<200;i++) parts.push({x:window.innerWidth/2, y:window.innerHeight/2, vx:(Math.random()-.5)*30, vy:(Math.random()-.5)*30, c:`hsl(${Math.random()*360},70%,50%)`}); updateConfetti(); }
+    function updateConfetti() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        let act = false; parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.vx*=0.95; ctx.fillStyle=p.c; ctx.fillRect(p.x,p.y,8,8); if(p.y<canvas.height) act=true; });
+        if(act) requestAnimationFrame(updateConfetti); else ctx.clearRect(0,0,canvas.width,canvas.height);
     }
   </script>
 </body>
