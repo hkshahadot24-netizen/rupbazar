@@ -129,7 +129,7 @@
           </div>
         </div>
         
-        <!-- Monthly Lottery Banner (UPDATED) -->
+        <!-- Monthly Lottery Banner -->
         <div class="bg-[#0f172a] p-6 rounded-xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4 border border-slate-800 relative overflow-hidden group">
             <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
             <div class="flex items-center gap-4 z-10">
@@ -174,7 +174,8 @@
             </div>
           </div>
           <div class="p-4 border-b">
-              <input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন (নাম, আইডি, কার্ড নম্বর...)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" autocomplete="off">
+              <!-- Updated Search Placeholder -->
+              <input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন (নাম, মোবাইল, আইডি, কার্ড...)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" autocomplete="off">
           </div>
           <div id="member-list-cards" class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
           <div id="member-list-placeholder" class="hidden p-6 text-center text-gray-500"></div>
@@ -235,10 +236,10 @@
       </div>
   </div>
 
-  <!-- Admin Modal -->
+  <!-- Admin Modal (Fix: Ensure it can close) -->
   <div id="admin-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-[60] justify-center items-center p-4">
     <div id="admin-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 relative modal-exit">
-      <button id="close-admin-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+      <button id="close-admin-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer">&times;</button>
       <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">অ্যাডমিন প্যানেল</h3>
       
       <!-- Logo Edit -->
@@ -254,6 +255,16 @@
       <!-- Lottery Button -->
       <div class="mb-6">
          <button id="open-lottery-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 px-4 rounded-xl font-bold hover:scale-105 transition shadow-md flex justify-center items-center gap-2"><span>🎲 লাকি লটারি</span></button>
+      </div>
+
+      <!-- Change Password Section -->
+      <div class="mb-6 pt-4 border-t">
+          <label class="block text-sm font-medium text-gray-700 mb-1">অ্যাডমিন পাসওয়ার্ড পরিবর্তন</label>
+          <input id="new-admin-password" type="password" placeholder="নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)" class="w-full p-2 rounded-lg text-gray-800 text-sm border border-gray-300 focus:ring-2 focus:ring-indigo-300 focus:outline-none">
+          <button id="save-password-btn" class="mt-2 w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 text-sm flex justify-center items-center gap-2">
+            <span>পাসওয়ার্ড আপডেট</span>
+            <div class="spinner hidden"></div>
+          </button>
       </div>
 
       <!-- Logout -->
@@ -324,7 +335,7 @@
     </div>
   </div>
 
-  <!-- Transaction Modal (CENTERED & UPDATED) -->
+  <!-- Transaction Modal -->
   <div id="transaction-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-80 z-[60] flex justify-center items-center p-4">
     <div id="transaction-modal-box" class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative modal-exit m-auto">
         <button id="close-transaction-modal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-3xl font-bold transition">&times;</button>
@@ -379,7 +390,7 @@
         </div>
   </div>
 
-  <!-- Lottery Modal (Included) -->
+  <!-- Lottery Modal -->
   <div id="lottery-modal" class="hidden fixed inset-0 z-[100] flex flex-col bg-[#0f172a]">
     <canvas id="confetti"></canvas>
     <div class="absolute top-4 left-4 z-50"><button id="close-lottery-btn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg border border-slate-500"><span>⬅ ফিরে যান</span></button></div>
@@ -413,7 +424,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, sendEmailVerification, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
     setLogLevel('Debug');
@@ -425,6 +436,9 @@
     let app, db, auth;
     let members = [], fundDistribution = {}, notice = { text: '', imageUrl: '', linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
+    
+    // NEW STATE FOR FUND EDITING
+    let editingFundMonth = null;
     
     // Live Lottery Sync Variables
     let lastDrawTime = 0; 
@@ -460,7 +474,17 @@
         document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(td)}`;
         document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(tlt)}`;
         const c = document.getElementById('member-list-cards'), p = document.getElementById('member-list-placeholder'); c.innerHTML = '';
-        const fm = members.filter(m => { const q = searchQuery.toLowerCase(); return (m.name||'').toLowerCase().includes(q) || (m.id||'').includes(q) || (m.cardNumber||'').includes(q); });
+        
+        // --- UPDATED SEARCH LOGIC ---
+        const fm = members.filter(m => { 
+            const q = searchQuery.toLowerCase(); 
+            return (m.name||'').toLowerCase().includes(q) || 
+                   (m.id||'').toLowerCase().includes(q) || 
+                   (m.cardNumber||'').toLowerCase().includes(q) ||
+                   (m.phone||'').includes(q) ||
+                   (m.employeeId||'').toLowerCase().includes(q);
+        });
+        
         if (fm.length === 0) { p.classList.remove('hidden'); p.textContent = searchQuery ? 'কোনো সদস্য পাওয়া যায়নি।' : 'কোনো সদস্য নেই।'; }
         else {
             p.classList.add('hidden');
@@ -536,12 +560,81 @@
         const md = {}; members.forEach(m => (m.transactions||[]).forEach(t => { if(t.type==='deposit') { const k = t.date.substring(0,7); md[k]=(md[k]||0)+Number(t.amount); } }));
         const g = calculateAvailableFund();
         const keys = Object.keys(md).sort().reverse();
-        c.innerHTML = keys.length===0 ? '<div class="text-center text-gray-500">কোনো ডেটা নেই।</div>' : keys.map(k => {
-            const dist = fundDistribution[k]; const r = dist ? members.find(m=>m.id===dist.receiverId) : null;
+        
+        if (keys.length === 0) {
+            c.innerHTML = '<div class="text-center text-gray-500">কোনো ডেটা নেই।</div>';
+            return;
+        }
+
+        c.innerHTML = keys.map(k => {
+            const dist = fundDistribution[k]; 
+            const r = dist ? members.find(m=>m.id===dist.receiverId) : null;
             const max = Math.min(g, md[k]);
-            return `<div class="p-4 border rounded-lg shadow-sm"><h4 class="text-lg font-semibold text-blue-700">${formatDate(k+'-01','monthYear')}</h4><p>মোট জমা: <b>৳ ${getBengaliNumber(md[k])}</b></p>
-            ${r ? `<div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center gap-4"><img src="${r.photoUrl||`https://placehold.co/40x40?text=${r.name[0]}`}" class="w-12 h-12 rounded-full border-2 border-green-200"><div><p class="text-sm font-semibold text-green-700">✅ তহবিল প্রাপ্ত:</p><p class="text-lg font-bold">${r.name}</p><p class="text-md font-semibold text-green-600">৳ ${getBengaliNumber(dist.amount)}</p></div></div>` 
-            : `<form class="assign-fund-form mt-3 space-y-2" data-month="${k}"><p class="text-xs">সর্বোচ্চ ঋণযোগ্য: <b>৳ ${getBengaliNumber(max)}</b></p><p class="text-xs text-gray-500">(তহবিলে অবশিষ্ট: ৳ ${getBengaliNumber(g)})</p><select required class="w-full p-2 border rounded-lg bg-white"><option value="">সদস্য নির্বাচন</option>${members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select><input type="number" required class="w-full p-2 border rounded-lg" min="0" max="${max}" data-max="${max}"><button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">ঋণ প্রদান করুন</button></form>`}</div>`;
+            const isEditing = editingFundMonth === k;
+
+            let content = '';
+            
+            if (isEditing && dist) {
+                // EDIT MODE
+                content = `
+                    <div class="mt-3 p-3 border border-blue-200 rounded-lg bg-blue-50">
+                        <h5 class="text-sm font-bold text-blue-800 mb-2">তহবিল তথ্য সম্পাদনা করুন</h5>
+                        <form class="edit-fund-form space-y-3" data-month="${k}">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">প্রাপক</label>
+                                <select name="receiverId" required class="w-full p-2 border rounded-lg bg-white text-sm">
+                                    ${members.map(m => `<option value="${m.id}" ${m.id === dist.receiverId ? 'selected' : ''}>${m.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">পরিমাণ (৳)</label>
+                                <input type="number" name="amount" required class="w-full p-2 border rounded-lg text-sm" min="0" value="${dist.amount}">
+                            </div>
+                            <div class="flex gap-2 pt-1">
+                                <button type="submit" class="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700">সেভ করুন</button>
+                                <button type="button" class="cancel-fund-edit bg-gray-400 text-white px-3 py-1.5 rounded text-sm hover:bg-gray-500">বাতিল</button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            } else if (r) {
+                // DISPLAY MODE WITH EDIT BUTTON
+                content = `
+                    <div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center justify-between gap-2 group">
+                        <div class="flex items-center gap-4">
+                            <img src="${r.photoUrl||`https://placehold.co/40x40?text=${r.name[0]}`}" class="w-12 h-12 rounded-full border-2 border-green-200 object-cover">
+                            <div>
+                                <p class="text-sm font-semibold text-green-700">✅ তহবিল প্রাপ্ত:</p>
+                                <p class="text-lg font-bold">${r.name}</p>
+                                <p class="text-md font-semibold text-green-600">৳ ${getBengaliNumber(dist.amount)}</p>
+                            </div>
+                        </div>
+                        <button class="edit-fund-btn bg-white border border-gray-200 p-2 rounded-full shadow-sm hover:bg-gray-100 text-blue-600 transition opacity-0 group-hover:opacity-100 focus:opacity-100" data-month="${k}" title="সম্পাদনা করুন">
+                            ✏️
+                        </button>
+                    </div>
+                `;
+            } else {
+                // ASSIGN MODE
+                content = `
+                    <form class="assign-fund-form mt-3 space-y-2" data-month="${k}">
+                        <p class="text-xs">সর্বোচ্চ ঋণযোগ্য: <b>৳ ${getBengaliNumber(max)}</b></p>
+                        <p class="text-xs text-gray-500">(তহবিলে অবশিষ্ট: ৳ ${getBengaliNumber(g)})</p>
+                        <select required class="w-full p-2 border rounded-lg bg-white">
+                            <option value="">সদস্য নির্বাচন</option>
+                            ${members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}
+                        </select>
+                        <input type="number" required class="w-full p-2 border rounded-lg" min="0" max="${max}" data-max="${max}">
+                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">ঋণ প্রদান করুন</button>
+                    </form>
+                `;
+            }
+
+            return `<div class="p-4 border rounded-lg shadow-sm bg-white">
+                <h4 class="text-lg font-semibold text-blue-700">${formatDate(k+'-01','monthYear')}</h4>
+                <p class="text-sm">মোট জমা: <b>৳ ${getBengaliNumber(md[k])}</b></p>
+                ${content}
+            </div>`;
         }).join('');
     };
 
@@ -628,6 +721,43 @@
     document.getElementById('add-member-form').addEventListener('submit', async e => { e.preventDefault(); const n = document.getElementById('member-name').value, p = document.getElementById('member-phone').value; if(!n||!p) return showMessage('নাম ও ফোন আবশ্যক', 'error'); await updateData({ members: [...members, { id: 'M'+Date.now(), name: n, phone: p, transactions: [], photoUrl: document.getElementById('member-photo-url').value, employeeId: document.getElementById('member-employee-id').value, cardNumber: document.getElementById('member-card-number').value, email: document.getElementById('member-email').value, notes: '' }] }); e.target.reset(); showMessage('সদস্য যোগ হয়েছে'); });
     document.getElementById('search-member-input').addEventListener('input', (e) => { searchQuery = e.target.value; renderUI(); });
 
+    // ADMIN PASSWORD CHANGE LISTENER
+    document.getElementById('save-password-btn').addEventListener('click', async () => {
+        const newPass = document.getElementById('new-admin-password').value;
+        if (!newPass || newPass.length < 6) return showMessage('পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে', 'error');
+        
+        const btn = document.getElementById('save-password-btn');
+        const spin = btn.querySelector('.spinner');
+        const txt = btn.querySelector('span');
+        
+        txt.textContent = 'আপডেট হচ্ছে...';
+        spin.classList.remove('hidden');
+        btn.disabled = true;
+
+        try {
+            const user = auth.currentUser;
+            if (user) {
+                await updatePassword(user, newPass);
+                showMessage('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে। অনুগ্রহ করে আবার লগইন করুন।');
+                document.getElementById('new-admin-password').value = '';
+                setTimeout(() => signOut(auth), 2000); // Auto logout for security
+            } else {
+                showMessage('ব্যবহারকারী লগইন অবস্থায় নেই', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (error.code === 'auth/requires-recent-login') {
+                showMessage('সুরক্ষার জন্য অনুগ্রহ করে লগআউট করে আবার লগইন করুন, তারপর চেষ্টা করুন।', 'error');
+            } else {
+                showMessage('পাসওয়ার্ড পরিবর্তন ব্যর্থ: ' + error.message, 'error');
+            }
+        } finally {
+            txt.textContent = 'পাসওয়ার্ড আপডেট';
+            spin.classList.add('hidden');
+            btn.disabled = false;
+        }
+    });
+
     document.addEventListener('click', async e => {
         const t = e.target.closest('button, svg'); if (!t) return;
         
@@ -663,16 +793,24 @@
             } 
         }
 
-        if (t.id==='open-fund-modal-btn') { renderFundModal(); document.getElementById('fund-modal').classList.remove('hidden'); document.getElementById('fund-modal').classList.add('flex'); }
+        if (t.id==='open-fund-modal-btn') { editingFundMonth = null; renderFundModal(); document.getElementById('fund-modal').classList.remove('hidden'); document.getElementById('fund-modal').classList.add('flex'); }
         if (t.id==='close-fund-modal') document.getElementById('fund-modal').classList.add('hidden');
         
+        if (t.classList.contains('edit-fund-btn')) { editingFundMonth = t.dataset.month; renderFundModal(); }
+        if (t.classList.contains('cancel-fund-edit')) { editingFundMonth = null; renderFundModal(); }
+
         if (t.id==='edit-notice-btn') { document.getElementById('notice-display').classList.add('hidden'); t.classList.add('hidden'); document.getElementById('notice-edit').classList.remove('hidden'); document.getElementById('notice-textarea').value=notice.text||''; document.getElementById('notice-image-url').value=notice.imageUrl||''; document.getElementById('notice-link-text').value=notice.linkText||''; document.getElementById('notice-link-url').value=notice.linkUrl||''; document.getElementById('new-link-name').value=''; document.getElementById('new-link-url').value=''; }
         if (t.id==='cancel-notice-btn') { document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); }
         if (t.id==='save-notice-btn') { await updateData({ notice: { text: document.getElementById('notice-textarea').value, imageUrl: document.getElementById('notice-image-url').value, linkText: document.getElementById('notice-link-text').value, linkUrl: document.getElementById('notice-link-url').value } }); document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); showMessage('নোটিশ আপডেট হয়েছে'); }
         
         // Admin & Lottery Triggers
         if (t.id === 'open-admin-btn' || t.closest('#open-admin-btn')) { document.getElementById('admin-modal').classList.remove('hidden'); document.getElementById('admin-modal').classList.add('flex'); }
-        if (t.id === 'close-admin-modal') document.getElementById('admin-modal').classList.add('hidden');
+        
+        // FIXED ADMIN CLOSE LOGIC
+        if (t.id === 'close-admin-modal' || t.closest('#close-admin-modal')) { 
+            document.getElementById('admin-modal').classList.add('hidden'); 
+            document.getElementById('admin-modal').classList.remove('flex'); 
+        }
 
         if (t.id === 'open-lottery-btn' || t.closest('#open-lottery-btn')) { document.getElementById('admin-modal').classList.add('hidden'); document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
         // NEW LISTENER FOR MAIN PAGE LOTTERY BUTTON
@@ -706,15 +844,56 @@
     });
 
     document.getElementById('fund-list-container').addEventListener('submit', async e => { 
-        if(e.target.classList.contains('assign-fund-form')) { 
-            e.preventDefault(); const amt = Number(e.target.querySelector('input').value), rid = e.target.querySelector('select').value, mk = e.target.dataset.month; 
+        e.preventDefault();
+        const form = e.target;
+        
+        if(form.classList.contains('assign-fund-form')) { 
+            const amt = Number(form.querySelector('input').value), rid = form.querySelector('select').value, mk = form.dataset.month; 
             const globalFund = calculateAvailableFund();
             if(amt > globalFund) return showMessage('তহবিলে পর্যাপ্ত টাকা নেই।', 'error');
             if(await showConfirmation('তহবিল প্রদান করবেন?')) { 
-                const mm = JSON.parse(JSON.stringify(members)); mm.find(m=>m.id===rid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: amt, description: 'তহবিল' }); 
-                await updateData({ members: mm, fundDistribution: { ...fundDistribution, [mk]: { receiverId: rid, amount: amt } } }); renderFundModal(); showMessage('প্রদান করা হয়েছে'); 
+                const mm = JSON.parse(JSON.stringify(members)); 
+                mm.find(m=>m.id===rid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: amt, description: 'তহবিল' }); 
+                await updateData({ members: mm, fundDistribution: { ...fundDistribution, [mk]: { receiverId: rid, amount: amt } } }); 
+                renderFundModal(); 
+                showMessage('প্রদান করা হয়েছে'); 
             } 
-        } 
+        } else if (form.classList.contains('edit-fund-form')) {
+            const mk = form.dataset.month;
+            const newRid = form.receiverId.value;
+            const newAmt = Number(form.amount.value);
+            
+            const oldDist = fundDistribution[mk];
+            const mm = JSON.parse(JSON.stringify(members));
+            
+            // Logic to update transaction without breaking anything
+            // 1. Find old transaction
+            const oldReceiver = mm.find(m => m.id === oldDist.receiverId);
+            const txIndex = oldReceiver.transactions.findIndex(t => t.date === mk+'-01' && t.type === 'loanTaken' && t.amount === oldDist.amount); // Simple match
+            
+            if (txIndex === -1) {
+                // Fallback: Create new if missing (should generally not happen)
+                if (newRid === oldDist.receiverId) {
+                     mm.find(m=>m.id===newRid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: newAmt, description: 'তহবিল' });
+                }
+            } else {
+                if (newRid === oldDist.receiverId) {
+                    // Same person, just update amount
+                    oldReceiver.transactions[txIndex].amount = newAmt;
+                } else {
+                    // Person changed
+                    // Remove from old
+                    oldReceiver.transactions.splice(txIndex, 1);
+                    // Add to new
+                    mm.find(m=>m.id===newRid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: newAmt, description: 'তহবিল' });
+                }
+            }
+
+            await updateData({ members: mm, fundDistribution: { ...fundDistribution, [mk]: { receiverId: newRid, amount: newAmt } } });
+            editingFundMonth = null;
+            renderFundModal();
+            showMessage('তহবিল আপডেট হয়েছে');
+        }
     });
 
     // --- LOTTERY LOGIC ---
