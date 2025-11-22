@@ -49,6 +49,7 @@
     <header class="w-full bg-gradient-to-r from-pink-600 to-red-600 text-white p-3 shadow-lg sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-row justify-between items-center gap-4">
+          <!-- Logo & Title -->
           <div class="flex items-center gap-3">
             <img id="header-logo-img" src="https://placehold.co/48x48/FFFFFF/F87171?text=লোগো" alt="লোগো" class="w-12 h-12 rounded-full border-2 border-white object-cover bg-white">
             <div class="flex-grow">
@@ -59,15 +60,23 @@
               <p class="text-sm font-bold text-white mt-1">★ বিশ্বাস ★ মানবিকতা ★ উন্নয়ন ★</p>
             </div>
           </div>
+          
+          <!-- Admin Panel Button -->
+          <div>
+            <button id="open-admin-btn" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg backdrop-blur-sm transition flex items-center gap-2 border border-white/30 shadow-sm hover:shadow-md">
+                <span class="text-xl">⚙️</span> 
+                <span class="hidden sm:inline">অ্যাডমিন</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>
 
     <!-- Main Content Grid -->
-    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
       
-      <!-- Content Column -->
-      <div class="lg:col-span-3 space-y-6">
+      <!-- Content Column (Full Width Now) -->
+      <div class="w-full space-y-6">
         
         <!-- Notice Board -->
         <div class="bg-white p-6 rounded-xl shadow-lg prose max-w-none">
@@ -119,6 +128,25 @@
             <p id="total-loan-given" class="text-4xl font-bold text-red-600">৳ ০</p>
           </div>
         </div>
+        
+        <!-- Monthly Lottery Banner (UPDATED) -->
+        <div class="bg-[#0f172a] p-6 rounded-xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4 border border-slate-800 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+            <div class="flex items-center gap-4 z-10">
+                <div class="bg-slate-800 p-3 rounded-xl shadow-inner border border-slate-700">
+                    <span class="text-3xl">🎲</span>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-cyan-400">মাসিক লটারি</h3>
+                    <p class="text-slate-400 text-sm font-medium">ভাগ্য পরীক্ষা ও ফলাফল</p>
+                </div>
+            </div>
+            <div class="z-10 w-full sm:w-auto">
+                <button id="main-lottery-btn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-blue-600/30 transition transform hover:scale-105 active:scale-95 flex justify-center items-center gap-2">
+                    লটারি ড্র করুন
+                </button>
+            </div>
+        </div>
 
         <!-- Add Member Form -->
         <div class="bg-white p-6 rounded-xl shadow-lg">
@@ -148,39 +176,10 @@
           <div class="p-4 border-b">
               <input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন (নাম, আইডি, কার্ড নম্বর...)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" autocomplete="off">
           </div>
-          <div id="member-list-cards" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          <div id="member-list-cards" class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
           <div id="member-list-placeholder" class="hidden p-6 text-center text-gray-500"></div>
         </div>
       </div> 
-
-      <!-- Sidebar Column -->
-      <div class="lg:col-span-1 space-y-6 lg:sticky lg:top-24 h-fit">
-          <div class="bg-white p-5 rounded-xl shadow-lg space-y-4">
-            <h3 class="text-xl font-bold text-gray-800 border-b pb-2">অ্যাডমিন প্যানেল</h3>
-            
-            <!-- Logo Edit -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">লোগো সম্পাদনা</label>
-              <input id="logo-url-input" type="url" placeholder="লোগো লিংক এখানে দিন" class="w-full p-2 rounded-lg text-gray-800 text-sm border border-gray-300 focus:ring-2 focus:ring-pink-300 focus:outline-none">
-              <button id="save-logo-btn" class="mt-2 w-full bg-white text-pink-600 py-2 px-4 rounded-lg font-bold hover:bg-pink-100 transition duration-200 text-sm flex-shrink-0 flex justify-center items-center gap-2 border border-pink-300">
-                <span>লোগো সেভ</span>
-                <div class="spinner-gray hidden"></div>
-              </button>
-            </div>
-            
-            <!-- Lottery Button (Added) -->
-            <div class="pt-2">
-               <button id="open-lottery-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 px-4 rounded-xl font-bold hover:scale-105 transition shadow-md flex justify-center items-center gap-2"><span>🎲 লাকি লটারি</span></button>
-            </div>
-
-            <!-- Logout -->
-            <div class="pt-4 border-t">
-              <button id="logout-main-btn" class="w-full bg-red-700 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-800 transition duration-200 text-sm">
-                লগ আউট
-              </button>
-            </div>
-          </div>
-      </div>
     </main>
 
     <!-- Sync Status -->
@@ -234,6 +233,36 @@
             </form>
           </div>
       </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div id="admin-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-[60] justify-center items-center p-4">
+    <div id="admin-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 relative modal-exit">
+      <button id="close-admin-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+      <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">অ্যাডমিন প্যানেল</h3>
+      
+      <!-- Logo Edit -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">লোগো সম্পাদনা</label>
+        <input id="logo-url-input" type="url" placeholder="লোগো লিংক এখানে দিন" class="w-full p-2 rounded-lg text-gray-800 text-sm border border-gray-300 focus:ring-2 focus:ring-pink-300 focus:outline-none">
+        <button id="save-logo-btn" class="mt-2 w-full bg-white text-pink-600 py-2 px-4 rounded-lg font-bold hover:bg-pink-100 transition duration-200 text-sm flex-shrink-0 flex justify-center items-center gap-2 border border-pink-300">
+          <span>লোগো সেভ</span>
+          <div class="spinner-gray hidden"></div>
+        </button>
+      </div>
+      
+      <!-- Lottery Button -->
+      <div class="mb-6">
+         <button id="open-lottery-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 px-4 rounded-xl font-bold hover:scale-105 transition shadow-md flex justify-center items-center gap-2"><span>🎲 লাকি লটারি</span></button>
+      </div>
+
+      <!-- Logout -->
+      <div class="pt-4 border-t">
+        <button id="logout-main-btn" class="w-full bg-red-700 text-white py-2 px-4 rounded-lg font-bold hover:bg-red-800 transition duration-200 text-sm">
+          লগ আউট
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Profile Modal -->
@@ -641,8 +670,14 @@
         if (t.id==='cancel-notice-btn') { document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); }
         if (t.id==='save-notice-btn') { await updateData({ notice: { text: document.getElementById('notice-textarea').value, imageUrl: document.getElementById('notice-image-url').value, linkText: document.getElementById('notice-link-text').value, linkUrl: document.getElementById('notice-link-url').value } }); document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); showMessage('নোটিশ আপডেট হয়েছে'); }
         
-        // Lottery Triggers
-        if (t.id === 'open-lottery-btn' || t.closest('#open-lottery-btn')) { document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
+        // Admin & Lottery Triggers
+        if (t.id === 'open-admin-btn' || t.closest('#open-admin-btn')) { document.getElementById('admin-modal').classList.remove('hidden'); document.getElementById('admin-modal').classList.add('flex'); }
+        if (t.id === 'close-admin-modal') document.getElementById('admin-modal').classList.add('hidden');
+
+        if (t.id === 'open-lottery-btn' || t.closest('#open-lottery-btn')) { document.getElementById('admin-modal').classList.add('hidden'); document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
+        // NEW LISTENER FOR MAIN PAGE LOTTERY BUTTON
+        if (t.id === 'main-lottery-btn' || t.closest('#main-lottery-btn')) { document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
+
         if (t.id === 'close-lottery-btn' || t.closest('#close-lottery-btn')) { document.getElementById('lottery-modal').classList.add('hidden'); }
         if (t.id === 'lotteryClearListBtn') clearLotteryList();
         if (t.id === 'lotteryClearHistoryBtn') clearLotteryHistory();
@@ -815,5 +850,3 @@
   </script>
 </body>
 </html>
-
-
