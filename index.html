@@ -7,6 +7,8 @@
   <!-- Added typography plugin for better notice rendering -->
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
     /* ফন্ট আপডেট: 'Noto Sans Bengali' প্রধান ফন্ট */
@@ -113,7 +115,7 @@
           </div>
         </div>
 
-        <!-- Stats -->
+        <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
             <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট সদস্য</h3>
@@ -127,6 +129,25 @@
             <h3 class="text-lg font-semibold text-gray-500 mb-2">মোট ঋণ প্রদান</h3>
             <p id="total-loan-given" class="text-4xl font-bold text-red-600">৳ ০</p>
           </div>
+        </div>
+
+        <!-- CHARTS SECTION (NEW) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Financial Overview Chart -->
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg flex flex-col">
+                <h3 class="text-lg font-bold text-gray-700 mb-4 text-center border-b pb-2">আর্থিক সারসংক্ষেপ</h3>
+                <div class="flex-grow relative h-64 sm:h-80 w-full">
+                    <canvas id="financeChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Monthly Trend Chart -->
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg flex flex-col">
+                <h3 class="text-lg font-bold text-gray-700 mb-4 text-center border-b pb-2">মাসিক জমার হার</h3>
+                <div class="flex-grow relative h-64 sm:h-80 w-full">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
         </div>
         
         <!-- Monthly Lottery Banner -->
@@ -440,6 +461,10 @@
     // NEW STATE FOR FUND EDITING
     let editingFundMonth = null;
     
+    // CHARTS
+    let financeChartInstance = null;
+    let trendChartInstance = null;
+    
     // Live Lottery Sync Variables
     let lastDrawTime = 0; 
     let iAmTheDrawer = false;
@@ -455,6 +480,105 @@
     const calculateMemberTotals = (m) => { const t = { totalDeposit: 0, totalLoanTaken: 0, totalLoanRepaid: 0, currentLoan: 0 }; (m?.transactions || []).forEach(tx => { const a = Number(tx.amount)||0; if(tx.type==='deposit') t.totalDeposit+=a; else if(tx.type==='loanTaken') t.totalLoanTaken+=a; else if(tx.type==='loanRepayment') t.totalLoanRepaid+=a; }); t.currentLoan = t.totalLoanTaken - t.totalLoanRepaid; return t; };
     const calculateAvailableFund = () => { let td=0, tlt=0, tlr=0; members.forEach(m => { const t = calculateMemberTotals(m); td+=t.totalDeposit; tlt+=t.totalLoanTaken; tlr+=t.totalLoanRepaid; }); return td + tlr - tlt; };
 
+    // --- CHART RENDERING ---
+    const renderCharts = (td, tlt, tlr) => {
+        // 1. Finance Overview Bar Chart
+        const ctxFinance = document.getElementById('financeChart').getContext('2d');
+        if (financeChartInstance) financeChartInstance.destroy();
+        
+        financeChartInstance = new Chart(ctxFinance, {
+            type: 'bar',
+            data: {
+                labels: ['মোট জমা', 'ঋণ প্রদান', 'ঋণ ফেরত'],
+                datasets: [{
+                    label: 'পরিমাণ (টাকা)',
+                    data: [td, tlt, tlr],
+                    backgroundColor: [
+                        'rgba(22, 163, 74, 0.7)', // Green for Deposit
+                        'rgba(220, 38, 38, 0.7)', // Red for Loan Given
+                        'rgba(202, 138, 4, 0.7)'  // Yellow/Gold for Loan Repaid
+                    ],
+                    borderColor: [
+                        'rgb(22, 163, 74)',
+                        'rgb(220, 38, 38)',
+                        'rgb(202, 138, 4)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: { label: (c) => `৳ ${getBengaliNumber(c.raw)}` }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Monthly Trend Line Chart
+        const monthlyData = {};
+        members.forEach(m => {
+            (m.transactions || []).forEach(t => {
+                if (t.type === 'deposit') {
+                    const month = t.date.substring(0, 7); // YYYY-MM
+                    monthlyData[month] = (monthlyData[month] || 0) + Number(t.amount);
+                }
+            });
+        });
+        
+        const sortedMonths = Object.keys(monthlyData).sort();
+        // Optionally slice to show last 12 months if it gets too long
+        const displayMonths = sortedMonths; // .slice(-12); 
+
+        const labels = displayMonths.map(m => {
+            const d = new Date(m + '-01');
+            return d.toLocaleString('bn-BD', { month: 'short', year: 'numeric' });
+        });
+        const data = displayMonths.map(m => monthlyData[m]);
+
+        const ctxTrend = document.getElementById('trendChart').getContext('2d');
+        if (trendChartInstance) trendChartInstance.destroy();
+
+        trendChartInstance = new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'মাসিক জমা',
+                    data: data,
+                    borderColor: 'rgb(79, 70, 229)', // Indigo
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgb(79, 70, 229)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: { label: (c) => `৳ ${getBengaliNumber(c.raw)}` }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    };
+
     // --- UI RENDERING ---
     const renderHeaderLogo = () => { const img = document.getElementById('header-logo-img'); img.src = logoUrl || 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; img.onerror = () => img.src = 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; document.getElementById('logo-url-input').value = logoUrl || ''; };
     const renderImportantLinks = () => {
@@ -469,10 +593,21 @@
         if (notice.linkUrl) d.innerHTML += `<a href="${notice.linkUrl}" target="_blank" class="inline-block bg-indigo-600 text-white font-bold py-2 px-5 rounded-lg mt-4 no-underline">${notice.linkText||'বিস্তারিত'}</a>`;
     };
     const renderUI = () => {
-        let td = 0, tlt = 0; members.forEach(m => { const t = calculateMemberTotals(m); td += t.totalDeposit; tlt += t.totalLoanTaken; });
+        let td = 0, tlt = 0, tlr = 0; 
+        members.forEach(m => { 
+            const t = calculateMemberTotals(m); 
+            td += t.totalDeposit; 
+            tlt += t.totalLoanTaken; 
+            tlr += t.totalLoanRepaid; 
+        });
+        
         document.getElementById('total-members').textContent = getBengaliNumber(members.length);
         document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(td)}`;
         document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(tlt)}`;
+        
+        // RENDER CHARTS
+        renderCharts(td, tlt, tlr);
+
         const c = document.getElementById('member-list-cards'), p = document.getElementById('member-list-placeholder'); c.innerHTML = '';
         
         // --- UPDATED SEARCH LOGIC ---
