@@ -388,12 +388,19 @@
     import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
     setLogLevel('Debug');
-    const appId = 'default-samiti-app-id'; 
+    
+    // --- FIREBASE CONFIGURATION (Reverted to your specific project config) ---
+    const appId = 'default-samiti-app-id';
     const firebaseConfig = { apiKey: "AIzaSyBdfxO5LL9KfzJe-PhvaRbhDhz9G-QH1aE", authDomain: "sg-loan-online.firebaseapp.com", projectId: "sg-loan-online", storageBucket: "sg-loan-online.firebasestorage.app", messagingSenderId: "933667418231", appId: "1:933667418231:web:11c24150426bf869381672" };
 
     let app, db, auth;
-    let members = [], fundDistribution = {}, notice = { text: '', imageUrl: '', linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [] };
+    let members = [], fundDistribution = {}, notice = { text: '', imageUrl: '', linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
+    
+    // Live Lottery Sync Variables
+    let lastDrawTime = 0; 
+    let iAmTheDrawer = false;
+    let isFirstSnapshot = true;
 
     // --- UTILS ---
     const getBengaliNumber = (n) => { if (n == null || isNaN(n)) return "০"; return new Intl.NumberFormat('bn-BD', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n); };
@@ -510,7 +517,24 @@
     };
 
     // --- FIREBASE OPS ---
-    const initFirebase = () => { try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); } catch(e){ showMessage('ডাটাবেস সংযোগ ত্রুটি', 'error'); } };
+    const initFirebase = () => { 
+        try { 
+            app = initializeApp(firebaseConfig); 
+            db = getFirestore(app); 
+            auth = getAuth(app); 
+
+            // Initialize Auth State Listener HERE
+            onAuthStateChanged(auth, u => {
+                if (u && u.emailVerified) { document.getElementById('auth-modal').classList.add('hidden'); document.getElementById('verify-email-modal').classList.add('hidden'); document.getElementById('main-app-content').classList.remove('hidden'); listen(); }
+                else if (u) { document.getElementById('user-email-info').textContent = u.email; document.getElementById('verify-email-modal').classList.remove('hidden'); document.getElementById('verify-email-modal').classList.add('flex'); document.getElementById('main-app-content').classList.add('hidden'); }
+                else { document.getElementById('auth-modal').classList.remove('hidden'); document.getElementById('auth-modal').classList.add('flex'); document.getElementById('main-app-content').classList.add('hidden'); }
+            });
+
+        } catch(e) { 
+            console.error(e);
+            showMessage('ডাটাবেস সংযোগ বা কনফিগারেশন ত্রুটি: ' + e.message, 'error'); 
+        } 
+    };
     
     const updateData = async (d) => { 
         if (isSaving) return; isSaving = true; showSyncStatus("সিঙ্ক...", true); 
@@ -533,22 +557,38 @@
         notice = typeof d.notice === 'string' ? {text: d.notice} : (d.notice || {});
         
         // Lottery Sync
-        const dbLottery = d.lottery || { participants: [], history: [] };
+        const dbLottery = d.lottery || { participants: [], history: [], liveDraw: null };
         lottery.participants = dbLottery.participants || [];
         lottery.history = dbLottery.history || [];
+        
+        // LIVE DRAW SYNC LOGIC
+        if (dbLottery.liveDraw) {
+            if (isFirstSnapshot) {
+                // On first load, don't trigger animation for old draws, just sync state
+                lastDrawTime = dbLottery.liveDraw.ts;
+            } else if (dbLottery.liveDraw.ts > lastDrawTime) {
+                // New draw detected!
+                lastDrawTime = dbLottery.liveDraw.ts;
+                if (!l_isAnimating) {
+                   // Ensure modal is open if user is somewhere else? 
+                   // Option: Auto-open modal or show notification. For now, we animate if modal is open.
+                   // If modal is closed, user misses animation but sees result later.
+                   if (!document.getElementById('lottery-modal').classList.contains('hidden')) {
+                       startLiveLottery(dbLottery.liveDraw.winnerIndex);
+                   }
+                }
+            }
+        }
+        isFirstSnapshot = false;
 
         renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); 
         if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal();
         if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
     });
 
+    // Initialize the app
     initFirebase();
-    onAuthStateChanged(auth, u => {
-        if (u && u.emailVerified) { document.getElementById('auth-modal').classList.add('hidden'); document.getElementById('verify-email-modal').classList.add('hidden'); document.getElementById('main-app-content').classList.remove('hidden'); listen(); }
-        else if (u) { document.getElementById('user-email-info').textContent = u.email; document.getElementById('verify-email-modal').classList.remove('hidden'); document.getElementById('verify-email-modal').classList.add('flex'); document.getElementById('main-app-content').classList.add('hidden'); }
-        else { document.getElementById('auth-modal').classList.remove('hidden'); document.getElementById('auth-modal').classList.add('flex'); document.getElementById('main-app-content').classList.add('hidden'); }
-    });
-
+    
     // --- EVENT LISTENERS ---
     document.getElementById('login-form').addEventListener('submit', async e => { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); } catch(e){ document.getElementById('login-error').textContent='ভুল তথ্য।'; } });
     document.getElementById('register-form').addEventListener('submit', async e => { e.preventDefault(); const p = document.getElementById('register-password').value; if(p!==document.getElementById('confirm-password').value) return document.getElementById('register-error').textContent='পাসওয়ার্ড মিলছে না'; try { const c = await createUserWithEmailAndPassword(auth, document.getElementById('register-email').value, p); await sendEmailVerification(c.user); showMessage('ভেরিফিকেশন লিঙ্ক পাঠানো হয়েছে।'); } catch(e){ document.getElementById('register-error').textContent='নিবন্ধন ব্যর্থ।'; } });
@@ -646,6 +686,7 @@
     let l_isAnimating = false;
     function initLottery() { resizeCanvas(); renderLottery(); }
     async function saveLotteryToFirebase() { try { await updateData({ lottery: lottery }); } catch (e) { showMessage("লটারি সেভ সমস্যা", "error"); } }
+    
     function renderLottery() {
         const listEl = document.getElementById("lotteryParticipants"), countBadge = document.getElementById("lotteryCountBadge"), historyEl = document.getElementById("lotteryHistory");
         const lp = lottery.participants, lh = lottery.history;
@@ -661,35 +702,111 @@
         if (lh.length === 0) historyEl.innerHTML = `<li class="text-center text-slate-600 text-xs py-4">ইতিহাস নেই</li>`;
         else lh.slice().reverse().forEach(h => { historyEl.innerHTML += `<li class="flex justify-between items-center bg-slate-900/50 p-3 rounded border-l-4 border-cyan-500"><span class="text-cyan-400 font-medium">${h.winner}</span><span class="text-slate-500 text-xs">${h.date}</span></li>`; });
     }
+    
     document.getElementById("lotteryAddForm").addEventListener("submit", e => { e.preventDefault(); const i = document.getElementById("lotteryNameInput"), n = i.value.trim(); if(!n) return; lottery.participants.push(n); i.value=""; saveLotteryToFirebase(); renderLottery(); });
+    
     function deleteParticipant(i) { if(l_isAnimating) return; lottery.participants.splice(i, 1); saveLotteryToFirebase(); renderLottery(); }
+    
     function clearLotteryList() { if(l_isAnimating || lottery.participants.length===0) return; if(confirm("সব নাম মুছবেন?")) { lottery.participants=[]; saveLotteryToFirebase(); renderLottery(); document.getElementById("lotteryWinnerSection").classList.add('hidden'); } }
+    
     function clearLotteryHistory() { if(confirm("ইতিহাস মুছবেন?")) { lottery.history=[]; saveLotteryToFirebase(); renderLottery(); } }
-    document.getElementById("lotteryDrawBtn").addEventListener("click", () => {
+
+    // TRIGGER FOR LIVE LOTTERY
+    document.getElementById("lotteryDrawBtn").addEventListener("click", async () => {
         if (l_isAnimating || lottery.participants.length < 2) return alert("কমপক্ষে ২টি নাম প্রয়োজন!");
-        l_isAnimating = true; document.getElementById("lotteryWinnerSection").classList.add('hidden');
-        const btn = document.getElementById("lotteryDrawBtn"); btn.disabled=true; btn.textContent="ড্র হচ্ছে...";
+        
+        // 1. Determine winner locally (The Admin decides)
+        const winnerIndex = Math.floor(Math.random() * lottery.participants.length);
+        
+        // 2. Mark myself as the "drawer" so only I save the history to DB later
+        iAmTheDrawer = true;
+
+        // 3. Disable button immediately
+        const btn = document.getElementById("lotteryDrawBtn"); 
+        btn.disabled=true; 
+        btn.textContent="ড্র হচ্ছে...";
+
+        // 4. Update Firebase with the winner index and timestamp. 
+        // This triggers the 'onSnapshot' for everyone (including me).
+        try {
+            await updateData({ 
+                lottery: { 
+                    ...lottery, 
+                    liveDraw: { 
+                        winnerIndex: winnerIndex, 
+                        ts: Date.now() 
+                    } 
+                } 
+            });
+        } catch(e) {
+            console.error("Failed to start live draw", e);
+            btn.disabled=false;
+            btn.textContent="ড্র শুরু করুন 🎲";
+            iAmTheDrawer = false;
+        }
+    });
+
+    // START ANIMATION (Called by onSnapshot)
+    function startLiveLottery(winnerIndex) {
+        l_isAnimating = true; 
+        document.getElementById("lotteryWinnerSection").classList.add('hidden');
+        const btn = document.getElementById("lotteryDrawBtn"); 
+        btn.disabled=true; 
+        btn.textContent="ড্র হচ্ছে...";
+        
         const items = document.getElementById("lotteryParticipants").querySelectorAll("li");
         let cur = 0, cyc = 0;
+        
         function anim() {
             items.forEach(i => i.classList.remove('active-highlight'));
-            items[cur].classList.add('active-highlight'); items[cur].scrollIntoView({block:'center', behavior:'smooth'});
-            cur = (cur+1)%lottery.participants.length; cyc++;
-            if (cyc < 30 + Math.random()*20) setTimeout(anim, Math.min(100+cyc*2, 350));
-            else finish((cur-1+lottery.participants.length)%lottery.participants.length);
-        } anim();
-    });
-    function finish(i) {
-        const w = lottery.participants[i], ws = document.getElementById("lotteryWinnerSection");
-        document.getElementById("lotteryWinnerText").textContent = w;
-        ws.classList.remove('hidden', 'animate-bounce'); void ws.offsetWidth; ws.classList.add('animate-bounce');
-        lottery.history.push({ winner: w, date: new Date().toLocaleDateString('bn-BD') }); saveLotteryToFirebase(); startConfetti();
-        l_isAnimating = false; document.getElementById("lotteryDrawBtn").disabled=false; document.getElementById("lotteryDrawBtn").textContent="ড্র শুরু করুন 🎲"; renderLottery();
+            if(items[cur]) {
+                items[cur].classList.add('active-highlight'); 
+                items[cur].scrollIntoView({block:'center', behavior:'smooth'});
+            }
+            
+            cur = (cur+1) % lottery.participants.length; 
+            cyc++;
+            
+            // Animation Duration Logic
+            if (cyc < 30 + Math.random()*10) { 
+                setTimeout(anim, Math.min(100+cyc*2, 350));
+            } else {
+                finish(winnerIndex); // Pass the predetermined winner index
+            }
+        } 
+        anim();
     }
+
+    function finish(i) {
+        const w = lottery.participants[i];
+        const ws = document.getElementById("lotteryWinnerSection");
+        
+        document.getElementById("lotteryWinnerText").textContent = w;
+        ws.classList.remove('hidden', 'animate-bounce'); 
+        void ws.offsetWidth; 
+        ws.classList.add('animate-bounce');
+        
+        // ONLY the person who clicked "Draw" saves the history to DB to avoid duplicates
+        if (iAmTheDrawer) {
+             lottery.history.push({ winner: w, date: new Date().toLocaleDateString('bn-BD') }); 
+             saveLotteryToFirebase();
+             iAmTheDrawer = false; 
+        }
+
+        startConfetti();
+        l_isAnimating = false; 
+        document.getElementById("lotteryDrawBtn").disabled=false; 
+        document.getElementById("lotteryDrawBtn").textContent="ড্র শুরু করুন 🎲"; 
+        renderLottery();
+    }
+
     const canvas = document.getElementById("confetti"), ctx = canvas.getContext("2d");
-    let parts = []; function resize() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
-    window.addEventListener('resize', resize);
+    let parts = []; 
+    function resizeCanvas() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    
     function startConfetti() { parts=[]; for(let i=0;i<200;i++) parts.push({x:window.innerWidth/2, y:window.innerHeight/2, vx:(Math.random()-.5)*30, vy:(Math.random()-.5)*30, c:`hsl(${Math.random()*360},70%,50%)`}); updateConfetti(); }
+    
     function updateConfetti() {
         ctx.clearRect(0,0,canvas.width,canvas.height);
         let act = false; parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.vx*=0.95; ctx.fillStyle=p.c; ctx.fillRect(p.x,p.y,8,8); if(p.y<canvas.height) act=true; });
@@ -698,3 +815,5 @@
   </script>
 </body>
 </html>
+
+
