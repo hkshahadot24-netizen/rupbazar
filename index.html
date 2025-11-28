@@ -40,6 +40,9 @@
     .lottery-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
     #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
     .active-highlight { background-color: #06b6d4; color: black; font-weight: bold; transform: scale(1.05); box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
+    
+    /* Slideshow Transition */
+    .slide-fade { transition: opacity 1s ease-in-out; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -87,9 +90,15 @@
               <button id="edit-notice-btn" class="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm">সম্পাদনা</button>
           </div>
           <div id="notice-display" class="text-gray-700"></div>
+          
+          <!-- UPDATED NOTICE EDIT FORM -->
           <div id="notice-edit" class="hidden space-y-3 not-prose">
               <textarea id="notice-textarea" rows="4" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="নোটিশ লিখুন..."></textarea>
-              <input id="notice-image-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="ছবির লিংক (ঐচ্ছিক)">
+              
+              <!-- Changed to Textarea for multiple images -->
+              <label class="block text-sm font-medium text-gray-700 mt-2">স্লাইডশো ইমেজ লিংক (প্রতি লাইনে একটি করে লিংক দিন)</label>
+              <textarea id="notice-image-urls" rows="3" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"></textarea>
+              
               <input id="notice-link-text" type="text" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="লিংকের নাম (যেমন: 'বিস্তারিত দেখুন')">
               <input id="notice-link-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="সম্পূর্ণ লিংক (https://...)">
 
@@ -455,11 +464,12 @@
     const firebaseConfig = { apiKey: "AIzaSyBdfxO5LL9KfzJe-PhvaRbhDhz9G-QH1aE", authDomain: "sg-loan-online.firebaseapp.com", projectId: "sg-loan-online", storageBucket: "sg-loan-online.firebasestorage.app", messagingSenderId: "933667418231", appId: "1:933667418231:web:11c24150426bf869381672" };
 
     let app, db, auth;
-    let members = [], fundDistribution = {}, notice = { text: '', imageUrl: '', linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
+    let members = [], fundDistribution = {}, notice = { text: '', imageUrls: [], linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
     
     // NEW STATE FOR FUND EDITING
     let editingFundMonth = null;
+    let noticeSlideInterval = null; // Variable for slideshow interval
     
     // CHARTS
     let financeChartInstance = null;
@@ -535,8 +545,7 @@
         });
         
         const sortedMonths = Object.keys(monthlyData).sort();
-        // Optionally slice to show last 12 months if it gets too long
-        const displayMonths = sortedMonths; // .slice(-12); 
+        const displayMonths = sortedMonths; 
 
         const labels = displayMonths.map(m => {
             const d = new Date(m + '-01');
@@ -585,13 +594,73 @@
         const c = document.getElementById('important-links-display'); if (importantLinks.length === 0) { c.innerHTML = ''; return; }
         c.innerHTML = `<h4 class="text-lg font-semibold text-gray-800 mb-2 not-prose">🔗 গুরুত্বপূর্ণ লিংকসমূহ</h4><div class="flex flex-wrap gap-2 not-prose">${importantLinks.map(l => `<a href="${l.url}" target="_blank" class="bg-indigo-100 text-indigo-700 text-sm font-medium px-3 py-1 rounded-full hover:bg-indigo-200 transition duration-200 flex items-center gap-2"><span>${l.name}</span><button class="delete-link-btn text-indigo-400 hover:text-indigo-600 font-bold" data-id="${l.id}">&times;</button></a>`).join('')}</div><hr class="my-4">`;
     };
+    
+    // MODIFIED RENDER NOTICE BOARD FUNCTION FOR SLIDESHOW
     const renderNoticeBoard = () => {
         const d = document.getElementById('notice-display'); d.innerHTML = '';
-        if (!notice.text && !notice.imageUrl && !notice.linkUrl) { d.innerHTML = '<p class="text-gray-500">আপাতত কোনো নতুন নোটিশ নেই।</p>'; return; }
-        if (notice.imageUrl) d.innerHTML += `<img src="${notice.imageUrl}" class="max-w-full h-auto rounded-lg mb-4 mx-auto" onerror="this.style.display='none'">`;
+        if (noticeSlideInterval) clearInterval(noticeSlideInterval);
+
+        // Normalize images: legacy `imageUrl` or new `imageUrls`
+        let images = [];
+        if (Array.isArray(notice.imageUrls)) {
+            images = notice.imageUrls.filter(u => u.trim() !== '');
+        } else if (notice.imageUrl) {
+            images = [notice.imageUrl];
+        }
+
+        if (images.length === 0 && !notice.text && !notice.linkUrl) {
+            d.innerHTML = '<p class="text-gray-500">আপাতত কোনো নতুন নোটিশ নেই।</p>'; return;
+        }
+
+        // Render Images (Single or Slideshow)
+        if (images.length > 0) {
+            if (images.length === 1) {
+                // Single Image
+                d.innerHTML += `<img src="${images[0]}" class="w-full h-auto rounded-lg mb-4 mx-auto shadow-sm" onerror="this.style.display='none'">`;
+            } else {
+                // Slideshow
+                let slidesHtml = images.map((url, i) =>
+                    `<img src="${url}" class="notice-slide absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${i === 0 ? 'opacity-100' : 'opacity-0'}" onerror="this.style.display='none'">`
+                ).join('');
+
+                // Render Container
+                d.innerHTML += `
+                    <div class="relative w-full h-64 sm:h-80 md:h-96 bg-gray-100 rounded-lg overflow-hidden mb-4 shadow-sm border border-gray-200">
+                        ${slidesHtml}
+                        <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-2 z-10 pointer-events-none">
+                            ${images.map((_, i) => `<div class="w-2 h-2 rounded-full bg-white/60 ${i===0?'bg-white scale-125':''} shadow transition-all dot-indicator" data-index="${i}"></div>`).join('')}
+                        </div>
+                    </div>
+                `;
+
+                // Logic
+                let currentSlide = 0;
+                noticeSlideInterval = setInterval(() => {
+                    const slides = document.querySelectorAll('.notice-slide');
+                    const dots = document.querySelectorAll('.dot-indicator');
+                    if (slides.length === 0) return;
+
+                    // Hide current
+                    slides[currentSlide].classList.remove('opacity-100');
+                    slides[currentSlide].classList.add('opacity-0');
+                    if(dots[currentSlide]) dots[currentSlide].classList.remove('bg-white', 'scale-125');
+
+                    // Next
+                    currentSlide = (currentSlide + 1) % slides.length;
+
+                    // Show next
+                    slides[currentSlide].classList.remove('opacity-0');
+                    slides[currentSlide].classList.add('opacity-100');
+                    if(dots[currentSlide]) dots[currentSlide].classList.add('bg-white', 'scale-125');
+
+                }, 4000); // 4 seconds
+            }
+        }
+
         if (notice.text) d.innerHTML += `<div>${notice.text.split('\n').map(l => `<p>${l}</p>`).join('')}</div>`;
-        if (notice.linkUrl) d.innerHTML += `<a href="${notice.linkUrl}" target="_blank" class="inline-block bg-indigo-600 text-white font-bold py-2 px-5 rounded-lg mt-4 no-underline">${notice.linkText||'বিস্তারিত'}</a>`;
+        if (notice.linkUrl) d.innerHTML += `<a href="${notice.linkUrl}" target="_blank" class="inline-block bg-indigo-600 text-white font-bold py-2 px-5 rounded-lg mt-4 no-underline hover:bg-indigo-700 transition">${notice.linkText||'বিস্তারিত'}</a>`;
     };
+
     const renderUI = () => {
         let td = 0, tlt = 0, tlr = 0; 
         members.forEach(m => { 
@@ -710,7 +779,6 @@
             let content = '';
             
             if (isEditing && dist) {
-                // EDIT MODE
                 content = `
                     <div class="mt-3 p-3 border border-blue-200 rounded-lg bg-blue-50">
                         <h5 class="text-sm font-bold text-blue-800 mb-2">তহবিল তথ্য সম্পাদনা করুন</h5>
@@ -733,7 +801,6 @@
                     </div>
                 `;
             } else if (r) {
-                // DISPLAY MODE WITH EDIT BUTTON
                 content = `
                     <div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center justify-between gap-2 group">
                         <div class="flex items-center gap-4">
@@ -750,7 +817,6 @@
                     </div>
                 `;
             } else {
-                // ASSIGN MODE
                 content = `
                     <form class="assign-fund-form mt-3 space-y-2" data-month="${k}">
                         <p class="text-xs">সর্বোচ্চ ঋণযোগ্য: <b>৳ ${getBengaliNumber(max)}</b></p>
@@ -811,25 +877,35 @@
     const listen = () => onSnapshot(doc(db, 'artifacts', appId, 'public-data', 'main'), s => {
         const d = s.data(); if(!d) return;
         members = d.members || []; fundDistribution = d.fundDistribution || {}; logoUrl = d.logoUrl || ''; importantLinks = d.importantLinks || [];
-        notice = typeof d.notice === 'string' ? {text: d.notice} : (d.notice || {});
+        
+        // Handle Legacy Notice Structure vs New Structure
+        if (d.notice) {
+             if (typeof d.notice === 'string') {
+                 notice = { text: d.notice, imageUrls: [], linkText: '', linkUrl: '' };
+             } else {
+                 notice = d.notice;
+                 // Ensure imageUrls exists if only imageUrl was present
+                 if (!notice.imageUrls && notice.imageUrl) {
+                     notice.imageUrls = [notice.imageUrl];
+                 } else if (!notice.imageUrls) {
+                     notice.imageUrls = [];
+                 }
+             }
+        } else {
+            notice = { text: '', imageUrls: [], linkText: '', linkUrl: '' };
+        }
         
         // Lottery Sync
         const dbLottery = d.lottery || { participants: [], history: [], liveDraw: null };
         lottery.participants = dbLottery.participants || [];
         lottery.history = dbLottery.history || [];
         
-        // LIVE DRAW SYNC LOGIC
         if (dbLottery.liveDraw) {
             if (isFirstSnapshot) {
-                // On first load, don't trigger animation for old draws, just sync state
                 lastDrawTime = dbLottery.liveDraw.ts;
             } else if (dbLottery.liveDraw.ts > lastDrawTime) {
-                // New draw detected!
                 lastDrawTime = dbLottery.liveDraw.ts;
                 if (!l_isAnimating) {
-                   // Ensure modal is open if user is somewhere else? 
-                   // Option: Auto-open modal or show notification. For now, we animate if modal is open.
-                   // If modal is closed, user misses animation but sees result later.
                    if (!document.getElementById('lottery-modal').classList.contains('hidden')) {
                        startLiveLottery(dbLottery.liveDraw.winnerIndex);
                    }
@@ -934,21 +1010,57 @@
         if (t.classList.contains('edit-fund-btn')) { editingFundMonth = t.dataset.month; renderFundModal(); }
         if (t.classList.contains('cancel-fund-edit')) { editingFundMonth = null; renderFundModal(); }
 
-        if (t.id==='edit-notice-btn') { document.getElementById('notice-display').classList.add('hidden'); t.classList.add('hidden'); document.getElementById('notice-edit').classList.remove('hidden'); document.getElementById('notice-textarea').value=notice.text||''; document.getElementById('notice-image-url').value=notice.imageUrl||''; document.getElementById('notice-link-text').value=notice.linkText||''; document.getElementById('notice-link-url').value=notice.linkUrl||''; document.getElementById('new-link-name').value=''; document.getElementById('new-link-url').value=''; }
-        if (t.id==='cancel-notice-btn') { document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); }
-        if (t.id==='save-notice-btn') { await updateData({ notice: { text: document.getElementById('notice-textarea').value, imageUrl: document.getElementById('notice-image-url').value, linkText: document.getElementById('notice-link-text').value, linkUrl: document.getElementById('notice-link-url').value } }); document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); showMessage('নোটিশ আপডেট হয়েছে'); }
+        // --- UPDATED NOTICE LISTENERS ---
+        if (t.id==='edit-notice-btn') { 
+            document.getElementById('notice-display').classList.add('hidden'); 
+            t.classList.add('hidden'); 
+            document.getElementById('notice-edit').classList.remove('hidden'); 
+            
+            document.getElementById('notice-textarea').value=notice.text||''; 
+            // Populate multiline text area
+            document.getElementById('notice-image-urls').value = (notice.imageUrls || (notice.imageUrl ? [notice.imageUrl] : [])).join('\n');
+            
+            document.getElementById('notice-link-text').value=notice.linkText||''; 
+            document.getElementById('notice-link-url').value=notice.linkUrl||''; 
+            document.getElementById('new-link-name').value=''; 
+            document.getElementById('new-link-url').value=''; 
+        }
+        
+        if (t.id==='cancel-notice-btn') { 
+            document.getElementById('notice-edit').classList.add('hidden'); 
+            document.getElementById('notice-display').classList.remove('hidden'); 
+            document.getElementById('edit-notice-btn').classList.remove('hidden'); 
+        }
+        
+        if (t.id==='save-notice-btn') { 
+            // Read lines, filter empty/spaces
+            const rawUrls = document.getElementById('notice-image-urls').value;
+            const urlArray = rawUrls.split('\n').map(l => l.trim()).filter(l => l !== '');
+            
+            await updateData({ 
+                notice: { 
+                    text: document.getElementById('notice-textarea').value, 
+                    imageUrls: urlArray, // Save as array
+                    imageUrl: urlArray[0] || '', // Fallback for backward compatibility
+                    linkText: document.getElementById('notice-link-text').value, 
+                    linkUrl: document.getElementById('notice-link-url').value 
+                } 
+            }); 
+            
+            document.getElementById('notice-edit').classList.add('hidden'); 
+            document.getElementById('notice-display').classList.remove('hidden'); 
+            document.getElementById('edit-notice-btn').classList.remove('hidden'); 
+            showMessage('নোটিশ আপডেট হয়েছে'); 
+        }
         
         // Admin & Lottery Triggers
         if (t.id === 'open-admin-btn' || t.closest('#open-admin-btn')) { document.getElementById('admin-modal').classList.remove('hidden'); document.getElementById('admin-modal').classList.add('flex'); }
-        
-        // FIXED ADMIN CLOSE LOGIC
         if (t.id === 'close-admin-modal' || t.closest('#close-admin-modal')) { 
             document.getElementById('admin-modal').classList.add('hidden'); 
             document.getElementById('admin-modal').classList.remove('flex'); 
         }
 
         if (t.id === 'open-lottery-btn' || t.closest('#open-lottery-btn')) { document.getElementById('admin-modal').classList.add('hidden'); document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
-        // NEW LISTENER FOR MAIN PAGE LOTTERY BUTTON
         if (t.id === 'main-lottery-btn' || t.closest('#main-lottery-btn')) { document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
 
         if (t.id === 'close-lottery-btn' || t.closest('#close-lottery-btn')) { document.getElementById('lottery-modal').classList.add('hidden'); }
@@ -1001,25 +1113,18 @@
             const oldDist = fundDistribution[mk];
             const mm = JSON.parse(JSON.stringify(members));
             
-            // Logic to update transaction without breaking anything
-            // 1. Find old transaction
             const oldReceiver = mm.find(m => m.id === oldDist.receiverId);
-            const txIndex = oldReceiver.transactions.findIndex(t => t.date === mk+'-01' && t.type === 'loanTaken' && t.amount === oldDist.amount); // Simple match
+            const txIndex = oldReceiver.transactions.findIndex(t => t.date === mk+'-01' && t.type === 'loanTaken' && t.amount === oldDist.amount);
             
             if (txIndex === -1) {
-                // Fallback: Create new if missing (should generally not happen)
                 if (newRid === oldDist.receiverId) {
                      mm.find(m=>m.id===newRid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: newAmt, description: 'তহবিল' });
                 }
             } else {
                 if (newRid === oldDist.receiverId) {
-                    // Same person, just update amount
                     oldReceiver.transactions[txIndex].amount = newAmt;
                 } else {
-                    // Person changed
-                    // Remove from old
                     oldReceiver.transactions.splice(txIndex, 1);
-                    // Add to new
                     mm.find(m=>m.id===newRid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: newAmt, description: 'তহবিল' });
                 }
             }
@@ -1063,65 +1168,34 @@
     // TRIGGER FOR LIVE LOTTERY
     document.getElementById("lotteryDrawBtn").addEventListener("click", async () => {
         if (l_isAnimating || lottery.participants.length < 2) return alert("কমপক্ষে ২টি নাম প্রয়োজন!");
-        
-        // 1. Determine winner locally (The Admin decides)
         const winnerIndex = Math.floor(Math.random() * lottery.participants.length);
-        
-        // 2. Mark myself as the "drawer" so only I save the history to DB later
         iAmTheDrawer = true;
-
-        // 3. Disable button immediately
         const btn = document.getElementById("lotteryDrawBtn"); 
         btn.disabled=true; 
         btn.textContent="ড্র হচ্ছে...";
 
-        // 4. Update Firebase with the winner index and timestamp. 
-        // This triggers the 'onSnapshot' for everyone (including me).
         try {
             await updateData({ 
-                lottery: { 
-                    ...lottery, 
-                    liveDraw: { 
-                        winnerIndex: winnerIndex, 
-                        ts: Date.now() 
-                    } 
-                } 
+                lottery: { ...lottery, liveDraw: { winnerIndex: winnerIndex, ts: Date.now() } } 
             });
         } catch(e) {
             console.error("Failed to start live draw", e);
-            btn.disabled=false;
-            btn.textContent="ড্র শুরু করুন 🎲";
-            iAmTheDrawer = false;
+            btn.disabled=false; btn.textContent="ড্র শুরু করুন 🎲"; iAmTheDrawer = false;
         }
     });
 
-    // START ANIMATION (Called by onSnapshot)
     function startLiveLottery(winnerIndex) {
         l_isAnimating = true; 
         document.getElementById("lotteryWinnerSection").classList.add('hidden');
         const btn = document.getElementById("lotteryDrawBtn"); 
-        btn.disabled=true; 
-        btn.textContent="ড্র হচ্ছে...";
-        
+        btn.disabled=true; btn.textContent="ড্র হচ্ছে...";
         const items = document.getElementById("lotteryParticipants").querySelectorAll("li");
         let cur = 0, cyc = 0;
-        
         function anim() {
             items.forEach(i => i.classList.remove('active-highlight'));
-            if(items[cur]) {
-                items[cur].classList.add('active-highlight'); 
-                items[cur].scrollIntoView({block:'center', behavior:'smooth'});
-            }
-            
-            cur = (cur+1) % lottery.participants.length; 
-            cyc++;
-            
-            // Animation Duration Logic
-            if (cyc < 30 + Math.random()*10) { 
-                setTimeout(anim, Math.min(100+cyc*2, 350));
-            } else {
-                finish(winnerIndex); // Pass the predetermined winner index
-            }
+            if(items[cur]) { items[cur].classList.add('active-highlight'); items[cur].scrollIntoView({block:'center', behavior:'smooth'}); }
+            cur = (cur+1) % lottery.participants.length; cyc++;
+            if (cyc < 30 + Math.random()*10) { setTimeout(anim, Math.min(100+cyc*2, 350)); } else { finish(winnerIndex); }
         } 
         anim();
     }
@@ -1129,33 +1203,18 @@
     function finish(i) {
         const w = lottery.participants[i];
         const ws = document.getElementById("lotteryWinnerSection");
-        
         document.getElementById("lotteryWinnerText").textContent = w;
-        ws.classList.remove('hidden', 'animate-bounce'); 
-        void ws.offsetWidth; 
-        ws.classList.add('animate-bounce');
-        
-        // ONLY the person who clicked "Draw" saves the history to DB to avoid duplicates
-        if (iAmTheDrawer) {
-             lottery.history.push({ winner: w, date: new Date().toLocaleDateString('bn-BD') }); 
-             saveLotteryToFirebase();
-             iAmTheDrawer = false; 
-        }
-
-        startConfetti();
-        l_isAnimating = false; 
-        document.getElementById("lotteryDrawBtn").disabled=false; 
-        document.getElementById("lotteryDrawBtn").textContent="ড্র শুরু করুন 🎲"; 
-        renderLottery();
+        ws.classList.remove('hidden', 'animate-bounce'); void ws.offsetWidth; ws.classList.add('animate-bounce');
+        if (iAmTheDrawer) { lottery.history.push({ winner: w, date: new Date().toLocaleDateString('bn-BD') }); saveLotteryToFirebase(); iAmTheDrawer = false; }
+        startConfetti(); l_isAnimating = false; 
+        document.getElementById("lotteryDrawBtn").disabled=false; document.getElementById("lotteryDrawBtn").textContent="ড্র শুরু করুন 🎲"; renderLottery();
     }
 
     const canvas = document.getElementById("confetti"), ctx = canvas.getContext("2d");
     let parts = []; 
     function resizeCanvas() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
     window.addEventListener('resize', resizeCanvas);
-    
     function startConfetti() { parts=[]; for(let i=0;i<200;i++) parts.push({x:window.innerWidth/2, y:window.innerHeight/2, vx:(Math.random()-.5)*30, vy:(Math.random()-.5)*30, c:`hsl(${Math.random()*360},70%,50%)`}); updateConfetti(); }
-    
     function updateConfetti() {
         ctx.clearRect(0,0,canvas.width,canvas.height);
         let act = false; parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.vx*=0.95; ctx.fillStyle=p.c; ctx.fillRect(p.x,p.y,8,8); if(p.y<canvas.height) act=true; });
