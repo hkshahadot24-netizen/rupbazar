@@ -13,13 +13,17 @@
   <style>
     /* ফন্ট আপডেট: 'Noto Sans Bengali' প্রধান ফন্ট */
     body { font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif; }
+    
+    /* স্পিনার এবং অ্যানিমেশন */
     .spinner { border: 3px solid rgba(255,255,255,0.3); border-left-color: #ffffff; border-radius:50%; width:20px; height:20px; animation:spin 1s linear infinite;}
     .spinner-gray { border: 2px solid rgba(0,0,0,0.2); border-left-color: #4a5568; border-radius:50%; width:16px; height:16px; animation:spin 1s linear infinite;}
     @keyframes spin { 100% { transform: rotate(360deg);} }
+    
     .modal-enter { opacity: 0; transform: scale(0.95); }
     .modal-enter-active { opacity: 1; transform: scale(1); transition: all 300ms ease-out; }
     .modal-exit { opacity: 1; transform: scale(1); }
     .modal-exit-active { opacity: 0; transform: scale(0.95); transition: all 300ms ease-in; }
+    
     [type='date']::-webkit-calendar-picker-indicator {
         cursor: pointer;
         filter: invert(0.5) sepia(0.6) saturate(5) hue-rotate(200deg);
@@ -30,7 +34,20 @@
         background-color: #eef2ff;
     }
 
-    /* --- LOTTERY STYLES --- */
+    /* --- PREMIUM SLIDER STYLES (KEN BURNS EFFECT) --- */
+    @keyframes kenburns {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.15); }
+    }
+    .animate-kenburns {
+        animation: kenburns 12s ease-in-out infinite alternate;
+        transform-origin: center center;
+    }
+    .slide-wrapper {
+        position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity 1.5s ease-in-out;
+    }
+
+    /* --- LOTTERY STYLES (From index1.txt) --- */
     #lottery-modal { font-family: 'Hind Siliguri', sans-serif; background-color: #0f172a; color: #f1f5f9; }
     #lottery-modal ::-webkit-scrollbar { width: 8px; }
     #lottery-modal ::-webkit-scrollbar-track { background: #1e293b; }
@@ -41,13 +58,56 @@
     #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
     .active-highlight { background-color: #06b6d4; color: black; font-weight: bold; transform: scale(1.05); box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
     
-    /* Slideshow Transition */
-    .slide-fade { transition: opacity 1s ease-in-out; }
+    /* --- MODERN AUTH STYLES (From index.html) --- */
+    .auth-bg {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+    }
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    }
+    .auth-input {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    .auth-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        transform: translateY(-2px);
+    }
+    .floating-shape {
+        position: absolute;
+        filter: blur(50px);
+        z-index: 0;
+        animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <!-- Main Application Content (Hidden by default) -->
+  <!-- INITIAL APP LOADER -->
+  <div id="app-loader" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-opacity duration-500">
+      <div class="relative w-24 h-24">
+          <div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+          <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+          <div class="absolute inset-0 flex items-center justify-center font-bold text-indigo-700 text-xl">S</div>
+      </div>
+      <h2 class="mt-4 text-xl font-bold text-gray-700 animate-pulse">লোড হচ্ছে...</h2>
+  </div>
+
+  <!-- Main Application Content -->
   <div id="main-app-content" class="hidden">
     
     <!-- Header -->
@@ -66,8 +126,15 @@
             </div>
           </div>
           
-          <!-- Admin Panel Button -->
-          <div>
+          <!-- Actions: App Button & Admin Button -->
+          <div class="flex items-center gap-2 sm:gap-3">
+            <!-- App Download Button (New) -->
+            <a id="header-app-btn" href="#important-links-display" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg backdrop-blur-sm transition flex items-center gap-2 border border-white/30 shadow-sm hover:shadow-md group">
+                <span class="text-xl group-hover:scale-110 transition-transform">📱</span> 
+                <span class="hidden md:inline">অ্যাপ</span>
+            </a>
+
+            <!-- Admin Panel Button -->
             <button id="open-admin-btn" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg backdrop-blur-sm transition flex items-center gap-2 border border-white/30 shadow-sm hover:shadow-md">
                 <span class="text-xl">⚙️</span> 
                 <span class="hidden sm:inline">অ্যাডমিন</span>
@@ -80,46 +147,51 @@
     <!-- Main Content Grid -->
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
       
-      <!-- Content Column (Full Width Now) -->
+      <!-- Content Column -->
       <div class="w-full space-y-6">
         
-        <!-- Notice Board -->
-        <div class="bg-white p-6 rounded-xl shadow-lg prose max-w-none">
-          <div id="important-links-display" class="mb-4"></div>
-          <div class="flex justify-end items-center mb-4 not-prose">
-              <button id="edit-notice-btn" class="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm">সম্পাদনা</button>
-          </div>
-          <div id="notice-display" class="text-gray-700"></div>
-          
-          <!-- UPDATED NOTICE EDIT FORM -->
-          <div id="notice-edit" class="hidden space-y-3 not-prose">
-              <textarea id="notice-textarea" rows="4" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="নোটিশ লিখুন..."></textarea>
-              
-              <!-- Changed to Textarea for multiple images -->
-              <label class="block text-sm font-medium text-gray-700 mt-2">স্লাইডশো ইমেজ লিংক (প্রতি লাইনে একটি করে লিংক দিন)</label>
-              <textarea id="notice-image-urls" rows="3" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"></textarea>
-              
-              <input id="notice-link-text" type="text" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="লিংকের নাম (যেমন: 'বিস্তারিত দেখুন')">
-              <input id="notice-link-url" type="url" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="সম্পূর্ণ লিংক (https://...)">
+        <!-- NOTICE BOARD SYSTEM -->
+        <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 relative overflow-hidden group">
+          <!-- Decoration -->
+          <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
 
-              <div class="pt-4 border-t mt-4">
-                  <h5 class="text-md font-semibold text-gray-700 mb-2">নতুন গুরুত্বপূর্ণ লিংক যুক্ত করুন</h5>
-                  <div class="space-y-2">
-                      <input id="new-link-name" type="text" class="w-full p-2 border rounded-lg" placeholder="লিংকের নাম (যেমন: 'ফেসবুক গ্রুপ')">
-                      <input id="new-link-url" type="url" class="w-full p-2 border rounded-lg" placeholder="সম্পূর্ণ লিংক (https://...)">
-                      <button id="save-new-link-btn" type="button" class="bg-blue-600 text-white py-2 px-3 rounded-lg font-bold hover:bg-blue-700 transition text-sm flex items-center gap-2">
-                          <span>লিংক সেভ</span>
-                          <div class="spinner hidden"></div>
-                      </button>
+          <div id="important-links-display" class="mb-4 relative z-10"></div>
+          
+          <div class="flex justify-end items-center mb-2 not-prose relative z-10">
+              <button id="edit-notice-btn" class="text-xs bg-gray-100 text-gray-600 py-1 px-3 rounded-full font-semibold hover:bg-gray-200 transition border border-gray-200">✏️ সম্পাদনা</button>
+          </div>
+
+          <!-- NOTICE DISPLAY AREA -->
+          <div id="notice-display" class="text-gray-700 relative z-10"></div>
+          
+          <!-- NOTICE EDIT FORM -->
+          <div id="notice-edit" class="hidden space-y-4 not-prose relative z-10 bg-gray-50 p-4 rounded-xl border border-gray-200 mt-4">
+              <h4 class="font-bold text-gray-700 border-b pb-2">নোটিশ ও স্লাইডার আপডেট</h4>
+              <textarea id="notice-textarea" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="নোটিশের বিস্তারিত লিখুন..."></textarea>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">স্লাইডশো ইমেজ লিংক (প্রতি লাইনে একটি)</label>
+                <textarea id="notice-image-urls" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 font-mono text-sm" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"></textarea>
+                <p class="text-xs text-gray-500 mt-1">পরামর্শ: ভালো মানের ল্যান্ডস্কেপ ছবি ব্যবহার করুন।</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input id="notice-link-text" type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="লিংকের নাম (যেমন: বিস্তারিত)">
+                  <input id="notice-link-url" type="url" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="লিংক URL (https://...)">
+              </div>
+
+              <div class="pt-4 border-t mt-4 bg-white p-3 rounded-lg shadow-sm">
+                  <h5 class="text-sm font-bold text-gray-700 mb-2">🔗 নতুন লিংক যুক্ত করুন</h5>
+                  <div class="flex flex-col sm:flex-row gap-2">
+                      <input id="new-link-name" type="text" class="flex-1 p-2 border rounded-lg text-sm" placeholder="নাম (ফেসবুক গ্রুপ / অ্যাপ)">
+                      <input id="new-link-url" type="url" class="flex-1 p-2 border rounded-lg text-sm" placeholder="URL (https://...)">
+                      <button id="save-new-link-btn" type="button" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 transition text-sm whitespace-nowrap">অ্যাড লিংক</button>
                   </div>
               </div>
 
-              <div class="flex gap-3 pt-4 border-t">
-                  <button id="save-notice-btn" class="bg-green-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-700 transition flex items-center gap-2">
-                      <span>নোটিশ সেভ</span>
-                      <div class="spinner hidden"></div>
-                  </button>
-                  <button id="cancel-notice-btn" class="bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600 transition">বাতিল</button>
+              <div class="flex gap-3 pt-4">
+                  <button id="save-notice-btn" class="flex-1 bg-green-600 text-white py-2.5 rounded-lg font-bold hover:bg-green-700 transition shadow-md">সেভ করুন</button>
+                  <button id="cancel-notice-btn" class="flex-1 bg-gray-500 text-white py-2.5 rounded-lg font-bold hover:bg-gray-600 transition shadow-md">বাতিল</button>
               </div>
           </div>
         </div>
@@ -140,7 +212,7 @@
           </div>
         </div>
 
-        <!-- CHARTS SECTION (NEW) -->
+        <!-- CHARTS SECTION -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Financial Overview Chart -->
             <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg flex flex-col">
@@ -204,7 +276,6 @@
             </div>
           </div>
           <div class="p-4 border-b">
-              <!-- Updated Search Placeholder -->
               <input id="search-member-input" type="search" placeholder="সদস্য খুঁজুন (নাম, মোবাইল, আইডি, কার্ড...)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" autocomplete="off">
           </div>
           <div id="member-list-cards" class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -227,48 +298,90 @@
     </div>
   </div>
   
-  <!-- Verify Email Modal -->
-  <div id="verify-email-modal" class="hidden fixed inset-0 bg-gray-100 z-[150] justify-center items-center p-4">
-    <div class="bg-white w-full max-w-md p-8 rounded-xl shadow-2xl text-center">
-      <h2 class="text-2xl font-bold text-gray-800 mb-4">আপনার ইমেইল ভেরিফাই করুন</h2>
-      <p class="text-gray-600 mb-6">আমরা আপনার <strong id="user-email-info" class="text-indigo-600">...</strong> ঠিকানায় একটি ভেরিফিকেশন লিঙ্ক পাঠিয়েছি।</p>
-      <div class="flex flex-col sm:flex-row gap-4">
-        <button id="resend-verification-btn" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200">লিঙ্কটি আবার পাঠান</button>
-        <button id="logout-btn" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-400 transition duration-200">লগ আউট</button>
+  <!-- Verify Email Modal (Redesigned) -->
+  <div id="verify-email-modal" class="hidden fixed inset-0 auth-bg z-[150] justify-center items-center p-4">
+    <div class="glass-panel w-full max-w-md p-8 rounded-2xl shadow-2xl text-center relative overflow-hidden">
+       <!-- Decoration -->
+       <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500 rounded-full blur-[60px] opacity-40"></div>
+       <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-pink-500 rounded-full blur-[60px] opacity-40"></div>
+
+      <div class="relative z-10">
+          <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner animate-pulse">
+            <span class="text-4xl">📧</span>
+          </div>
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">ইমেইল ভেরিফিকেশন</h2>
+          <p class="text-gray-600 mb-6 font-medium">আপনার <strong id="user-email-info" class="text-indigo-600 bg-indigo-50 px-2 py-1 rounded">...</strong> ঠিকানায় আমরা একটি লিংক পাঠিয়েছি। দয়া করে সেটি কনফার্ম করুন।</p>
+          <div class="flex flex-col gap-3">
+            <button id="resend-verification-btn" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 hover:shadow-lg transition duration-300 transform hover:-translate-y-1">লিঙ্কটি আবার পাঠান</button>
+            <button id="logout-btn" class="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-50 transition duration-300">লগ আউট / অন্য অ্যাকাউন্টে যান</button>
+          </div>
       </div>
     </div>
   </div>
 
-  <!-- Auth Modal -->
-  <div id="auth-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-[200] justify-center items-center p-4 transition-opacity duration-300">
-      <div class="bg-white w-full max-w-sm p-6 sm:p-8 rounded-xl shadow-2xl transition-transform duration-300 transform scale-95">
-          <div class="flex border-b mb-6">
-              <button id="login-tab" class="flex-1 py-2 text-center font-semibold border-b-2 tab-active">প্রবেশ করুন</button>
-              <button id="register-tab" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-gray-500">নিবন্ধন করুন</button>
+  <!-- Auth Modal (MODERN GLASSMORPHISM DESIGN) -->
+  <div id="auth-modal" class="hidden fixed inset-0 auth-bg z-[200] justify-center items-center p-4 transition-all duration-500">
+      <!-- Floating Shapes -->
+      <div class="floating-shape bg-purple-400 w-64 h-64 rounded-full top-10 left-10 opacity-30"></div>
+      <div class="floating-shape bg-blue-400 w-48 h-48 rounded-full bottom-10 right-10 opacity-30" style="animation-delay: 2s;"></div>
+
+      <div class="glass-panel w-full max-w-md p-8 rounded-3xl shadow-2xl relative z-10">
+          <div class="text-center mb-8">
+              <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight">স্বাগতম</h1>
+              <p class="text-gray-500 text-sm mt-1">মেইন গেইট সমবায় সমিতি ম্যানেজমেন্ট</p>
           </div>
-          <div id="login-view">
-            <form id="login-form" class="space-y-4">
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label><input type="email" id="login-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড</label><input type="password" id="login-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
-              <p id="login-error" class="text-red-500 text-sm h-4"></p>
-              <button id="login-button" type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-md disabled:opacity-50 flex justify-center items-center gap-2"><span>প্রবেশ করুন</span><div class="spinner hidden"></div></button>
+
+          <div class="flex p-1 bg-gray-100 rounded-xl mb-8 relative">
+              <div id="tab-indicator" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm transition-all duration-300 ease-out"></div>
+              <button id="login-tab" class="flex-1 py-3 text-center font-bold text-sm relative z-10 transition-colors text-indigo-600">লগ ইন</button>
+              <button id="register-tab" class="flex-1 py-3 text-center font-bold text-sm text-gray-500 relative z-10 transition-colors hover:text-gray-700">রেজিস্ট্রেশন</button>
+          </div>
+
+          <div id="login-view" class="space-y-6">
+            <form id="login-form" class="space-y-5">
+              <div class="space-y-1">
+                  <label class="text-xs font-bold text-gray-500 uppercase ml-1">ইমেইল</label>
+                  <input type="email" id="login-email" required class="auth-input w-full p-4 rounded-xl text-gray-800 placeholder-gray-400 outline-none" placeholder="name@example.com">
+              </div>
+              <div class="space-y-1">
+                  <label class="text-xs font-bold text-gray-500 uppercase ml-1">পাসওয়ার্ড</label>
+                  <input type="password" id="login-password" required class="auth-input w-full p-4 rounded-xl text-gray-800 placeholder-gray-400 outline-none" placeholder="••••••••">
+              </div>
+              <p id="login-error" class="text-red-500 text-sm font-semibold text-center h-5"></p>
+              <button id="login-button" type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-4 rounded-xl font-bold hover:shadow-xl transition transform hover:scale-[1.02] active:scale-95 flex justify-center items-center gap-2">
+                  <span>প্রবেশ করুন</span>
+                  <div class="spinner hidden"></div>
+              </button>
             </form>
           </div>
-          <div id="register-view" class="hidden">
-            <form id="register-form" class="space-y-4">
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">ইমেইল</label><input type="email" id="register-email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label><input type="password" id="register-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
-              <div><label class="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড নিশ্চিত করুন</label><input type="password" id="confirm-password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></div>
-              <p id="register-error" class="text-red-500 text-sm h-4"></p>
-              <button id="register-button" type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition duration-200 shadow-md disabled:opacity-50 flex justify-center items-center gap-2"><span>নিবন্ধন করুন</span><div class="spinner hidden"></div></button>
+
+          <div id="register-view" class="hidden space-y-6">
+            <form id="register-form" class="space-y-5">
+              <div class="space-y-1">
+                  <label class="text-xs font-bold text-gray-500 uppercase ml-1">ইমেইল</label>
+                  <input type="email" id="register-email" required class="auth-input w-full p-4 rounded-xl text-gray-800 placeholder-gray-400 outline-none" placeholder="name@example.com">
+              </div>
+              <div class="space-y-1">
+                  <label class="text-xs font-bold text-gray-500 uppercase ml-1">পাসওয়ার্ড (৬+ অক্ষর)</label>
+                  <input type="password" id="register-password" required class="auth-input w-full p-4 rounded-xl text-gray-800 placeholder-gray-400 outline-none" placeholder="••••••••">
+              </div>
+              <div class="space-y-1">
+                  <label class="text-xs font-bold text-gray-500 uppercase ml-1">পাসওয়ার্ড নিশ্চিত করুন</label>
+                  <input type="password" id="confirm-password" required class="auth-input w-full p-4 rounded-xl text-gray-800 placeholder-gray-400 outline-none" placeholder="••••••••">
+              </div>
+              <p id="register-error" class="text-red-500 text-sm font-semibold text-center h-5"></p>
+              <button id="register-button" type="submit" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-bold hover:shadow-xl transition transform hover:scale-[1.02] active:scale-95 flex justify-center items-center gap-2">
+                  <span>অ্যাকাউন্ট খুলুন</span>
+                  <div class="spinner hidden"></div>
+              </button>
             </form>
           </div>
       </div>
   </div>
 
-  <!-- Admin Modal (Fix: Ensure it can close) -->
+  <!-- Admin Modal -->
   <div id="admin-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-[60] justify-center items-center p-4">
-    <div id="admin-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 relative modal-exit">
+    <div id="admin-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 relative modal-exit max-h-[90vh] overflow-y-auto">
       <button id="close-admin-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer">&times;</button>
       <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">অ্যাডমিন প্যানেল</h3>
       
@@ -282,11 +395,17 @@
         </button>
       </div>
       
-      <!-- Lottery Button -->
+      
+      <!-- App Link Edit (NEW) -->
       <div class="mb-6">
-         <button id="open-lottery-btn" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 px-4 rounded-xl font-bold hover:scale-105 transition shadow-md flex justify-center items-center gap-2"><span>🎲 লাকি লটারি</span></button>
+        <label class="block text-sm font-medium text-gray-700 mb-1">অ্যাপ ডাউনলোড লিংক</label>
+        <input id="app-url-input" type="url" placeholder="অ্যাপের লিংক এখানে দিন" class="w-full p-2 rounded-lg text-gray-800 text-sm border border-gray-300 focus:ring-2 focus:ring-pink-300 focus:outline-none">
+        <button id="save-app-url-btn" class="mt-2 w-full bg-white text-indigo-600 py-2 px-4 rounded-lg font-bold hover:bg-indigo-100 transition duration-200 text-sm flex-shrink-0 flex justify-center items-center gap-2 border border-indigo-300">
+          <span>লিংক সেভ</span>
+          <div class="spinner-gray hidden"></div>
+        </button>
       </div>
-
+      
       <!-- Change Password Section -->
       <div class="mb-6 pt-4 border-t">
           <label class="block text-sm font-medium text-gray-700 mb-1">অ্যাডমিন পাসওয়ার্ড পরিবর্তন</label>
@@ -420,7 +539,7 @@
         </div>
   </div>
 
-  <!-- Lottery Modal -->
+  <!-- Lottery Modal (REPLACED FROM index1.txt) -->
   <div id="lottery-modal" class="hidden fixed inset-0 z-[100] flex flex-col bg-[#0f172a]">
     <canvas id="confetti"></canvas>
     <div class="absolute top-4 left-4 z-50"><button id="close-lottery-btn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg border border-slate-500"><span>⬅ ফিরে যান</span></button></div>
@@ -459,23 +578,20 @@
     
     setLogLevel('Debug');
     
-    // --- FIREBASE CONFIGURATION (Reverted to your specific project config) ---
+    // --- FIREBASE CONFIGURATION ---
     const appId = 'default-samiti-app-id';
     const firebaseConfig = { apiKey: "AIzaSyBdfxO5LL9KfzJe-PhvaRbhDhz9G-QH1aE", authDomain: "sg-loan-online.firebaseapp.com", projectId: "sg-loan-online", storageBucket: "sg-loan-online.firebasestorage.app", messagingSenderId: "933667418231", appId: "1:933667418231:web:11c24150426bf869381672" };
 
     let app, db, auth;
     let members = [], fundDistribution = {}, notice = { text: '', imageUrls: [], linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
+    let appDownloadUrl = ''; // NEW VARIABLE
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
     
-    // NEW STATE FOR FUND EDITING
     let editingFundMonth = null;
-    let noticeSlideInterval = null; // Variable for slideshow interval
-    
-    // CHARTS
+    let noticeSlideInterval = null; 
     let financeChartInstance = null;
     let trendChartInstance = null;
     
-    // Live Lottery Sync Variables
     let lastDrawTime = 0; 
     let iAmTheDrawer = false;
     let isFirstSnapshot = true;
@@ -492,215 +608,97 @@
 
     // --- CHART RENDERING ---
     const renderCharts = (td, tlt, tlr) => {
-        // 1. Finance Overview Bar Chart
         const ctxFinance = document.getElementById('financeChart').getContext('2d');
         if (financeChartInstance) financeChartInstance.destroy();
-        
-        financeChartInstance = new Chart(ctxFinance, {
-            type: 'bar',
-            data: {
-                labels: ['মোট জমা', 'ঋণ প্রদান', 'ঋণ ফেরত'],
-                datasets: [{
-                    label: 'পরিমাণ (টাকা)',
-                    data: [td, tlt, tlr],
-                    backgroundColor: [
-                        'rgba(22, 163, 74, 0.7)', // Green for Deposit
-                        'rgba(220, 38, 38, 0.7)', // Red for Loan Given
-                        'rgba(202, 138, 4, 0.7)'  // Yellow/Gold for Loan Repaid
-                    ],
-                    borderColor: [
-                        'rgb(22, 163, 74)',
-                        'rgb(220, 38, 38)',
-                        'rgb(202, 138, 4)'
-                    ],
-                    borderWidth: 1,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: { label: (c) => `৳ ${getBengaliNumber(c.raw)}` }
-                    }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
+        financeChartInstance = new Chart(ctxFinance, { type: 'bar', data: { labels: ['মোট জমা', 'ঋণ প্রদান', 'ঋণ ফেরত'], datasets: [{ label: 'পরিমাণ (টাকা)', data: [td, tlt, tlr], backgroundColor: ['rgba(22, 163, 74, 0.7)', 'rgba(220, 38, 38, 0.7)', 'rgba(202, 138, 4, 0.7)'], borderColor: ['rgb(22, 163, 74)', 'rgb(220, 38, 38)', 'rgb(202, 138, 4)'], borderWidth: 1, borderRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `৳ ${getBengaliNumber(c.raw)}` } } }, scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } } } });
 
-        // 2. Monthly Trend Line Chart
-        const monthlyData = {};
-        members.forEach(m => {
-            (m.transactions || []).forEach(t => {
-                if (t.type === 'deposit') {
-                    const month = t.date.substring(0, 7); // YYYY-MM
-                    monthlyData[month] = (monthlyData[month] || 0) + Number(t.amount);
-                }
-            });
-        });
-        
+        const monthlyData = {}; members.forEach(m => { (m.transactions || []).forEach(t => { if (t.type === 'deposit') { const month = t.date.substring(0, 7); monthlyData[month] = (monthlyData[month] || 0) + Number(t.amount); } }); });
         const sortedMonths = Object.keys(monthlyData).sort();
         const displayMonths = sortedMonths; 
-
-        const labels = displayMonths.map(m => {
-            const d = new Date(m + '-01');
-            return d.toLocaleString('bn-BD', { month: 'short', year: 'numeric' });
-        });
+        const labels = displayMonths.map(m => { const d = new Date(m + '-01'); return d.toLocaleString('bn-BD', { month: 'short', year: 'numeric' }); });
         const data = displayMonths.map(m => monthlyData[m]);
-
         const ctxTrend = document.getElementById('trendChart').getContext('2d');
         if (trendChartInstance) trendChartInstance.destroy();
-
-        trendChartInstance = new Chart(ctxTrend, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'মাসিক জমা',
-                    data: data,
-                    borderColor: 'rgb(79, 70, 229)', // Indigo
-                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: 'rgb(79, 70, 229)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: { label: (c) => `৳ ${getBengaliNumber(c.raw)}` }
-                    }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
+        trendChartInstance = new Chart(ctxTrend, { type: 'line', data: { labels: labels, datasets: [{ label: 'মাসিক জমা', data: data, borderColor: 'rgb(79, 70, 229)', backgroundColor: 'rgba(79, 70, 229, 0.1)', borderWidth: 2, pointBackgroundColor: 'rgb(79, 70, 229)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `৳ ${getBengaliNumber(c.raw)}` } } }, scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } } } });
     };
 
     // --- UI RENDERING ---
     const renderHeaderLogo = () => { const img = document.getElementById('header-logo-img'); img.src = logoUrl || 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; img.onerror = () => img.src = 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; document.getElementById('logo-url-input').value = logoUrl || ''; };
-    const renderImportantLinks = () => {
-        const c = document.getElementById('important-links-display'); if (importantLinks.length === 0) { c.innerHTML = ''; return; }
-        c.innerHTML = `<h4 class="text-lg font-semibold text-gray-800 mb-2 not-prose">🔗 গুরুত্বপূর্ণ লিংকসমূহ</h4><div class="flex flex-wrap gap-2 not-prose">${importantLinks.map(l => `<a href="${l.url}" target="_blank" class="bg-indigo-100 text-indigo-700 text-sm font-medium px-3 py-1 rounded-full hover:bg-indigo-200 transition duration-200 flex items-center gap-2"><span>${l.name}</span><button class="delete-link-btn text-indigo-400 hover:text-indigo-600 font-bold" data-id="${l.id}">&times;</button></a>`).join('')}</div><hr class="my-4">`;
+    
+    // Updated: Handle Header App Button
+    const renderHeaderAppButton = () => {
+        const headerAppBtn = document.getElementById('header-app-btn');
+        const adminInput = document.getElementById('app-url-input');
+        
+        // Update Admin Input
+        if(adminInput) adminInput.value = appDownloadUrl || '';
+
+        // Update Header Button Link
+        if (headerAppBtn) {
+            if (appDownloadUrl && appDownloadUrl.trim() !== '') {
+                headerAppBtn.href = appDownloadUrl;
+                headerAppBtn.target = "_blank";
+            } else {
+                // Fallback Logic
+                const appLink = importantLinks.find(l => l.name.toLowerCase().includes('app') || l.name.toLowerCase().includes('apk') || l.name.toLowerCase().includes('download') || l.name.includes('অ্যাপ'));
+                if (appLink) {
+                    headerAppBtn.href = appLink.url;
+                    headerAppBtn.target = "_blank";
+                } else {
+                    headerAppBtn.href = "#important-links-display";
+                    headerAppBtn.target = "_self";
+                }
+            }
+        }
+    };
+
+    const renderImportantLinks = () => { 
+        const c = document.getElementById('important-links-display'); if (importantLinks.length === 0) { c.innerHTML = ''; return; } 
+        c.innerHTML = `<div class="flex flex-wrap gap-3 not-prose mb-4">${importantLinks.map(l => `<a href="${l.url}" target="_blank" class="group bg-white border border-indigo-100 text-indigo-700 text-sm font-semibold px-4 py-2 rounded-lg shadow-sm hover:shadow-md hover:border-indigo-300 transition flex items-center gap-2"><span>🔗 ${l.name}</span><button class="delete-link-btn text-gray-300 group-hover:text-red-400 font-bold ml-1 transition" data-id="${l.id}">&times;</button></a>`).join('')}</div>`;
+        renderHeaderAppButton();
     };
     
- // MODIFIED RENDER NOTICE BOARD FUNCTION (SLIDER & FULL IMAGE FIT)
+    // UPDATED RENDER NOTICE BOARD FUNCTION FOR KEN BURNS SLIDESHOW
     const renderNoticeBoard = () => {
         const d = document.getElementById('notice-display'); d.innerHTML = '';
         if (noticeSlideInterval) clearInterval(noticeSlideInterval);
+        let images = []; if (Array.isArray(notice.imageUrls)) { images = notice.imageUrls.filter(u => u.trim() !== ''); } else if (notice.imageUrl) { images = [notice.imageUrl]; }
+        if (images.length === 0 && !notice.text && !notice.linkUrl) { d.innerHTML = '<div class="text-center p-8 bg-gray-50 rounded-lg text-gray-400 italic">আপাতত কোনো নতুন নোটিশ নেই।</div>'; return; }
 
-        // Normalize images: legacy `imageUrl` or new `imageUrls`
-        let images = [];
-        if (Array.isArray(notice.imageUrls)) {
-            images = notice.imageUrls.filter(u => u.trim() !== '');
-        } else if (notice.imageUrl) {
-            images = [notice.imageUrl];
-        }
-
-        if (images.length === 0 && !notice.text && !notice.linkUrl) {
-            d.innerHTML = '<p class="text-gray-500">আপাতত কোনো নতুন নোটিশ নেই।</p>'; return;
-        }
-
-        // Render Images (Single or Slideshow)
         if (images.length > 0) {
-            if (images.length === 1) {
-                // Single Image - Updated to show full image (object-contain)
-                d.innerHTML += `
-                    <div class="w-full bg-black rounded-lg mb-4 shadow-sm overflow-hidden flex justify-center items-center">
-                         <img src="${images[0]}" class="w-full h-auto max-h-[500px] object-contain" onerror="this.style.display='none'">
-                    </div>
-                `;
-            } else {
-                // Slideshow - Updated for Sliding Effect (Right to Left) & Full Image
-                let slidesHtml = images.map((url) =>
-                    `<div class="min-w-full h-full flex items-center justify-center bg-black relative">
-                        <img src="${url}" class="w-full h-full object-contain" onerror="this.style.display='none'">
-                    </div>`
-                ).join('');
+            let slidesHtml = images.map((url, i) => `
+                <div class="slide-wrapper absolute top-0 left-0 w-full h-full ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'} transition-opacity duration-1000">
+                    <img src="${url}" class="w-full h-full object-cover animate-kenburns" onerror="this.style.display='none'">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
+                </div>
+            `).join('');
+            let indicatorsHtml = images.length > 1 ? `<div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">${images.map((_, i) => `<div class="w-2 h-2 rounded-full transition-all duration-300 ${i===0?'bg-white w-6':'bg-white/50 hover:bg-white/80'} shadow-sm dot-indicator" data-index="${i}"></div>`).join('')}</div>` : '';
+            let navHtml = images.length > 1 ? `<button id="prev-slide-btn" class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition opacity-0 group-hover:opacity-100">❮</button><button id="next-slide-btn" class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition opacity-0 group-hover:opacity-100">❯</button>` : '';
 
-                // Render Container with Flex Track
-                d.innerHTML += `
-                    <div class="relative w-full h-64 sm:h-80 md:h-96 bg-gray-200 rounded-lg overflow-hidden mb-4 shadow-sm border border-gray-200 group">
-                        <div id="slider-track" class="flex h-full transition-transform duration-700 ease-in-out" style="transform: translateX(0%);">
-                            ${slidesHtml}
-                        </div>
-                        
-                        <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10 pointer-events-none">
-                            ${images.map((_, i) => `<div class="w-2.5 h-2.5 rounded-full bg-white/40 ${i===0?'bg-white scale-125 shadow-md':''} transition-all duration-300 dot-indicator" data-index="${i}"></div>`).join('')}
-                        </div>
-                    </div>
-                `;
-
-                // Logic for Sliding Animation
+            d.innerHTML += `<div class="relative w-full h-64 sm:h-80 md:h-[400px] bg-white rounded-xl overflow-hidden mb-6 shadow-md border border-gray-100 group">${slidesHtml}${indicatorsHtml}${navHtml}</div>`;
+            if (images.length > 1) {
                 let currentSlide = 0;
-                noticeSlideInterval = setInterval(() => {
-                    const track = document.getElementById('slider-track');
-                    const dots = document.querySelectorAll('.dot-indicator');
-                    if (!track) return;
-
-                    // Calculate Next Slide
-                    currentSlide = (currentSlide + 1) % images.length;
-
-                    // Apply Slide Transformation (Move Left)
-                    track.style.transform = `translateX(-${currentSlide * 100}%)`;
-
-                    // Update Dots
-                    dots.forEach((dot, index) => {
-                        if(index === currentSlide) {
-                            dot.classList.remove('bg-white/40');
-                            dot.classList.add('bg-white', 'scale-125', 'shadow-md');
-                        } else {
-                            dot.classList.add('bg-white/40');
-                            dot.classList.remove('bg-white', 'scale-125', 'shadow-md');
-                        }
-                    });
-
-                }, 4000); // 4 seconds interval
+                const changeSlide = (nextIndex) => {
+                    const slides = d.querySelectorAll('.slide-wrapper'); const dots = d.querySelectorAll('.dot-indicator');
+                    slides[currentSlide].classList.remove('opacity-100', 'z-10'); slides[currentSlide].classList.add('opacity-0', 'z-0'); if(dots[currentSlide]) { dots[currentSlide].classList.remove('bg-white', 'w-6'); dots[currentSlide].classList.add('bg-white/50'); }
+                    currentSlide = nextIndex;
+                    slides[currentSlide].classList.remove('opacity-0', 'z-0'); slides[currentSlide].classList.add('opacity-100', 'z-10'); if(dots[currentSlide]) { dots[currentSlide].classList.remove('bg-white/50'); dots[currentSlide].classList.add('bg-white', 'w-6'); }
+                };
+                const nextSlide = () => changeSlide((currentSlide + 1) % images.length); const prevSlide = () => changeSlide((currentSlide - 1 + images.length) % images.length);
+                noticeSlideInterval = setInterval(nextSlide, 5000);
+                setTimeout(() => { document.getElementById('prev-slide-btn')?.addEventListener('click', (e) => { e.stopPropagation(); clearInterval(noticeSlideInterval); prevSlide(); noticeSlideInterval = setInterval(nextSlide, 5000); }); document.getElementById('next-slide-btn')?.addEventListener('click', (e) => { e.stopPropagation(); clearInterval(noticeSlideInterval); nextSlide(); noticeSlideInterval = setInterval(nextSlide, 5000); }); }, 0);
             }
         }
-
-        if (notice.text) d.innerHTML += `<div>${notice.text.split('\n').map(l => `<p>${l}</p>`).join('')}</div>`;
-        if (notice.linkUrl) d.innerHTML += `<a href="${notice.linkUrl}" target="_blank" class="inline-block bg-indigo-600 text-white font-bold py-2 px-5 rounded-lg mt-4 no-underline hover:bg-indigo-700 transition">${notice.linkText||'বিস্তারিত'}</a>`;
+        if (notice.text) d.innerHTML += `<div class="prose max-w-none text-gray-700 leading-relaxed">${notice.text.split('\n').map(l => `<p class="mb-2">${l}</p>`).join('')}</div>`;
+        if (notice.linkUrl) d.innerHTML += `<div class="mt-6 text-center"><a href="${notice.linkUrl}" target="_blank" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition transform no-underline"><span>${notice.linkText||'বিস্তারিত দেখুন'}</span><span>↗</span></a></div>`;
     };
 
     const renderUI = () => {
-        let td = 0, tlt = 0, tlr = 0; 
-        members.forEach(m => { 
-            const t = calculateMemberTotals(m); 
-            td += t.totalDeposit; 
-            tlt += t.totalLoanTaken; 
-            tlr += t.totalLoanRepaid; 
-        });
-        
-        document.getElementById('total-members').textContent = getBengaliNumber(members.length);
-        document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(td)}`;
-        document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(tlt)}`;
-        
-        // RENDER CHARTS
+        let td = 0, tlt = 0, tlr = 0; members.forEach(m => { const t = calculateMemberTotals(m); td += t.totalDeposit; tlt += t.totalLoanTaken; tlr += t.totalLoanRepaid; });
+        document.getElementById('total-members').textContent = getBengaliNumber(members.length); document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(td)}`; document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(tlt)}`;
         renderCharts(td, tlt, tlr);
-
         const c = document.getElementById('member-list-cards'), p = document.getElementById('member-list-placeholder'); c.innerHTML = '';
-        
-        // --- UPDATED SEARCH LOGIC ---
-        const fm = members.filter(m => { 
-            const q = searchQuery.toLowerCase(); 
-            return (m.name||'').toLowerCase().includes(q) || 
-                   (m.id||'').toLowerCase().includes(q) || 
-                   (m.cardNumber||'').toLowerCase().includes(q) ||
-                   (m.phone||'').includes(q) ||
-                   (m.employeeId||'').toLowerCase().includes(q);
-        });
+        const fm = members.filter(m => { const q = searchQuery.toLowerCase(); return (m.name||'').toLowerCase().includes(q) || (m.id||'').toLowerCase().includes(q) || (m.cardNumber||'').toLowerCase().includes(q) || (m.phone||'').includes(q) || (m.employeeId||'').toLowerCase().includes(q); });
         
         if (fm.length === 0) { p.classList.remove('hidden'); p.textContent = searchQuery ? 'কোনো সদস্য পাওয়া যায়নি।' : 'কোনো সদস্য নেই।'; }
         else {
@@ -713,157 +711,93 @@
                     <button class="view-profile-btn mt-4 w-full bg-indigo-500 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-600" data-id="${m.id}">বিস্তারিত দেখুন</button></div>`;
             });
         }
-        if (activeMember && !fm.find(m => m.id === activeMember.id)) closeProfileModal();
-        else if (activeMember) showProfile(activeMember.id, false);
+        if (activeMember && !fm.find(m => m.id === activeMember.id)) closeProfileModal(); else if (activeMember) showProfile(activeMember.id, false);
     };
     
     const toggleProfileEditMode = (isEditing) => {
-        document.querySelectorAll('#profile-content-details [id$="-view"]').forEach(el => el.classList.toggle('hidden', isEditing));
-        document.querySelectorAll('#profile-content-details [id$="-edit"]').forEach(el => el.classList.toggle('hidden', !isEditing));
-        document.getElementById('edit-profile-btn').classList.toggle('hidden', isEditing);
-        document.getElementById('save-profile-btn').classList.toggle('hidden', !isEditing);
-        document.getElementById('cancel-edit-btn').classList.toggle('hidden', !isEditing);
+        document.querySelectorAll('#profile-content-details [id$="-view"]').forEach(el => el.classList.toggle('hidden', isEditing)); document.querySelectorAll('#profile-content-details [id$="-edit"]').forEach(el => el.classList.toggle('hidden', !isEditing));
+        document.getElementById('edit-profile-btn').classList.toggle('hidden', isEditing); document.getElementById('save-profile-btn').classList.toggle('hidden', !isEditing); document.getElementById('cancel-edit-btn').classList.toggle('hidden', !isEditing);
     };
 
     const showProfile = (id, anim=true) => {
         const m = members.find(x => x.id === id); activeMember = m; if (!m) return;
-        toggleProfileEditMode(false);
-        const t = calculateMemberTotals(m);
-        document.getElementById('profile-header-img').src = m.photoUrl || `https://placehold.co/96x96/EFEFEF/AAAAAA?text=${m.name[0]}`;
-        document.getElementById('profile-header-name').textContent = m.name;
+        toggleProfileEditMode(false); const t = calculateMemberTotals(m);
+        document.getElementById('profile-header-img').src = m.photoUrl || `https://placehold.co/96x96/EFEFEF/AAAAAA?text=${m.name[0]}`; document.getElementById('profile-header-name').textContent = m.name;
         ['name','id','photo-url','employee-id','card-number','email','phone','notes'].forEach(k => {
             const v = document.getElementById(`profile-${k}-view`); const e = document.getElementById(`profile-${k}-edit`);
             const val = m[k.replace(/-/g,'')] || m[k==='photo-url'?'photoUrl':k==='employee-id'?'employeeId':k==='card-number'?'cardNumber':k] || 'N/A';
             if(v) v.textContent = val; if(e) e.value = val === 'N/A' ? '' : val;
         });
-        document.getElementById('paid-total').textContent = `৳ ${getBengaliNumber(t.totalDeposit)}`;
-        document.getElementById('loan-taken').textContent = `৳ ${getBengaliNumber(t.totalLoanTaken)}`;
-        document.getElementById('loan-repaid').textContent = `৳ ${getBengaliNumber(t.totalLoanRepaid)}`;
-        document.getElementById('current-loan').textContent = `৳ ${getBengaliNumber(t.currentLoan)}`;
-        
+        document.getElementById('paid-total').textContent = `৳ ${getBengaliNumber(t.totalDeposit)}`; document.getElementById('loan-taken').textContent = `৳ ${getBengaliNumber(t.totalLoanTaken)}`; document.getElementById('loan-repaid').textContent = `৳ ${getBengaliNumber(t.totalLoanRepaid)}`; document.getElementById('current-loan').textContent = `৳ ${getBengaliNumber(t.currentLoan)}`;
         document.getElementById('transactions-table-body').innerHTML = (m.transactions||[]).length===0 ? '<tr><td colspan="4" class="py-4 text-center text-gray-500">কোনো লেনদেন নেই।</td></tr>' :
             [...m.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(tx => {
-                const clr = tx.type==='deposit'?'text-green-600':tx.type==='loanTaken'?'text-blue-600':'text-yellow-700';
-                const typ = tx.type==='deposit'?'কিস্তি/জমা':tx.type==='loanTaken'?'ঋণ গ্রহণ':'ঋণ পরিশোধ';
+                const clr = tx.type==='deposit'?'text-green-600':tx.type==='loanTaken'?'text-blue-600':'text-yellow-700'; const typ = tx.type==='deposit'?'কিস্তি/জমা':tx.type==='loanTaken'?'ঋণ গ্রহণ':'ঋণ পরিশোধ';
                 return `<tr class="hover:bg-gray-100"><td class="py-2 px-4 text-sm">${formatDate(tx.date)}</td><td class="py-2 px-4 text-sm">${typ}${tx.linkedDepositId?' 🔗':''}<br><span class="text-xs text-gray-500">${tx.description||''}</span></td><td class="py-2 px-4 text-right font-mono font-semibold ${clr}">${getBengaliNumber(tx.amount)}</td><td class="py-2 px-4 text-center space-x-2"><button class="edit-transaction-btn text-blue-500" data-tid="${tx.id}" ${tx.linkedDepositId?'disabled':''}>✏️</button><button class="delete-transaction-btn text-red-500" data-tid="${tx.id}" ${tx.linkedDepositId?'disabled':''}>🗑️</button></td></tr>`;
             }).join('');
-
-        document.getElementById('profile-modal').classList.remove('hidden', 'flex');
-        document.getElementById('profile-modal').classList.add('flex');
-        if (anim) { document.getElementById('profile-modal-box').classList.add('modal-enter-active'); }
+        document.getElementById('profile-modal').classList.remove('hidden', 'flex'); document.getElementById('profile-modal').classList.add('flex'); if (anim) { document.getElementById('profile-modal-box').classList.add('modal-enter-active'); }
     };
     const closeProfileModal = () => { document.getElementById('profile-modal').classList.add('hidden'); activeMember = null; };
-    
     const openTransactionModal = (tid=null) => {
-        document.getElementById('transaction-form').reset();
-        document.getElementById('transaction-id').value = tid || '';
-        document.getElementById('transaction-date').valueAsDate = new Date();
-        document.getElementById('transaction-type').disabled = !!tid;
+        document.getElementById('transaction-form').reset(); document.getElementById('transaction-id').value = tid || ''; document.getElementById('transaction-date').valueAsDate = new Date(); document.getElementById('transaction-type').disabled = !!tid;
         document.getElementById('transaction-modal-title').textContent = tid ? "লেনদেন সম্পাদনা" : "নতুন লেনদেন";
-        if(tid) {
-            const tx = activeMember.transactions.find(t=>t.id===tid);
-            if(tx) {
-                const f = document.getElementById('transaction-form');
-                f.id.value=tx.id; f.date.value=tx.date; f.type.value=tx.type; f.amount.value=tx.amount; f.description.value=tx.description||'';
-            }
-        }
-        document.getElementById('transaction-modal').classList.remove('hidden');
-        document.getElementById('transaction-modal').classList.add('flex');
+        if(tid) { const tx = activeMember.transactions.find(t=>t.id===tid); if(tx) { const f = document.getElementById('transaction-form'); f.id.value=tx.id; f.date.value=tx.date; f.type.value=tx.type; f.amount.value=tx.amount; f.description.value=tx.description||''; } }
+        document.getElementById('transaction-modal').classList.remove('hidden'); document.getElementById('transaction-modal').classList.add('flex');
     };
     const closeTransactionModal = () => document.getElementById('transaction-modal').classList.add('hidden');
 
     const renderFundModal = () => {
         const c = document.getElementById('fund-list-container');
         const md = {}; members.forEach(m => (m.transactions||[]).forEach(t => { if(t.type==='deposit') { const k = t.date.substring(0,7); md[k]=(md[k]||0)+Number(t.amount); } }));
-        const g = calculateAvailableFund();
-        const keys = Object.keys(md).sort().reverse();
-        
-        if (keys.length === 0) {
-            c.innerHTML = '<div class="text-center text-gray-500">কোনো ডেটা নেই।</div>';
-            return;
-        }
+        const g = calculateAvailableFund(); const keys = Object.keys(md).sort().reverse();
+        if (keys.length === 0) { c.innerHTML = '<div class="text-center text-gray-500">কোনো ডেটা নেই।</div>'; return; }
 
         c.innerHTML = keys.map(k => {
-            const dist = fundDistribution[k]; 
-            const r = dist ? members.find(m=>m.id===dist.receiverId) : null;
-            const max = Math.min(g, md[k]);
-            const isEditing = editingFundMonth === k;
-
+            const dist = fundDistribution[k]; const r = dist ? members.find(m=>m.id===dist.receiverId) : null; const max = Math.min(g, md[k]); const isEditing = editingFundMonth === k;
             let content = '';
-            
             if (isEditing && dist) {
-                content = `
-                    <div class="mt-3 p-3 border border-blue-200 rounded-lg bg-blue-50">
-                        <h5 class="text-sm font-bold text-blue-800 mb-2">তহবিল তথ্য সম্পাদনা করুন</h5>
-                        <form class="edit-fund-form space-y-3" data-month="${k}">
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">প্রাপক</label>
-                                <select name="receiverId" required class="w-full p-2 border rounded-lg bg-white text-sm">
-                                    ${members.map(m => `<option value="${m.id}" ${m.id === dist.receiverId ? 'selected' : ''}>${m.name}</option>`).join('')}
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">পরিমাণ (৳)</label>
-                                <input type="number" name="amount" required class="w-full p-2 border rounded-lg text-sm" min="0" value="${dist.amount}">
-                            </div>
-                            <div class="flex gap-2 pt-1">
-                                <button type="submit" class="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700">সেভ করুন</button>
-                                <button type="button" class="cancel-fund-edit bg-gray-400 text-white px-3 py-1.5 rounded text-sm hover:bg-gray-500">বাতিল</button>
-                            </div>
-                        </form>
-                    </div>
-                `;
+                content = `<div class="mt-3 p-3 border border-blue-200 rounded-lg bg-blue-50"><h5 class="text-sm font-bold text-blue-800 mb-2">তহবিল তথ্য সম্পাদনা করুন</h5><form class="edit-fund-form space-y-3" data-month="${k}"><div><label class="block text-xs text-gray-600 mb-1">প্রাপক</label><select name="receiverId" required class="w-full p-2 border rounded-lg bg-white text-sm">${members.map(m => `<option value="${m.id}" ${m.id === dist.receiverId ? 'selected' : ''}>${m.name}</option>`).join('')}</select></div><div><label class="block text-xs text-gray-600 mb-1">পরিমাণ (৳)</label><input type="number" name="amount" required class="w-full p-2 border rounded-lg text-sm" min="0" value="${dist.amount}"></div><div class="flex gap-2 pt-1"><button type="submit" class="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700">সেভ করুন</button><button type="button" class="cancel-fund-edit bg-gray-400 text-white px-3 py-1.5 rounded text-sm hover:bg-gray-500">বাতিল</button></div></form></div>`;
             } else if (r) {
-                content = `
-                    <div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center justify-between gap-2 group">
-                        <div class="flex items-center gap-4">
-                            <img src="${r.photoUrl||`https://placehold.co/40x40?text=${r.name[0]}`}" class="w-12 h-12 rounded-full border-2 border-green-200 object-cover">
-                            <div>
-                                <p class="text-sm font-semibold text-green-700">✅ তহবিল প্রাপ্ত:</p>
-                                <p class="text-lg font-bold">${r.name}</p>
-                                <p class="text-md font-semibold text-green-600">৳ ${getBengaliNumber(dist.amount)}</p>
-                            </div>
-                        </div>
-                        <button class="edit-fund-btn bg-white border border-gray-200 p-2 rounded-full shadow-sm hover:bg-gray-100 text-blue-600 transition opacity-0 group-hover:opacity-100 focus:opacity-100" data-month="${k}" title="সম্পাদনা করুন">
-                            ✏️
-                        </button>
-                    </div>
-                `;
+                content = `<div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center justify-between gap-2 group"><div class="flex items-center gap-4"><img src="${r.photoUrl||`https://placehold.co/40x40?text=${r.name[0]}`}" class="w-12 h-12 rounded-full border-2 border-green-200 object-cover"><div><p class="text-sm font-semibold text-green-700">✅ তহবিল প্রাপ্ত:</p><p class="text-lg font-bold">${r.name}</p><p class="text-md font-semibold text-green-600">৳ ${getBengaliNumber(dist.amount)}</p></div></div><button class="edit-fund-btn bg-white border border-gray-200 p-2 rounded-full shadow-sm hover:bg-gray-100 text-blue-600 transition opacity-0 group-hover:opacity-100 focus:opacity-100" data-month="${k}" title="সম্পাদনা করুন">✏️</button></div>`;
             } else {
-                content = `
-                    <form class="assign-fund-form mt-3 space-y-2" data-month="${k}">
-                        <p class="text-xs">সর্বোচ্চ ঋণযোগ্য: <b>৳ ${getBengaliNumber(max)}</b></p>
-                        <p class="text-xs text-gray-500">(তহবিলে অবশিষ্ট: ৳ ${getBengaliNumber(g)})</p>
-                        <select required class="w-full p-2 border rounded-lg bg-white">
-                            <option value="">সদস্য নির্বাচন</option>
-                            ${members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}
-                        </select>
-                        <input type="number" required class="w-full p-2 border rounded-lg" min="0" max="${max}" data-max="${max}">
-                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">ঋণ প্রদান করুন</button>
-                    </form>
-                `;
+                content = `<form class="assign-fund-form mt-3 space-y-2" data-month="${k}"><p class="text-xs">সর্বোচ্চ ঋণযোগ্য: <b>৳ ${getBengaliNumber(max)}</b></p><p class="text-xs text-gray-500">(তহবিলে অবশিষ্ট: ৳ ${getBengaliNumber(g)})</p><select required class="w-full p-2 border rounded-lg bg-white"><option value="">সদস্য নির্বাচন</option>${members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select><input type="number" required class="w-full p-2 border rounded-lg" min="0" max="${max}" data-max="${max}"><button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">ঋণ প্রদান করুন</button></form>`;
             }
-
-            return `<div class="p-4 border rounded-lg shadow-sm bg-white">
-                <h4 class="text-lg font-semibold text-blue-700">${formatDate(k+'-01','monthYear')}</h4>
-                <p class="text-sm">মোট জমা: <b>৳ ${getBengaliNumber(md[k])}</b></p>
-                ${content}
-            </div>`;
+            return `<div class="p-4 border rounded-lg shadow-sm bg-white"><h4 class="text-lg font-semibold text-blue-700">${formatDate(k+'-01','monthYear')}</h4><p class="text-sm">মোট জমা: <b>৳ ${getBengaliNumber(md[k])}</b></p>${content}</div>`;
         }).join('');
     };
 
     // --- FIREBASE OPS ---
     const initFirebase = () => { 
         try { 
-            app = initializeApp(firebaseConfig); 
-            db = getFirestore(app); 
-            auth = getAuth(app); 
+            app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); 
 
-            // Initialize Auth State Listener HERE
+            // Initialize Auth State Listener
             onAuthStateChanged(auth, u => {
-                if (u && u.emailVerified) { document.getElementById('auth-modal').classList.add('hidden'); document.getElementById('verify-email-modal').classList.add('hidden'); document.getElementById('main-app-content').classList.remove('hidden'); listen(); }
-                else if (u) { document.getElementById('user-email-info').textContent = u.email; document.getElementById('verify-email-modal').classList.remove('hidden'); document.getElementById('verify-email-modal').classList.add('flex'); document.getElementById('main-app-content').classList.add('hidden'); }
-                else { document.getElementById('auth-modal').classList.remove('hidden'); document.getElementById('auth-modal').classList.add('flex'); document.getElementById('main-app-content').classList.add('hidden'); }
+                const loader = document.getElementById('app-loader');
+                
+                // Transition logic
+                if (u && u.emailVerified) { 
+                    document.getElementById('auth-modal').classList.add('hidden'); 
+                    document.getElementById('verify-email-modal').classList.add('hidden'); 
+                    document.getElementById('main-app-content').classList.remove('hidden'); 
+                    listen(); 
+                } else if (u) { 
+                    document.getElementById('user-email-info').textContent = u.email; 
+                    document.getElementById('auth-modal').classList.add('hidden'); // Hide login
+                    document.getElementById('main-app-content').classList.add('hidden'); // Hide main app
+                    document.getElementById('verify-email-modal').classList.remove('hidden'); 
+                    document.getElementById('verify-email-modal').classList.add('flex'); 
+                } else { 
+                    document.getElementById('main-app-content').classList.add('hidden'); 
+                    document.getElementById('verify-email-modal').classList.add('hidden'); 
+                    document.getElementById('auth-modal').classList.remove('hidden'); 
+                    document.getElementById('auth-modal').classList.add('flex'); 
+                }
+
+                // Hide loader
+                if(loader && !loader.classList.contains('opacity-0')) {
+                    loader.classList.add('opacity-0');
+                    setTimeout(() => loader.classList.add('hidden'), 500);
+                }
             });
 
         } catch(e) { 
@@ -872,210 +806,113 @@
         } 
     };
     
-    const updateData = async (d) => { 
-        if (isSaving) return; isSaving = true; showSyncStatus("সিঙ্ক...", true); 
-        try { 
-            await setDoc(doc(db, 'artifacts', appId, 'public-data', 'main'), { 
-                members: d.members!==undefined?d.members:members, 
-                fundDistribution: d.fundDistribution!==undefined?d.fundDistribution:fundDistribution, 
-                notice: d.notice!==undefined?d.notice:notice, 
-                logoUrl: d.logoUrl!==undefined?d.logoUrl:logoUrl, 
-                importantLinks: d.importantLinks!==undefined?d.importantLinks:importantLinks,
-                lottery: d.lottery!==undefined?d.lottery:lottery 
-            }); 
-            showSyncStatus("সেভ হয়েছে"); 
-        } catch(e){ showMessage("সেভ ব্যর্থ", 'error'); } finally { isSaving=false; hideSyncStatus(); } 
-    };
+    // Updated Data Structure in updateData
+    const updateData = async (d) => { if (isSaving) return; isSaving = true; showSyncStatus("সিঙ্ক...", true); try { await setDoc(doc(db, 'artifacts', appId, 'public-data', 'main'), { members: d.members!==undefined?d.members:members, fundDistribution: d.fundDistribution!==undefined?d.fundDistribution:fundDistribution, notice: d.notice!==undefined?d.notice:notice, logoUrl: d.logoUrl!==undefined?d.logoUrl:logoUrl, importantLinks: d.importantLinks!==undefined?d.importantLinks:importantLinks, lottery: d.lottery!==undefined?d.lottery:lottery, appDownloadUrl: d.appDownloadUrl!==undefined?d.appDownloadUrl:appDownloadUrl }); showSyncStatus("সেভ হয়েছে"); } catch(e){ showMessage("সেভ ব্যর্থ", 'error'); } finally { isSaving=false; hideSyncStatus(); } };
 
     const listen = () => onSnapshot(doc(db, 'artifacts', appId, 'public-data', 'main'), s => {
         const d = s.data(); if(!d) return;
         members = d.members || []; fundDistribution = d.fundDistribution || {}; logoUrl = d.logoUrl || ''; importantLinks = d.importantLinks || [];
+        appDownloadUrl = d.appDownloadUrl || ''; // Load App URL
         
-        // Handle Legacy Notice Structure vs New Structure
-        if (d.notice) {
-             if (typeof d.notice === 'string') {
-                 notice = { text: d.notice, imageUrls: [], linkText: '', linkUrl: '' };
-             } else {
-                 notice = d.notice;
-                 // Ensure imageUrls exists if only imageUrl was present
-                 if (!notice.imageUrls && notice.imageUrl) {
-                     notice.imageUrls = [notice.imageUrl];
-                 } else if (!notice.imageUrls) {
-                     notice.imageUrls = [];
-                 }
-             }
-        } else {
-            notice = { text: '', imageUrls: [], linkText: '', linkUrl: '' };
-        }
-        
-        // Lottery Sync
-        const dbLottery = d.lottery || { participants: [], history: [], liveDraw: null };
-        lottery.participants = dbLottery.participants || [];
-        lottery.history = dbLottery.history || [];
-        
-        if (dbLottery.liveDraw) {
-            if (isFirstSnapshot) {
-                lastDrawTime = dbLottery.liveDraw.ts;
-            } else if (dbLottery.liveDraw.ts > lastDrawTime) {
-                lastDrawTime = dbLottery.liveDraw.ts;
-                if (!l_isAnimating) {
-                   if (!document.getElementById('lottery-modal').classList.contains('hidden')) {
-                       startLiveLottery(dbLottery.liveDraw.winnerIndex);
-                   }
-                }
-            }
-        }
-        isFirstSnapshot = false;
-
-        renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); 
-        if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal();
-        if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
+        if (d.notice) { if (typeof d.notice === 'string') { notice = { text: d.notice, imageUrls: [], linkText: '', linkUrl: '' }; } else { notice = d.notice; if (!notice.imageUrls && notice.imageUrl) { notice.imageUrls = [notice.imageUrl]; } else if (!notice.imageUrls) { notice.imageUrls = []; } } } else { notice = { text: '', imageUrls: [], linkText: '', linkUrl: '' }; }
+        const dbLottery = d.lottery || { participants: [], history: [], liveDraw: null }; lottery.participants = dbLottery.participants || []; lottery.history = dbLottery.history || [];
+        if (dbLottery.liveDraw) { if (isFirstSnapshot) { lastDrawTime = dbLottery.liveDraw.ts; } else if (dbLottery.liveDraw.ts > lastDrawTime) { lastDrawTime = dbLottery.liveDraw.ts; if (!l_isAnimating) { if (!document.getElementById('lottery-modal').classList.contains('hidden')) { startLiveLottery(dbLottery.liveDraw.winnerIndex); } } } }
+        isFirstSnapshot = false; renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); 
+        if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal(); if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
     });
 
     // Initialize the app
     initFirebase();
     
     // --- EVENT LISTENERS ---
-    document.getElementById('login-form').addEventListener('submit', async e => { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); } catch(e){ document.getElementById('login-error').textContent='ভুল তথ্য।'; } });
-    document.getElementById('register-form').addEventListener('submit', async e => { e.preventDefault(); const p = document.getElementById('register-password').value; if(p!==document.getElementById('confirm-password').value) return document.getElementById('register-error').textContent='পাসওয়ার্ড মিলছে না'; try { const c = await createUserWithEmailAndPassword(auth, document.getElementById('register-email').value, p); await sendEmailVerification(c.user); showMessage('ভেরিফিকেশন লিঙ্ক পাঠানো হয়েছে।'); } catch(e){ document.getElementById('register-error').textContent='নিবন্ধন ব্যর্থ।'; } });
+    document.getElementById('login-form').addEventListener('submit', async e => { 
+        e.preventDefault(); 
+        const btn = document.getElementById('login-button'); btn.disabled=true; btn.querySelector('.spinner').classList.remove('hidden');
+        try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); } 
+        catch(e){ document.getElementById('login-error').textContent='ভুল তথ্য।'; btn.disabled=false; btn.querySelector('.spinner').classList.add('hidden'); } 
+    });
+    
+    document.getElementById('register-form').addEventListener('submit', async e => { 
+        e.preventDefault(); 
+        const btn = document.getElementById('register-button'); 
+        const p = document.getElementById('register-password').value; 
+        if(p!==document.getElementById('confirm-password').value) return document.getElementById('register-error').textContent='পাসওয়ার্ড মিলছে না'; 
+        
+        btn.disabled=true; btn.querySelector('.spinner').classList.remove('hidden');
+        try { 
+            const c = await createUserWithEmailAndPassword(auth, document.getElementById('register-email').value, p); 
+            await sendEmailVerification(c.user); 
+            showMessage('ভেরিফিকেশন লিঙ্ক পাঠানো হয়েছে।'); 
+        } catch(e){ document.getElementById('register-error').textContent='নিবন্ধন ব্যর্থ।'; btn.disabled=false; btn.querySelector('.spinner').classList.add('hidden'); } 
+    });
+
     document.getElementById('logout-main-btn').addEventListener('click', () => signOut(auth));
-    document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        signOut(auth).then(() => {
+            // Force reload UI state
+            document.getElementById('verify-email-modal').classList.add('hidden');
+            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('auth-modal').classList.add('flex');
+        });
+    });
     document.getElementById('resend-verification-btn').addEventListener('click', async () => { if(auth.currentUser) await sendEmailVerification(auth.currentUser); showMessage('পাঠানো হয়েছে।'); });
     
     document.getElementById('add-member-form').addEventListener('submit', async e => { e.preventDefault(); const n = document.getElementById('member-name').value, p = document.getElementById('member-phone').value; if(!n||!p) return showMessage('নাম ও ফোন আবশ্যক', 'error'); await updateData({ members: [...members, { id: 'M'+Date.now(), name: n, phone: p, transactions: [], photoUrl: document.getElementById('member-photo-url').value, employeeId: document.getElementById('member-employee-id').value, cardNumber: document.getElementById('member-card-number').value, email: document.getElementById('member-email').value, notes: '' }] }); e.target.reset(); showMessage('সদস্য যোগ হয়েছে'); });
     document.getElementById('search-member-input').addEventListener('input', (e) => { searchQuery = e.target.value; renderUI(); });
 
-    // ADMIN PASSWORD CHANGE LISTENER
     document.getElementById('save-password-btn').addEventListener('click', async () => {
-        const newPass = document.getElementById('new-admin-password').value;
-        if (!newPass || newPass.length < 6) return showMessage('পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে', 'error');
-        
-        const btn = document.getElementById('save-password-btn');
-        const spin = btn.querySelector('.spinner');
-        const txt = btn.querySelector('span');
-        
-        txt.textContent = 'আপডেট হচ্ছে...';
-        spin.classList.remove('hidden');
-        btn.disabled = true;
-
-        try {
-            const user = auth.currentUser;
-            if (user) {
-                await updatePassword(user, newPass);
-                showMessage('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে। অনুগ্রহ করে আবার লগইন করুন।');
-                document.getElementById('new-admin-password').value = '';
-                setTimeout(() => signOut(auth), 2000); // Auto logout for security
-            } else {
-                showMessage('ব্যবহারকারী লগইন অবস্থায় নেই', 'error');
-            }
-        } catch (error) {
-            console.error(error);
-            if (error.code === 'auth/requires-recent-login') {
-                showMessage('সুরক্ষার জন্য অনুগ্রহ করে লগআউট করে আবার লগইন করুন, তারপর চেষ্টা করুন।', 'error');
-            } else {
-                showMessage('পাসওয়ার্ড পরিবর্তন ব্যর্থ: ' + error.message, 'error');
-            }
-        } finally {
-            txt.textContent = 'পাসওয়ার্ড আপডেট';
-            spin.classList.add('hidden');
-            btn.disabled = false;
-        }
+        const newPass = document.getElementById('new-admin-password').value; if (!newPass || newPass.length < 6) return showMessage('পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে', 'error');
+        const btn = document.getElementById('save-password-btn'); const spin = btn.querySelector('.spinner'); const txt = btn.querySelector('span');
+        txt.textContent = 'আপডেট হচ্ছে...'; spin.classList.remove('hidden'); btn.disabled = true;
+        try { const user = auth.currentUser; if (user) { await updatePassword(user, newPass); showMessage('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে। অনুগ্রহ করে আবার লগইন করুন।'); document.getElementById('new-admin-password').value = ''; setTimeout(() => signOut(auth), 2000); } else { showMessage('ব্যবহারকারী লগইন অবস্থায় নেই', 'error'); } } catch (error) { console.error(error); if (error.code === 'auth/requires-recent-login') { showMessage('সুরক্ষার জন্য অনুগ্রহ করে লগআউট করে আবার লগইন করুন, তারপর চেষ্টা করুন।', 'error'); } else { showMessage('পাসওয়ার্ড পরিবর্তন ব্যর্থ: ' + error.message, 'error'); } } finally { txt.textContent = 'পাসওয়ার্ড আপডেট'; spin.classList.add('hidden'); btn.disabled = false; }
     });
 
     document.addEventListener('click', async e => {
         const t = e.target.closest('button, svg'); if (!t) return;
-        
-        // Profile Tabs
-        if (t.classList.contains('profile-tab')) {
-            document.querySelectorAll('.profile-tab').forEach(x=>x.classList.remove('tab-active', 'text-indigo-600')); t.classList.add('tab-active', 'text-indigo-600');
-            document.getElementById('profile-content-details').classList.toggle('hidden', t.id!=='profile-tab-details');
-            document.getElementById('profile-content-transactions').classList.toggle('hidden', t.id!=='profile-tab-transactions');
-            document.getElementById('profile-content-summary').classList.toggle('hidden', t.id!=='profile-tab-summary');
-        }
+        if (t.classList.contains('profile-tab')) { document.querySelectorAll('.profile-tab').forEach(x=>x.classList.remove('tab-active', 'text-indigo-600')); t.classList.add('tab-active', 'text-indigo-600'); document.getElementById('profile-content-details').classList.toggle('hidden', t.id!=='profile-tab-details'); document.getElementById('profile-content-transactions').classList.toggle('hidden', t.id!=='profile-tab-transactions'); document.getElementById('profile-content-summary').classList.toggle('hidden', t.id!=='profile-tab-summary'); }
 
-        if (t.id==='login-tab' || t.id==='register-tab') { document.getElementById('login-tab').classList.toggle('tab-active'); document.getElementById('register-tab').classList.toggle('tab-active'); document.getElementById('login-view').classList.toggle('hidden'); document.getElementById('register-view').classList.toggle('hidden'); }
+        // --- MODERN TAB SWITCHING LOGIC ---
+        if (t.id==='login-tab' || t.id==='register-tab') { 
+            const isLogin = t.id === 'login-tab';
+            const indicator = document.getElementById('tab-indicator');
+            indicator.style.transform = isLogin ? 'translateX(0)' : 'translateX(100%)';
+            indicator.style.width = isLogin ? 'calc(50% - 4px)' : 'calc(50% - 4px)'; 
+            document.getElementById('login-tab').classList.toggle('text-indigo-600', isLogin);
+            document.getElementById('login-tab').classList.toggle('text-gray-500', !isLogin);
+            document.getElementById('register-tab').classList.toggle('text-indigo-600', !isLogin);
+            document.getElementById('register-tab').classList.toggle('text-gray-500', isLogin);
+            if(isLogin) { document.getElementById('register-view').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden'); } else { document.getElementById('login-view').classList.add('hidden'); document.getElementById('register-view').classList.remove('hidden'); }
+        }
+        
         if (t.id==='save-logo-btn') await updateData({ logoUrl: document.getElementById('logo-url-input').value });
+        if (t.id==='save-app-url-btn') await updateData({ appDownloadUrl: document.getElementById('app-url-input').value });
+
         if (t.id==='save-new-link-btn') { const n = document.getElementById('new-link-name').value, u = document.getElementById('new-link-url').value; if(n&&u) { await updateData({ importantLinks: [...importantLinks, {id:'L'+Date.now(), name:n, url:u}] }); document.getElementById('new-link-name').value=''; document.getElementById('new-link-url').value=''; showMessage('লিংক সেভ হয়েছে'); } }
         if (t.classList.contains('delete-link-btn')) { if(await showConfirmation('লিংক মুছবেন?')) await updateData({ importantLinks: importantLinks.filter(l => l.id !== t.dataset.id) }); }
-        
         if (t.classList.contains('view-profile-btn')) showProfile(t.dataset.id);
         if (t.id==='close-profile') closeProfileModal();
         if (t.id==='edit-profile-btn') toggleProfileEditMode(true);
         if (t.id==='cancel-edit-btn') { showProfile(activeMember.id, false); toggleProfileEditMode(false); }
-        
         if (t.id==='save-profile-btn') { const u = { name: document.getElementById('profile-name-edit').value, phone: document.getElementById('profile-phone-edit').value, photoUrl: document.getElementById('profile-photo-url-edit').value, employeeId: document.getElementById('profile-employee-id-edit').value, cardNumber: document.getElementById('profile-card-number-edit').value, email: document.getElementById('profile-email-edit').value, notes: document.getElementById('profile-notes-edit').value }; const mm = JSON.parse(JSON.stringify(members)); Object.assign(mm.find(m=>m.id===activeMember.id), u); await updateData({ members: mm }); showMessage('আপডেট হয়েছে'); activeMember = mm.find(m=>m.id===activeMember.id); showProfile(activeMember.id, false); }
         if (t.id==='delete-member-btn') { if(await showConfirmation('সদস্য মুছবেন?')) { await updateData({ members: members.filter(m=>m.id!==activeMember.id) }); closeProfileModal(); showMessage('মুছে ফেলা হয়েছে'); } }
-        
         if (t.id==='open-transaction-modal-btn') openTransactionModal();
         if (t.id==='close-transaction-modal') closeTransactionModal();
         if (t.classList.contains('edit-transaction-btn')) openTransactionModal(t.dataset.tid);
-        if (t.classList.contains('delete-transaction-btn')) { 
-             if(await showConfirmation('লেনদেন মুছবেন?')) { 
-                const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); 
-                m.transactions = m.transactions.filter(x => x.id !== t.dataset.tid && x.linkedDepositId !== t.dataset.tid); 
-                await updateData({ members: mm }); showMessage('লেনদেন মুছে ফেলা হয়েছে'); showProfile(m.id, false); 
-            } 
-        }
-
+        if (t.classList.contains('delete-transaction-btn')) { if(await showConfirmation('লেনদেন মুছবেন?')) { const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); m.transactions = m.transactions.filter(x => x.id !== t.dataset.tid && x.linkedDepositId !== t.dataset.tid); await updateData({ members: mm }); showMessage('লেনদেন মুছে ফেলা হয়েছে'); showProfile(m.id, false); } }
         if (t.id==='open-fund-modal-btn') { editingFundMonth = null; renderFundModal(); document.getElementById('fund-modal').classList.remove('hidden'); document.getElementById('fund-modal').classList.add('flex'); }
         if (t.id==='close-fund-modal') document.getElementById('fund-modal').classList.add('hidden');
-        
         if (t.classList.contains('edit-fund-btn')) { editingFundMonth = t.dataset.month; renderFundModal(); }
         if (t.classList.contains('cancel-fund-edit')) { editingFundMonth = null; renderFundModal(); }
-
-        // --- UPDATED NOTICE LISTENERS ---
-        if (t.id==='edit-notice-btn') { 
-            document.getElementById('notice-display').classList.add('hidden'); 
-            t.classList.add('hidden'); 
-            document.getElementById('notice-edit').classList.remove('hidden'); 
-            
-            document.getElementById('notice-textarea').value=notice.text||''; 
-            // Populate multiline text area
-            document.getElementById('notice-image-urls').value = (notice.imageUrls || (notice.imageUrl ? [notice.imageUrl] : [])).join('\n');
-            
-            document.getElementById('notice-link-text').value=notice.linkText||''; 
-            document.getElementById('notice-link-url').value=notice.linkUrl||''; 
-            document.getElementById('new-link-name').value=''; 
-            document.getElementById('new-link-url').value=''; 
-        }
+        if (t.id==='edit-notice-btn') { document.getElementById('notice-display').classList.add('hidden'); t.classList.add('hidden'); document.getElementById('notice-edit').classList.remove('hidden'); document.getElementById('notice-textarea').value=notice.text||''; document.getElementById('notice-image-urls').value=(notice.imageUrls || (notice.imageUrl ? [notice.imageUrl] : [])).join('\n'); document.getElementById('notice-link-text').value=notice.linkText||''; document.getElementById('notice-link-url').value=notice.linkUrl||''; document.getElementById('new-link-name').value=''; document.getElementById('new-link-url').value=''; }
+        if (t.id==='cancel-notice-btn') { document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); }
+        if (t.id==='save-notice-btn') { const rawUrls = document.getElementById('notice-image-urls').value; const urlArray = rawUrls.split('\n').map(l => l.trim()).filter(l => l !== ''); await updateData({ notice: { text: document.getElementById('notice-textarea').value, imageUrls: urlArray, imageUrl: urlArray[0] || '', linkText: document.getElementById('notice-link-text').value, linkUrl: document.getElementById('notice-link-url').value } }); document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); showMessage('নোটিশ আপডেট হয়েছে'); }
         
-        if (t.id==='cancel-notice-btn') { 
-            document.getElementById('notice-edit').classList.add('hidden'); 
-            document.getElementById('notice-display').classList.remove('hidden'); 
-            document.getElementById('edit-notice-btn').classList.remove('hidden'); 
-        }
-        
-        if (t.id==='save-notice-btn') { 
-            // Read lines, filter empty/spaces
-            const rawUrls = document.getElementById('notice-image-urls').value;
-            const urlArray = rawUrls.split('\n').map(l => l.trim()).filter(l => l !== '');
-            
-            await updateData({ 
-                notice: { 
-                    text: document.getElementById('notice-textarea').value, 
-                    imageUrls: urlArray, // Save as array
-                    imageUrl: urlArray[0] || '', // Fallback for backward compatibility
-                    linkText: document.getElementById('notice-link-text').value, 
-                    linkUrl: document.getElementById('notice-link-url').value 
-                } 
-            }); 
-            
-            document.getElementById('notice-edit').classList.add('hidden'); 
-            document.getElementById('notice-display').classList.remove('hidden'); 
-            document.getElementById('edit-notice-btn').classList.remove('hidden'); 
-            showMessage('নোটিশ আপডেট হয়েছে'); 
-        }
-        
-        // Admin & Lottery Triggers
+        // --- ADMIN & LOTTERY TRIGGERS (UPDATED) ---
         if (t.id === 'open-admin-btn' || t.closest('#open-admin-btn')) { document.getElementById('admin-modal').classList.remove('hidden'); document.getElementById('admin-modal').classList.add('flex'); }
-        if (t.id === 'close-admin-modal' || t.closest('#close-admin-modal')) { 
-            document.getElementById('admin-modal').classList.add('hidden'); 
-            document.getElementById('admin-modal').classList.remove('flex'); 
-        }
-
+        if (t.id === 'close-admin-modal' || t.closest('#close-admin-modal')) { document.getElementById('admin-modal').classList.add('hidden'); document.getElementById('admin-modal').classList.remove('flex'); }
+        
         if (t.id === 'open-lottery-btn' || t.closest('#open-lottery-btn')) { document.getElementById('admin-modal').classList.add('hidden'); document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
         if (t.id === 'main-lottery-btn' || t.closest('#main-lottery-btn')) { document.getElementById('lottery-modal').classList.remove('hidden'); initLottery(); }
-
         if (t.id === 'close-lottery-btn' || t.closest('#close-lottery-btn')) { document.getElementById('lottery-modal').classList.add('hidden'); }
         if (t.id === 'lotteryClearListBtn') clearLotteryList();
         if (t.id === 'lotteryClearHistoryBtn') clearLotteryHistory();
@@ -1106,7 +943,6 @@
     document.getElementById('fund-list-container').addEventListener('submit', async e => { 
         e.preventDefault();
         const form = e.target;
-        
         if(form.classList.contains('assign-fund-form')) { 
             const amt = Number(form.querySelector('input').value), rid = form.querySelector('select').value, mk = form.dataset.month; 
             const globalFund = calculateAvailableFund();
@@ -1119,37 +955,13 @@
                 showMessage('প্রদান করা হয়েছে'); 
             } 
         } else if (form.classList.contains('edit-fund-form')) {
-            const mk = form.dataset.month;
-            const newRid = form.receiverId.value;
-            const newAmt = Number(form.amount.value);
-            
-            const oldDist = fundDistribution[mk];
-            const mm = JSON.parse(JSON.stringify(members));
-            
-            const oldReceiver = mm.find(m => m.id === oldDist.receiverId);
-            const txIndex = oldReceiver.transactions.findIndex(t => t.date === mk+'-01' && t.type === 'loanTaken' && t.amount === oldDist.amount);
-            
-            if (txIndex === -1) {
-                if (newRid === oldDist.receiverId) {
-                     mm.find(m=>m.id===newRid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: newAmt, description: 'তহবিল' });
-                }
-            } else {
-                if (newRid === oldDist.receiverId) {
-                    oldReceiver.transactions[txIndex].amount = newAmt;
-                } else {
-                    oldReceiver.transactions.splice(txIndex, 1);
-                    mm.find(m=>m.id===newRid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: newAmt, description: 'তহবিল' });
-                }
-            }
-
-            await updateData({ members: mm, fundDistribution: { ...fundDistribution, [mk]: { receiverId: newRid, amount: newAmt } } });
-            editingFundMonth = null;
-            renderFundModal();
-            showMessage('তহবিল আপডেট হয়েছে');
+            const mk = form.dataset.month; const newRid = form.receiverId.value; const newAmt = Number(form.amount.value); const oldDist = fundDistribution[mk]; const mm = JSON.parse(JSON.stringify(members)); const oldReceiver = mm.find(m => m.id === oldDist.receiverId); const txIndex = oldReceiver.transactions.findIndex(t => t.date === mk+'-01' && t.type === 'loanTaken' && t.amount === oldDist.amount);
+            if (txIndex === -1) { if (newRid === oldDist.receiverId) { mm.find(m=>m.id===newRid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: newAmt, description: 'তহবিল' }); } } else { if (newRid === oldDist.receiverId) { oldReceiver.transactions[txIndex].amount = newAmt; } else { oldReceiver.transactions.splice(txIndex, 1); mm.find(m=>m.id===newRid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: newAmt, description: 'তহবিল' }); } }
+            await updateData({ members: mm, fundDistribution: { ...fundDistribution, [mk]: { receiverId: newRid, amount: newAmt } } }); editingFundMonth = null; renderFundModal(); showMessage('তহবিল আপডেট হয়েছে');
         }
     });
 
-    // --- LOTTERY LOGIC ---
+    // --- LOTTERY LOGIC (FROM index1.txt) ---
     let l_isAnimating = false;
     function initLottery() { resizeCanvas(); renderLottery(); }
     async function saveLotteryToFirebase() { try { await updateData({ lottery: lottery }); } catch (e) { showMessage("লটারি সেভ সমস্যা", "error"); } }
