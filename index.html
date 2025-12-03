@@ -19,6 +19,10 @@
     .spinner-gray { border: 2px solid rgba(0,0,0,0.2); border-left-color: #4a5568; border-radius:50%; width:16px; height:16px; animation:spin 1s linear infinite;}
     @keyframes spin { 100% { transform: rotate(360deg);} }
     
+    /* Reverse Spin for Double Ring Effect */
+    @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+    .animate-spin-reverse { animation: spin-reverse 1.5s linear infinite; }
+    
     .modal-enter { opacity: 0; transform: scale(0.95); }
     .modal-enter-active { opacity: 1; transform: scale(1); transition: all 300ms ease-out; }
     .modal-exit { opacity: 1; transform: scale(1); }
@@ -47,7 +51,7 @@
         position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity 1.5s ease-in-out;
     }
 
-    /* --- LOTTERY STYLES (From index1.txt) --- */
+    /* --- LOTTERY STYLES --- */
     #lottery-modal { font-family: 'Hind Siliguri', sans-serif; background-color: #0f172a; color: #f1f5f9; }
     #lottery-modal ::-webkit-scrollbar { width: 8px; }
     #lottery-modal ::-webkit-scrollbar-track { background: #1e293b; }
@@ -58,7 +62,7 @@
     #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
     .active-highlight { background-color: #06b6d4; color: black; font-weight: bold; transform: scale(1.05); box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
     
-    /* --- MODERN AUTH STYLES (From index.html) --- */
+    /* --- MODERN AUTH STYLES --- */
     .auth-bg {
         background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
         background-size: 400% 400%;
@@ -97,14 +101,17 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <!-- INITIAL APP LOADER -->
+  <!-- INITIAL APP LOADER (Redesigned) -->
   <div id="app-loader" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-opacity duration-500">
-      <div class="relative w-24 h-24">
-          <div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-          <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
-          <div class="absolute inset-0 flex items-center justify-center font-bold text-indigo-700 text-xl">S</div>
+      <div class="relative w-20 h-20 mb-4">
+          <!-- Outer Ring (Clockwise) -->
+          <div class="absolute inset-0 border-[5px] border-rose-500 border-t-transparent border-b-transparent rounded-full animate-spin"></div>
+          <!-- Inner Ring (Counter-Clockwise) -->
+          <div class="absolute inset-3 border-[4px] border-pink-400 border-l-transparent border-r-transparent rounded-full animate-spin-reverse"></div>
+          <!-- Center Dot -->
+          <div class="absolute inset-0 m-auto w-2 h-2 bg-rose-600 rounded-full animate-pulse"></div>
       </div>
-      <h2 class="mt-4 text-xl font-bold text-gray-700 animate-pulse">লোড হচ্ছে...</h2>
+      <h2 class="text-sm font-semibold text-rose-600 tracking-widest uppercase animate-pulse">মেইন গেইট সমবায় সমিতি</h2>
   </div>
 
   <!-- Main Application Content -->
@@ -128,7 +135,7 @@
           
           <!-- Actions: App Button & Admin Button -->
           <div class="flex items-center gap-2 sm:gap-3">
-            <!-- App Download Button (New) -->
+            <!-- App Download Button -->
             <a id="header-app-btn" href="#important-links-display" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg backdrop-blur-sm transition flex items-center gap-2 border border-white/30 shadow-sm hover:shadow-md group">
                 <span class="text-xl group-hover:scale-110 transition-transform">📱</span> 
                 <span class="hidden md:inline">অ্যাপ</span>
@@ -396,7 +403,7 @@
       </div>
       
       
-      <!-- App Link Edit (NEW) -->
+      <!-- App Link Edit -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-1">অ্যাপ ডাউনলোড লিংক</label>
         <input id="app-url-input" type="url" placeholder="অ্যাপের লিংক এখানে দিন" class="w-full p-2 rounded-lg text-gray-800 text-sm border border-gray-300 focus:ring-2 focus:ring-pink-300 focus:outline-none">
@@ -539,7 +546,7 @@
         </div>
   </div>
 
-  <!-- Lottery Modal (REPLACED FROM index1.txt) -->
+  <!-- Lottery Modal -->
   <div id="lottery-modal" class="hidden fixed inset-0 z-[100] flex flex-col bg-[#0f172a]">
     <canvas id="confetti"></canvas>
     <div class="absolute top-4 left-4 z-50"><button id="close-lottery-btn" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg border border-slate-500"><span>⬅ ফিরে যান</span></button></div>
@@ -584,7 +591,7 @@
 
     let app, db, auth;
     let members = [], fundDistribution = {}, notice = { text: '', imageUrls: [], linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
-    let appDownloadUrl = ''; // NEW VARIABLE
+    let appDownloadUrl = ''; 
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
     
     let editingFundMonth = null;
