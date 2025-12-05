@@ -118,46 +118,39 @@
   <div id="main-app-content" class="hidden">
     
     <!-- Header -->
-    <header class="w-full bg-gradient-to-r from-pink-600 to-red-600 text-white p-3 shadow-lg sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-row justify-between items-center gap-4">
-          <!-- Logo & Title -->
-          <div class="flex items-center gap-3">
-            <img id="header-logo-img" src="https://placehold.co/48x48/FFFFFF/F87171?text=লোগো" alt="লোগো" class="w-12 h-12 rounded-full border-2 border-white object-cover bg-white">
+    <header class="w-full bg-gradient-to-r from-pink-600 to-red-600 text-white p-2 shadow-lg sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div class="flex flex-row justify-between items-center gap-2">
+          <div class="flex items-center gap-2">
+            <img id="header-logo-img" src="https://placehold.co/48x48/FFFFFF/F87171?text=লোগো" alt="লোগো" class="w-9 h-9 sm:w-12 sm:h-12 rounded-full border-2 border-white object-cover bg-white">
             <div class="flex-grow">
-              <h1 class="text-2xl sm:text-3xl font-bold text-white py-0">
-                মেইন গেইট সমবায় সমিতি
+              <h1 class="text-lg sm:text-3xl font-bold text-white leading-tight">
+             মেইন গেইট সমবায় সমিতি
               </h1>
               <p class="text-xs font-semibold text-pink-100"> স্থাপিত: ২০২৫</p>
               <p class="text-sm font-bold text-white mt-1">★ বিশ্বাস ★ মানবিকতা ★ উন্নয়ন ★</p>
             </div>
           </div>
           
-          <!-- Actions: App Button, Notification & Admin Button -->
-          <div class="flex items-center gap-2 sm:gap-3">
-            <!-- App Download Button -->
-            <a id="header-app-btn" href="#important-links-display" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg backdrop-blur-sm transition flex items-center gap-2 border border-white/30 shadow-sm hover:shadow-md group">
-                <span class="text-xl group-hover:scale-110 transition-transform">📱</span> 
+          <div class="flex items-center gap-1.5 sm:gap-3">
+            <a id="header-app-btn" href="#important-links-display" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-1.5 px-2 sm:px-4 rounded-lg backdrop-blur-sm transition flex items-center gap-1 border border-white/30 shadow-sm hover:shadow-md group text-xs sm:text-base">
+                <span class="text-base group-hover:scale-110 transition-transform">📱</span> 
                 <span class="hidden md:inline">অ্যাপ</span>
             </a>
 
-            <!-- Notification Button (UPDATED) -->
-            <button id="open-notif-btn" class="relative bg-white/10 hover:bg-white/20 text-white font-semibold p-2 rounded-lg backdrop-blur-sm transition border border-white/30 shadow-sm hover:shadow-md group">
-                <span class="text-xl">🔔</span>
-                <!-- Updated Badge with Count -->
-                <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border-2 border-white shadow-sm hidden"></span>
+            <button id="open-notif-btn" class="relative bg-white/10 hover:bg-white/20 text-white font-semibold p-1.5 sm:p-2 rounded-lg backdrop-blur-sm transition border border-white/30 shadow-sm hover:shadow-md group">
+                <span class="text-base sm:text-xl">🔔</span>
+                <span id="notif-badge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-bold px-1 py-0.5 rounded-full min-w-[14px] text-center border border-white shadow-sm hidden"></span>
             </button>
 
-            <!-- Admin Panel Button -->
-            <button id="open-admin-btn" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-lg backdrop-blur-sm transition flex items-center gap-2 border border-white/30 shadow-sm hover:shadow-md">
-                <span class="text-xl">⚙️</span> 
+            <button id="open-admin-btn" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-1.5 px-2 sm:px-4 rounded-lg backdrop-blur-sm transition flex items-center gap-1 border border-white/30 shadow-sm hover:shadow-md text-xs sm:text-base">
+                <span class="text-base sm:text-xl">⚙️</span> 
                 <span class="hidden sm:inline">অ্যাডমিন</span>
             </button>
           </div>
         </div>
       </div>
     </header>
-
     <!-- Main Content Grid -->
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
       
