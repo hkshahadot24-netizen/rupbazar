@@ -12,7 +12,7 @@
   
   <style>
     /* ফন্ট আপডেট: 'Noto Sans Bengali' প্রধান ফন্ট */
-    body { font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif; }
+    body { font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif; padding-bottom: 50px; /* To prevent footer overlap */ }
     
     /* স্পিনার এবং অ্যানিমেশন */
     .spinner { border: 3px solid rgba(255,255,255,0.3); border-left-color: #ffffff; border-radius:50%; width:20px; height:20px; animation:spin 1s linear infinite;}
@@ -97,18 +97,46 @@
         animation: float 6s ease-in-out infinite;
     }
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
+
+    /* --- SCROLLING TICKER ANIMATION --- */
+    @keyframes marquee {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+    .animate-marquee {
+        display: inline-block;
+        white-space: nowrap;
+        animation: marquee 20s linear infinite; 
+        padding-left: 100%; 
+    }
+    .ticker-container:hover .animate-marquee {
+        animation-play-state: paused;
+    }
+
+    /* --- AUTO TOAST ANIMATION --- */
+    .toast-slide-in {
+        animation: slideInBottom 0.5s ease-out forwards;
+    }
+    @keyframes slideInBottom {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .toast-slide-out {
+        animation: slideOutRight 0.5s ease-in forwards;
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-  <!-- INITIAL APP LOADER (Redesigned) -->
+  <!-- INITIAL APP LOADER -->
   <div id="app-loader" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center transition-opacity duration-500">
       <div class="relative w-20 h-20 mb-4">
-          <!-- Outer Ring (Clockwise) -->
           <div class="absolute inset-0 border-[5px] border-rose-500 border-t-transparent border-b-transparent rounded-full animate-spin"></div>
-          <!-- Inner Ring (Counter-Clockwise) -->
           <div class="absolute inset-3 border-[4px] border-pink-400 border-l-transparent border-r-transparent rounded-full animate-spin-reverse"></div>
-          <!-- Center Dot -->
           <div class="absolute inset-0 m-auto w-2 h-2 bg-rose-600 rounded-full animate-pulse"></div>
       </div>
       <h2 class="text-sm font-semibold text-rose-600 tracking-widest uppercase animate-pulse">মেইন গেইট সমবায় সমিতি</h2>
@@ -174,6 +202,13 @@
           <!-- NOTICE EDIT FORM -->
           <div id="notice-edit" class="hidden space-y-4 not-prose relative z-10 bg-gray-50 p-4 rounded-xl border border-gray-200 mt-4">
               <h4 class="font-bold text-gray-700 border-b pb-2">নোটিশ ও স্লাইডার আপডেট</h4>
+              
+              <!-- Scrolling Text Input -->
+              <div>
+                <label class="block text-sm font-bold text-indigo-700 mb-1">📢 স্ক্রলিং নোটিশ (নিচের জন্য)</label>
+                <input id="notice-scrolling-text" type="text" class="w-full p-3 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-indigo-50" placeholder="এখানে ব্রেকিং নিউজ বা ছোট নোটিশ লিখুন যা নিচে স্ক্রল করবে...">
+              </div>
+
               <textarea id="notice-textarea" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="নোটিশের বিস্তারিত লিখুন..."></textarea>
               
               <div>
@@ -291,8 +326,23 @@
       </div> 
     </main>
 
+    <!-- AUTO TOAST CONTAINER (NEW) -->
+    <div id="auto-toast-container" class="fixed bottom-14 right-4 z-[200] flex flex-col gap-2 items-end pointer-events-none">
+        <!-- Toasts will be injected here -->
+    </div>
+
+    <!-- FIXED BOTTOM TICKER -->
+    <div id="bottom-ticker" class="fixed bottom-0 left-0 w-full bg-indigo-900 text-white z-30 border-t-2 border-yellow-400 hidden shadow-lg">
+        <div class="flex items-center h-10 overflow-hidden relative">
+            <div class="bg-red-600 text-white px-3 h-full flex items-center font-bold z-10 shadow-md whitespace-nowrap text-sm">📢 নোটিশ:</div>
+            <div class="w-full overflow-hidden relative h-full flex items-center ticker-container bg-indigo-900">
+                <p id="ticker-content" class="animate-marquee text-sm font-semibold text-yellow-100"></p>
+            </div>
+        </div>
+    </div>
+
     <!-- Sync Status -->
-    <div id="sync-status" class="fixed bottom-4 right-4 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-xl transition-opacity duration-300 opacity-0 z-50">
+    <div id="sync-status" class="fixed bottom-12 right-4 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-xl transition-opacity duration-300 opacity-0 z-50">
       <div class="flex items-center gap-2">
           <div id="sync-spinner" class="spinner-gray hidden"></div>
           <span id="sync-text">সিঙ্ক হচ্ছে...</span>
@@ -612,7 +662,7 @@
     const firebaseConfig = { apiKey: "AIzaSyBdfxO5LL9KfzJe-PhvaRbhDhz9G-QH1aE", authDomain: "sg-loan-online.firebaseapp.com", projectId: "sg-loan-online", storageBucket: "sg-loan-online.firebasestorage.app", messagingSenderId: "933667418231", appId: "1:933667418231:web:11c24150426bf869381672" };
 
     let app, db, auth;
-    let members = [], fundDistribution = {}, notice = { text: '', imageUrls: [], linkText: '', linkUrl: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
+    let members = [], fundDistribution = {}, notice = { text: '', imageUrls: [], linkText: '', linkUrl: '', scrollingText: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
     let activityLog = []; // NEW: Activity Log Array
     let appDownloadUrl = ''; 
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
@@ -625,6 +675,7 @@
     let lastDrawTime = 0; 
     let iAmTheDrawer = false;
     let isFirstSnapshot = true;
+    let initialLoadComplete = false;
 
     // --- UTILS ---
     const getBengaliNumber = (n) => { if (n == null || isNaN(n)) return "০"; return new Intl.NumberFormat('bn-BD', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n); };
@@ -691,7 +742,7 @@
             const bgClass = isUnread ? 'bg-blue-50' : 'bg-white';
 
             list.innerHTML += `
-                <div class="${bgClass} p-3 rounded-lg shadow-sm ${colorClass} hover:bg-gray-50 transition text-sm">
+                <div class="${bgClass} p-3 rounded-lg shadow-sm ${colorClass} hover:bg-gray-50 transition text-sm cursor-pointer hover:shadow-md" onclick="window.handleNotificationClick('${log.msg.replace(/'/g, "\\'")}')">
                     <div class="flex justify-between items-start">
                         <span class="font-bold text-gray-800 flex items-center gap-1">${icon} ${log.msg}</span>
                         ${isUnread ? '<span class="w-2 h-2 rounded-full bg-red-500 mt-1"></span>' : ''}
@@ -702,6 +753,98 @@
                 </div>
             `;
         });
+    };
+
+    // --- AUTO TOAST NOTIFICATION LOGIC ---
+    const checkAndPlayNotifications = () => {
+        const lastRead = Number(localStorage.getItem('samiti_notif_last_read') || 0);
+        // Get unread logs, sort by Oldest First to show timeline
+        const unreadLogs = activityLog.filter(l => l.ts > lastRead).sort((a,b) => a.ts - b.ts);
+        
+        if (unreadLogs.length > 0) {
+            playNotificationSequence(unreadLogs);
+        }
+    };
+
+    const playNotificationSequence = (logs) => {
+        if (logs.length === 0) return;
+
+        const currentLog = logs[0];
+        const remainingLogs = logs.slice(1);
+
+        // Show toast
+        showAutoToast(currentLog);
+
+        // Update read status immediately so it doesn't show again if page reloaded
+        localStorage.setItem('samiti_notif_last_read', currentLog.ts);
+        renderNotifications(); // Update badge
+
+        // Schedule next
+        setTimeout(() => {
+            playNotificationSequence(remainingLogs);
+        }, 4000); // 4 seconds per toast
+    };
+
+    const showAutoToast = (log) => {
+        const container = document.getElementById('auto-toast-container');
+        const toast = document.createElement('div');
+        
+        let icon = '📌';
+        let bgClass = 'bg-white';
+        let borderClass = 'border-l-4 border-gray-400';
+
+        if(log.msg.includes('জমা') || log.msg.includes('টাকা')) { icon = '💰'; borderClass = 'border-l-4 border-green-500'; }
+        if(log.msg.includes('ঋণ') || log.msg.includes('খরচ')) { icon = '💸'; borderClass = 'border-l-4 border-red-500'; }
+        if(log.msg.includes('লটারি')) { icon = '🎲'; borderClass = 'border-l-4 border-purple-500'; }
+        if(log.msg.includes('সদস্য')) { icon = '👤'; borderClass = 'border-l-4 border-blue-500'; }
+        if(log.msg.includes('নোটিশ')) { icon = '📢'; borderClass = 'border-l-4 border-yellow-500'; }
+
+        toast.className = `toast-slide-in pointer-events-auto bg-white p-4 rounded-xl shadow-2xl ${borderClass} w-80 flex items-start gap-3 cursor-pointer hover:bg-gray-50 transition transform hover:scale-105`;
+        toast.innerHTML = `
+            <div class="text-2xl">${icon}</div>
+            <div class="flex-1">
+                <p class="font-bold text-gray-800 text-sm leading-tight">${log.msg}</p>
+                <p class="text-[10px] text-gray-500 mt-1 text-right">${log.dateStr}</p>
+            </div>
+        `;
+
+        // Click Handler
+        toast.addEventListener('click', () => {
+            window.handleNotificationClick(log.msg);
+            toast.remove(); // Remove immediately on click
+        });
+
+        container.appendChild(toast);
+
+        // Remove after 3.5 seconds (allowing slide out animation time)
+        setTimeout(() => {
+            toast.classList.remove('toast-slide-in');
+            toast.classList.add('toast-slide-out');
+            setTimeout(() => toast.remove(), 500);
+        }, 3500);
+    };
+
+    // --- NOTIFICATION CLICK HANDLER ---
+    window.handleNotificationClick = (msg) => {
+        // Simple keyword based routing
+        if (msg.includes('লটারি')) {
+            document.getElementById('lottery-modal').classList.remove('hidden');
+            initLottery();
+        } else if (msg.includes('নোটিশ')) {
+            document.getElementById('notice-display').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Highlight effect
+            const noticeBoard = document.getElementById('notice-display').parentElement;
+            noticeBoard.classList.add('ring-4', 'ring-yellow-400');
+            setTimeout(() => noticeBoard.classList.remove('ring-4', 'ring-yellow-400'), 2000);
+        } else if (msg.includes('তহবিল')) {
+            document.getElementById('open-fund-modal-btn').click();
+        } else {
+            // Default: Scroll to member list (Transactions/Members)
+            const memberList = document.getElementById('member-list-cards');
+            memberList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            memberList.parentElement.classList.add('ring-4', 'ring-blue-400');
+            setTimeout(() => memberList.parentElement.classList.remove('ring-4', 'ring-blue-400'), 2000);
+        }
     };
 
     // --- CHART RENDERING ---
@@ -759,6 +902,17 @@
     // UPDATED RENDER NOTICE BOARD FUNCTION FOR KEN BURNS SLIDESHOW
     const renderNoticeBoard = () => {
         const d = document.getElementById('notice-display'); d.innerHTML = '';
+        const ticker = document.getElementById('bottom-ticker');
+        const tickerContent = document.getElementById('ticker-content');
+        
+        // --- TICKER RENDER LOGIC ---
+        if (notice.scrollingText && notice.scrollingText.trim() !== '') {
+            ticker.classList.remove('hidden');
+            tickerContent.textContent = notice.scrollingText;
+        } else {
+            ticker.classList.add('hidden');
+        }
+
         if (noticeSlideInterval) clearInterval(noticeSlideInterval);
         let images = []; if (Array.isArray(notice.imageUrls)) { images = notice.imageUrls.filter(u => u.trim() !== ''); } else if (notice.imageUrl) { images = [notice.imageUrl]; }
         if (images.length === 0 && !notice.text && !notice.linkUrl) { d.innerHTML = '<div class="text-center p-8 bg-gray-50 rounded-lg text-gray-400 italic">আপাতত কোনো নতুন নোটিশ নেই।</div>'; return; }
@@ -928,13 +1082,30 @@
         appDownloadUrl = d.appDownloadUrl || ''; // Load App URL
         activityLog = d.activityLog || []; // Load Activity Log
 
-        if (d.notice) { if (typeof d.notice === 'string') { notice = { text: d.notice, imageUrls: [], linkText: '', linkUrl: '' }; } else { notice = d.notice; if (!notice.imageUrls && notice.imageUrl) { notice.imageUrls = [notice.imageUrl]; } else if (!notice.imageUrls) { notice.imageUrls = []; } } } else { notice = { text: '', imageUrls: [], linkText: '', linkUrl: '' }; }
+        if (d.notice) { 
+            if (typeof d.notice === 'string') { 
+                notice = { text: d.notice, imageUrls: [], linkText: '', linkUrl: '', scrollingText: '' }; 
+            } else { 
+                notice = d.notice; 
+                // Ensure array
+                if (!notice.imageUrls && notice.imageUrl) { notice.imageUrls = [notice.imageUrl]; } else if (!notice.imageUrls) { notice.imageUrls = []; }
+                // Ensure scrolling text
+                if (notice.scrollingText === undefined) notice.scrollingText = '';
+            } 
+        } else { notice = { text: '', imageUrls: [], linkText: '', linkUrl: '', scrollingText: '' }; }
+        
         const dbLottery = d.lottery || { participants: [], history: [], liveDraw: null }; lottery.participants = dbLottery.participants || []; lottery.history = dbLottery.history || [];
         if (dbLottery.liveDraw) { if (isFirstSnapshot) { lastDrawTime = dbLottery.liveDraw.ts; } else if (dbLottery.liveDraw.ts > lastDrawTime) { lastDrawTime = dbLottery.liveDraw.ts; if (!l_isAnimating) { if (!document.getElementById('lottery-modal').classList.contains('hidden')) { startLiveLottery(dbLottery.liveDraw.winnerIndex); } } } }
         isFirstSnapshot = false; 
         
         renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); renderNotifications(); // Render Notifications
         if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal(); if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
+
+        // Check for Auto Toasts on Initial Load (after login)
+        if (!initialLoadComplete) {
+            checkAndPlayNotifications();
+            initialLoadComplete = true;
+        }
     });
 
     // Initialize the app
@@ -1090,14 +1261,33 @@
         if (t.id==='close-fund-modal') document.getElementById('fund-modal').classList.add('hidden');
         if (t.classList.contains('edit-fund-btn')) { editingFundMonth = t.dataset.month; renderFundModal(); }
         if (t.classList.contains('cancel-fund-edit')) { editingFundMonth = null; renderFundModal(); }
-        if (t.id==='edit-notice-btn') { document.getElementById('notice-display').classList.add('hidden'); t.classList.add('hidden'); document.getElementById('notice-edit').classList.remove('hidden'); document.getElementById('notice-textarea').value=notice.text||''; document.getElementById('notice-image-urls').value=(notice.imageUrls || (notice.imageUrl ? [notice.imageUrl] : [])).join('\n'); document.getElementById('notice-link-text').value=notice.linkText||''; document.getElementById('notice-link-url').value=notice.linkUrl||''; document.getElementById('new-link-name').value=''; document.getElementById('new-link-url').value=''; }
+        if (t.id==='edit-notice-btn') { 
+            document.getElementById('notice-display').classList.add('hidden'); 
+            t.classList.add('hidden'); 
+            document.getElementById('notice-edit').classList.remove('hidden'); 
+            document.getElementById('notice-textarea').value=notice.text||''; 
+            document.getElementById('notice-image-urls').value=(notice.imageUrls || (notice.imageUrl ? [notice.imageUrl] : [])).join('\n'); 
+            document.getElementById('notice-link-text').value=notice.linkText||''; 
+            document.getElementById('notice-link-url').value=notice.linkUrl||''; 
+            // Scrolling Text
+            document.getElementById('notice-scrolling-text').value=notice.scrollingText||''; 
+
+            document.getElementById('new-link-name').value=''; 
+            document.getElementById('new-link-url').value=''; 
+        }
         if (t.id==='cancel-notice-btn') { document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); }
         
         // NOTICE UPDATE LOGGED
         if (t.id==='save-notice-btn') { 
             const rawUrls = document.getElementById('notice-image-urls').value; const urlArray = rawUrls.split('\n').map(l => l.trim()).filter(l => l !== ''); 
             await updateData({ 
-                notice: { text: document.getElementById('notice-textarea').value, imageUrls: urlArray, imageUrl: urlArray[0] || '', linkText: document.getElementById('notice-link-text').value, linkUrl: document.getElementById('notice-link-url').value },
+                notice: { 
+                    text: document.getElementById('notice-textarea').value, 
+                    imageUrls: urlArray, imageUrl: urlArray[0] || '', 
+                    linkText: document.getElementById('notice-link-text').value, 
+                    linkUrl: document.getElementById('notice-link-url').value,
+                    scrollingText: document.getElementById('notice-scrolling-text').value // Save Scrolling Text
+                },
                 activityLog: createLog('নোটিশ বোর্ড আপডেট করা হয়েছে', 'warning')
             }); 
             document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); showMessage('নোটিশ আপডেট হয়েছে'); 
