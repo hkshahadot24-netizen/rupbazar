@@ -98,16 +98,16 @@
     }
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
 
-    /* --- SCROLLING TICKER ANIMATION --- */
+    /* --- SCROLLING TICKER ANIMATION (UPDATED FOR SEAMLESS LOOP & SPEED) --- */
     @keyframes marquee {
-        0% { transform: translateX(100%); }
-        100% { transform: translateX(-100%); }
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
     }
     .animate-marquee {
         display: inline-block;
         white-space: nowrap;
-        animation: marquee 20s linear infinite; 
-        padding-left: 100%; 
+        animation: marquee 60s linear infinite; /* Base duration, overridden by JS */
+        /* Padding removed to prevent gaps */
     }
     .ticker-container:hover .animate-marquee {
         animation-play-state: paused;
@@ -652,7 +652,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, sendEmailVerification, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, sendEmailVerification, signOut, updatePassword, reload } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
     setLogLevel('Debug');
@@ -666,6 +666,7 @@
     let activityLog = []; // NEW: Activity Log Array
     let appDownloadUrl = ''; 
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
+    let isExplicitAuthAction = false; // NEW FLAG for tracking explicit login/register actions
     
     let editingFundMonth = null;
     let noticeSlideInterval = null; 
@@ -905,10 +906,31 @@
         const ticker = document.getElementById('bottom-ticker');
         const tickerContent = document.getElementById('ticker-content');
         
-        // --- TICKER RENDER LOGIC ---
+        // --- TICKER RENDER LOGIC (UPDATED) ---
         if (notice.scrollingText && notice.scrollingText.trim() !== '') {
             ticker.classList.remove('hidden');
-            tickerContent.textContent = notice.scrollingText;
+            
+            // Logic for continuous seamless scrolling
+            const baseText = notice.scrollingText.trim();
+            const separator = "  🔴  "; // Visible separator
+            const singleItem = baseText + separator;
+            
+            // Repeat enough times to ensure it fills screen widely (e.g. 5 times per half)
+            const repeatCount = 5; 
+            const halfContent = singleItem.repeat(repeatCount);
+            
+            // Double the content for the -50% slide trick
+            tickerContent.innerHTML = halfContent + halfContent;
+            
+            // Calculate duration for "Standard Readability" (e.g., 50 pixels per second approx, or chars based)
+            // Let's assume average char width ~10px. Speed ~50px/s => 5 chars/s.
+            // Total chars in the doubled string
+            const totalChars = (baseText.length + separator.length) * repeatCount * 2;
+            const speedPerChar = 0.25; // seconds per char (adjust for slowness)
+            const duration = Math.max(totalChars * speedPerChar, 20); // Min 20s
+            
+            tickerContent.style.animationDuration = `${duration}s`;
+            
         } else {
             ticker.classList.add('hidden');
         }
@@ -1022,23 +1044,39 @@
         try { 
             app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); 
 
-            // Initialize Auth State Listener
-            onAuthStateChanged(auth, u => {
+            // Initialize Auth State Listener (Updated to fix flicker)
+            onAuthStateChanged(auth, async u => {
                 const loader = document.getElementById('app-loader');
                 
+                // If user exists, but we want to be sure about the emailVerified status to prevent flicker
+                if (u && !u.emailVerified) {
+                    try { await reload(u); } catch(e) { console.log('Reload failed', e); }
+                }
+
                 // Transition logic
                 if (u && u.emailVerified) { 
+                    // User is logged in AND verified
                     document.getElementById('auth-modal').classList.add('hidden'); 
                     document.getElementById('verify-email-modal').classList.add('hidden'); 
                     document.getElementById('main-app-content').classList.remove('hidden'); 
                     listen(); 
                 } else if (u) { 
-                    document.getElementById('user-email-info').textContent = u.email; 
-                    document.getElementById('auth-modal').classList.add('hidden'); // Hide login
-                    document.getElementById('main-app-content').classList.add('hidden'); // Hide main app
-                    document.getElementById('verify-email-modal').classList.remove('hidden'); 
-                    document.getElementById('verify-email-modal').classList.add('flex'); 
+                    // User is logged in BUT NOT verified
+                    // Only show verification modal if user JUST tried to login/register manually
+                    // Otherwise (on reload), force logout to show input box
+                    if (isExplicitAuthAction) {
+                        document.getElementById('user-email-info').textContent = u.email; 
+                        document.getElementById('auth-modal').classList.add('hidden'); // Hide login
+                        document.getElementById('main-app-content').classList.add('hidden'); // Hide main app
+                        document.getElementById('verify-email-modal').classList.remove('hidden'); 
+                        document.getElementById('verify-email-modal').classList.add('flex'); 
+                    } else {
+                        // If this is a reload and user is unverified, sign out to show login screen
+                        signOut(auth);
+                        return; // Exit here, onAuthStateChanged will fire again with u=null
+                    }
                 } else { 
+                    // User is NOT logged in
                     document.getElementById('main-app-content').classList.add('hidden'); 
                     document.getElementById('verify-email-modal').classList.add('hidden'); 
                     document.getElementById('auth-modal').classList.remove('hidden'); 
@@ -1114,6 +1152,7 @@
     // --- EVENT LISTENERS ---
     document.getElementById('login-form').addEventListener('submit', async e => { 
         e.preventDefault(); 
+        isExplicitAuthAction = true; // Set flag to allow verify modal
         const btn = document.getElementById('login-button'); btn.disabled=true; btn.querySelector('.spinner').classList.remove('hidden');
         try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); } 
         catch(e){ document.getElementById('login-error').textContent='ভুল তথ্য।'; btn.disabled=false; btn.querySelector('.spinner').classList.add('hidden'); } 
@@ -1121,6 +1160,7 @@
     
     document.getElementById('register-form').addEventListener('submit', async e => { 
         e.preventDefault(); 
+        isExplicitAuthAction = true; // Set flag to allow verify modal
         const btn = document.getElementById('register-button'); 
         const p = document.getElementById('register-password').value; 
         if(p!==document.getElementById('confirm-password').value) return document.getElementById('register-error').textContent='পাসওয়ার্ড মিলছে না'; 
