@@ -98,7 +98,7 @@
     }
     @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
 
-    /* --- SCROLLING TICKER ANIMATION (UPDATED FOR SEAMLESS LOOP & SPEED) --- */
+    /* --- SCROLLING TICKER ANIMATION --- */
     @keyframes marquee {
         0% { transform: translateX(0); }
         100% { transform: translateX(-50%); }
@@ -106,8 +106,7 @@
     .animate-marquee {
         display: inline-block;
         white-space: nowrap;
-        animation: marquee 60s linear infinite; /* Base duration, overridden by JS */
-        /* Padding removed to prevent gaps */
+        animation: marquee 60s linear infinite; 
     }
     .ticker-container:hover .animate-marquee {
         animation-play-state: paused;
@@ -127,6 +126,24 @@
     @keyframes slideOutRight {
         from { transform: translateX(0); opacity: 1; }
         to { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* --- PREMIUM NOTICE BOARD FLOATING EFFECTS --- */
+    @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+    }
+    .animate-blob { animation: blob 7s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
@@ -499,10 +516,15 @@
         <div id="profile-content-container" class="overflow-y-auto flex-grow">
             <!-- Details Panel -->
             <div id="profile-content-details">
-                <div class="flex justify-end space-x-2 mb-4">
-                    <button id="edit-profile-btn" class="bg-yellow-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-yellow-600 transition flex items-center gap-2"><span>সম্পাদনা</span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>
-                    <button id="save-profile-btn" class="hidden bg-green-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-600 transition flex items-center gap-2"><span>সেভ</span><div id="save-profile-spinner" class="spinner hidden"></div></button>
-                    <button id="cancel-edit-btn" class="hidden bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600 transition">বাতিল</button>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <button id="add-to-lottery-btn" class="bg-purple-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-purple-700 transition flex items-center gap-2 shadow-sm text-sm">
+                        <span>🎲 লটারিতে যুক্ত করুন</span>
+                    </button>
+                    <div class="flex justify-end space-x-2 w-full sm:w-auto">
+                        <button id="edit-profile-btn" class="bg-yellow-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-yellow-600 transition flex items-center gap-2 text-sm"><span>সম্পাদনা</span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>
+                        <button id="save-profile-btn" class="hidden bg-green-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-600 transition flex items-center gap-2 text-sm"><span>সেভ</span><div id="save-profile-spinner" class="spinner hidden"></div></button>
+                        <button id="cancel-edit-btn" class="hidden bg-gray-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-gray-600 transition text-sm">বাতিল</button>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
                     <p class="text-gray-600 flex flex-col sm:col-span-2"><span class="font-semibold text-gray-800 mb-1">নাম:</span><span id="profile-name-view" class="text-gray-900 bg-gray-100 p-2 rounded"></span><input id="profile-name-edit" type="text" class="hidden border rounded-lg p-2"></p>
@@ -521,7 +543,7 @@
                 <div class="flex justify-end mb-4 gap-2"><button id="open-transaction-modal-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 transition flex items-center gap-2"><span>নতুন লেনদেন</span><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg></button></div>
                 <div class="overflow-y-auto border rounded-lg shadow-inner h-full">
                     <table class="min-w-full bg-gray-50">
-                        <thead class="bg-indigo-100 sticky top-0"><tr><th class="py-2 px-4 text-left text-xs font-medium text-gray-600 uppercase">তারিখ</th><th class="py-2 px-4 text-left text-xs font-medium text-gray-600 uppercase">বিবরণ</th><th class="py-2 px-4 text-right text-xs font-medium text-gray-600 uppercase">পরিমাণ (৳)</th><th class="py-2 px-4 text-center text-xs font-medium text-gray-600 uppercase">অ্যাকশন</th></tr></thead>
+                        <thead class="bg-indigo-100 sticky top-0"><tr><th class="py-2 px-4 text-left text-xs font-medium text-gray-600 uppercase">তারিখ ও আইডি</th><th class="py-2 px-4 text-left text-xs font-medium text-gray-600 uppercase">বিবরণ</th><th class="py-2 px-4 text-right text-xs font-medium text-gray-600 uppercase">পরিমাণ (৳)</th><th class="py-2 px-4 text-center text-xs font-medium text-gray-600 uppercase">অ্যাকশন</th></tr></thead>
                         <tbody id="transactions-table-body" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
@@ -621,7 +643,21 @@
         </div>
         <!-- Right/Main Display -->
         <div class="lg:col-span-8 flex flex-col gap-6 h-full">
-            <div id="lotteryWinnerSection" class="hidden w-full transition-all duration-500"><div class="lottery-card p-10 rounded-3xl border-4 border-yellow-500/50 shadow-[0_0_80px_rgba(234,179,8,0.5)] text-center bg-gradient-to-b from-slate-800/90 to-slate-900/95 backdrop-blur-xl transform scale-105"><h3 class="text-3xl text-yellow-400 mb-6 font-bold animate-pulse">🎉 অভিনন্দন! আজকের বিজয়ী 🎉</h3><div id="lotteryWinnerText" class="text-6xl md:text-8xl font-extrabold text-white break-words drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] tracking-wide"></div></div></div>
+            <div id="lotteryWinnerSection" class="hidden w-full transition-all duration-500">
+                <div class="lottery-card p-10 rounded-3xl border-4 border-yellow-500/50 shadow-[0_0_80px_rgba(234,179,8,0.5)] text-center bg-gradient-to-b from-slate-800/90 to-slate-900/95 backdrop-blur-xl transform scale-105">
+                    <h3 class="text-3xl text-yellow-400 mb-6 font-bold animate-pulse">🎉 অভিনন্দন! আজকের বিজয়ী 🎉</h3>
+                    <div id="lotteryWinnerText" class="text-6xl md:text-8xl font-extrabold text-white break-words drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] tracking-wide mb-4"></div>
+                    <div id="lotteryWinnerDetails" class="text-lg text-cyan-100 font-medium whitespace-pre-line mt-6 bg-slate-900/50 p-6 rounded-xl hidden text-left inline-block mx-auto border border-cyan-800/50"></div>
+                    <div id="lotteryWinnerActions" class="mt-8 flex flex-col sm:flex-row justify-center gap-4 hidden">
+                        <button id="send-winner-wa-btn" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition transform hover:scale-105">
+                            <span class="text-xl">📲</span> হোয়াটসঅ্যাপে পাঠান
+                        </button>
+                        <button id="save-winner-notice-btn" class="bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition transform hover:scale-105 text-slate-900">
+                            <span class="text-xl">📢</span> নোটিশে সেভ করুন
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div class="lottery-card p-6 rounded-xl flex-1 flex flex-col shadow-xl h-full min-h-[400px]"><div class="flex justify-between items-center mb-4 px-2"><h2 class="text-2xl font-semibold text-slate-200">অংশগ্রহণকারী <span class="text-base font-normal text-slate-400 ml-2">(মোট: <span id="lotteryCountBadge" class="text-cyan-400 font-bold">0</span>)</span></h2></div><ul id="lotteryParticipants" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 overflow-y-auto pr-2 flex-1 content-start"><li class="col-span-full text-center text-slate-500 italic py-10 text-lg">কোনো নাম যোগ করা হয়নি</li></ul></div>
         </div>
     </div>
@@ -663,10 +699,10 @@
 
     let app, db, auth;
     let members = [], fundDistribution = {}, notice = { text: '', imageUrls: [], linkText: '', linkUrl: '', scrollingText: '' }, logoUrl = '', importantLinks = [], lottery = { participants: [], history: [], liveDraw: null };
-    let activityLog = []; // NEW: Activity Log Array
+    let activityLog = []; 
     let appDownloadUrl = ''; 
     let activeMember = null, isSaving = false, verificationCheckInterval = null, searchQuery = '';
-    let isExplicitAuthAction = false; // NEW FLAG for tracking explicit login/register actions
+    let isExplicitAuthAction = false; 
     
     let editingFundMonth = null;
     let noticeSlideInterval = null; 
@@ -688,16 +724,47 @@
     const calculateMemberTotals = (m) => { const t = { totalDeposit: 0, totalLoanTaken: 0, totalLoanRepaid: 0, currentLoan: 0 }; (m?.transactions || []).forEach(tx => { const a = Number(tx.amount)||0; if(tx.type==='deposit') t.totalDeposit+=a; else if(tx.type==='loanTaken') t.totalLoanTaken+=a; else if(tx.type==='loanRepayment') t.totalLoanRepaid+=a; }); t.currentLoan = t.totalLoanTaken - t.totalLoanRepaid; return t; };
     const calculateAvailableFund = () => { let td=0, tlt=0, tlr=0; members.forEach(m => { const t = calculateMemberTotals(m); td+=t.totalDeposit; tlt+=t.totalLoanTaken; tlr+=t.totalLoanRepaid; }); return td + tlr - tlt; };
 
-    // --- NEW: NOTIFICATION SYSTEM HELPERS ---
+    // --- WHATSAPP MESSAGING HELPERS ---
+    const formatPhoneForWA = (phone) => {
+        if(!phone) return '';
+        let cleanPhone = phone.replace(/\D/g, '');
+        if(cleanPhone.length === 11 && cleanPhone.startsWith('01')) cleanPhone = '88' + cleanPhone;
+        else if(cleanPhone.length < 11) return ''; 
+        return cleanPhone;
+    };
+    
+    window.sendPersonalWhatsApp = (phone, name, amount, typeStr, txId, txDateStr) => {
+        const waPhone = formatPhoneForWA(phone);
+        if(!waPhone) return showMessage('সঠিক মোবাইল নম্বর নেই', 'error');
+        const msg = `আসসালামু আলাইকুম,\n*প্রিয় ${name}*,\n\n🏢 *মেইন গেইট সমবায় সমিতি* থেকে আপনার ${typeStr} বাবদ *৳${getBengaliNumber(amount)}* সফলভাবে সম্পন্ন হয়েছে।\n\n🧾 *লেনদেনের বিবরণ:*\n▪ ট্রানজ্যাকশন আইডি: ${txId}\n▪ তারিখ ও সময়: ${txDateStr}\n\n🌐 আপনার লেনদেন ও অ্যাকাউন্টের বিস্তারিত জানতে ভিজিট করুন:\nhttps://hkshahadot24-netizen.github.io/sgloan/\n\nধন্যবাদান্তে,\nমেইন গেইট সমবায় সমিতি।`;
+        window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+
+    window.sendBulkWhatsApp = async (baseMessage) => {
+        let successCount = 0;
+        for (let i = 0; i < members.length; i++) {
+            let m = members[i];
+            const waPhone = formatPhoneForWA(m.phone);
+            if(waPhone) {
+                let msg = `আসসালামু আলাইকুম,\n*প্রিয় ${m.name}*,\n\n${baseMessage}\n\n🌐 আপনার লেনদেন ও অ্যাকাউন্টের বিস্তারিত জানতে ভিজিট করুন:\nhttps://hkshahadot24-netizen.github.io/sgloan/\n\nধন্যবাদান্তে,\ মেইন গেইট সমবায় সমিতি।`;
+                window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                successCount++;
+                // ১.৫ সেকেন্ড বিরতি দিয়ে পরের ট্যাব ওপেন হবে (ব্রাউজার ব্লক এড়াতে)
+                await new Promise(r => setTimeout(r, 1500)); 
+            }
+        }
+        showMessage(`${successCount} জন সদস্যকে মেসেজ পাঠানো সম্পন্ন হয়েছে।`);
+    };
+
+    // --- NOTIFICATION SYSTEM HELPERS ---
     const createLog = (msg, type = 'info') => {
         const newLog = {
             id: 'LOG' + Date.now(),
             msg: msg,
-            type: type, // info, success, warning, error
+            type: type, 
             ts: Date.now(),
             dateStr: new Date().toLocaleString('bn-BD')
         };
-        // নতুন লগ সবার আগে, এবং সর্বোচ্চ ৫০টি লগ রাখবে
         return [newLog, ...activityLog].slice(0, 50); 
     };
 
@@ -706,20 +773,18 @@
         const badge = document.getElementById('notif-badge');
         const countSpan = document.getElementById('notif-count');
         
-        // --- UPDATED LOGIC FOR BADGE (READ/UNREAD) ---
         const lastRead = Number(localStorage.getItem('samiti_notif_last_read') || 0);
         const unreadCount = activityLog.filter(l => l.ts > lastRead).length;
 
         if (unreadCount > 0) {
             badge.textContent = getBengaliNumber(unreadCount);
             badge.classList.remove('hidden');
-            badge.classList.add('animate-bounce'); // Visual cue for new items
+            badge.classList.add('animate-bounce'); 
         } else {
             badge.classList.add('hidden');
             badge.classList.remove('animate-bounce');
         }
 
-        // Modal Content
         countSpan.textContent = getBengaliNumber(activityLog.length);
         list.innerHTML = '';
 
@@ -738,7 +803,6 @@
             if(log.msg.includes('সদস্য')) { icon = '👤'; colorClass = 'border-l-4 border-blue-500'; }
             if(log.msg.includes('নোটিশ')) { icon = '📢'; colorClass = 'border-l-4 border-yellow-500'; }
 
-            // Highlight new items inside the list as well
             const isUnread = log.ts > lastRead;
             const bgClass = isUnread ? 'bg-blue-50' : 'bg-white';
 
@@ -756,10 +820,8 @@
         });
     };
 
-    // --- AUTO TOAST NOTIFICATION LOGIC ---
     const checkAndPlayNotifications = () => {
         const lastRead = Number(localStorage.getItem('samiti_notif_last_read') || 0);
-        // Get unread logs, sort by Oldest First to show timeline
         const unreadLogs = activityLog.filter(l => l.ts > lastRead).sort((a,b) => a.ts - b.ts);
         
         if (unreadLogs.length > 0) {
@@ -773,17 +835,14 @@
         const currentLog = logs[0];
         const remainingLogs = logs.slice(1);
 
-        // Show toast
         showAutoToast(currentLog);
 
-        // Update read status immediately so it doesn't show again if page reloaded
         localStorage.setItem('samiti_notif_last_read', currentLog.ts);
-        renderNotifications(); // Update badge
+        renderNotifications(); 
 
-        // Schedule next
         setTimeout(() => {
             playNotificationSequence(remainingLogs);
-        }, 4000); // 4 seconds per toast
+        }, 4000); 
     };
 
     const showAutoToast = (log) => {
@@ -809,15 +868,13 @@
             </div>
         `;
 
-        // Click Handler
         toast.addEventListener('click', () => {
             window.handleNotificationClick(log.msg);
-            toast.remove(); // Remove immediately on click
+            toast.remove(); 
         });
 
         container.appendChild(toast);
 
-        // Remove after 3.5 seconds (allowing slide out animation time)
         setTimeout(() => {
             toast.classList.remove('toast-slide-in');
             toast.classList.add('toast-slide-out');
@@ -825,22 +882,18 @@
         }, 3500);
     };
 
-    // --- NOTIFICATION CLICK HANDLER ---
     window.handleNotificationClick = (msg) => {
-        // Simple keyword based routing
         if (msg.includes('লটারি')) {
             document.getElementById('lottery-modal').classList.remove('hidden');
             initLottery();
         } else if (msg.includes('নোটিশ')) {
             document.getElementById('notice-display').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Highlight effect
             const noticeBoard = document.getElementById('notice-display').parentElement;
             noticeBoard.classList.add('ring-4', 'ring-yellow-400');
             setTimeout(() => noticeBoard.classList.remove('ring-4', 'ring-yellow-400'), 2000);
         } else if (msg.includes('তহবিল')) {
             document.getElementById('open-fund-modal-btn').click();
         } else {
-            // Default: Scroll to member list (Transactions/Members)
             const memberList = document.getElementById('member-list-cards');
             memberList.scrollIntoView({ behavior: 'smooth', block: 'start' });
             memberList.parentElement.classList.add('ring-4', 'ring-blue-400');
@@ -867,21 +920,15 @@
     // --- UI RENDERING ---
     const renderHeaderLogo = () => { const img = document.getElementById('header-logo-img'); img.src = logoUrl || 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; img.onerror = () => img.src = 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; document.getElementById('logo-url-input').value = logoUrl || ''; };
     
-    // Updated: Handle Header App Button
     const renderHeaderAppButton = () => {
         const headerAppBtn = document.getElementById('header-app-btn');
         const adminInput = document.getElementById('app-url-input');
-        
-        // Update Admin Input
         if(adminInput) adminInput.value = appDownloadUrl || '';
-
-        // Update Header Button Link
         if (headerAppBtn) {
             if (appDownloadUrl && appDownloadUrl.trim() !== '') {
                 headerAppBtn.href = appDownloadUrl;
                 headerAppBtn.target = "_blank";
             } else {
-                // Fallback Logic
                 const appLink = importantLinks.find(l => l.name.toLowerCase().includes('app') || l.name.toLowerCase().includes('apk') || l.name.toLowerCase().includes('download') || l.name.includes('অ্যাপ'));
                 if (appLink) {
                     headerAppBtn.href = appLink.url;
@@ -900,37 +947,23 @@
         renderHeaderAppButton();
     };
     
-    // UPDATED RENDER NOTICE BOARD FUNCTION FOR KEN BURNS SLIDESHOW
     const renderNoticeBoard = () => {
         const d = document.getElementById('notice-display'); d.innerHTML = '';
         const ticker = document.getElementById('bottom-ticker');
         const tickerContent = document.getElementById('ticker-content');
         
-        // --- TICKER RENDER LOGIC (UPDATED) ---
         if (notice.scrollingText && notice.scrollingText.trim() !== '') {
             ticker.classList.remove('hidden');
-            
-            // Logic for continuous seamless scrolling
             const baseText = notice.scrollingText.trim();
-            const separator = "  🔴  "; // Visible separator
+            const separator = "  🔴  "; 
             const singleItem = baseText + separator;
-            
-            // Repeat enough times to ensure it fills screen widely (e.g. 5 times per half)
             const repeatCount = 5; 
             const halfContent = singleItem.repeat(repeatCount);
-            
-            // Double the content for the -50% slide trick
             tickerContent.innerHTML = halfContent + halfContent;
-            
-            // Calculate duration for "Standard Readability" (e.g., 50 pixels per second approx, or chars based)
-            // Let's assume average char width ~10px. Speed ~50px/s => 5 chars/s.
-            // Total chars in the doubled string
             const totalChars = (baseText.length + separator.length) * repeatCount * 2;
-            const speedPerChar = 0.25; // seconds per char (adjust for slowness)
-            const duration = Math.max(totalChars * speedPerChar, 20); // Min 20s
-            
+            const speedPerChar = 0.25; 
+            const duration = Math.max(totalChars * speedPerChar, 20); 
             tickerContent.style.animationDuration = `${duration}s`;
-            
         } else {
             ticker.classList.add('hidden');
         }
@@ -963,8 +996,73 @@
                 setTimeout(() => { document.getElementById('prev-slide-btn')?.addEventListener('click', (e) => { e.stopPropagation(); clearInterval(noticeSlideInterval); prevSlide(); noticeSlideInterval = setInterval(nextSlide, 5000); }); document.getElementById('next-slide-btn')?.addEventListener('click', (e) => { e.stopPropagation(); clearInterval(noticeSlideInterval); nextSlide(); noticeSlideInterval = setInterval(nextSlide, 5000); }); }, 0);
             }
         }
-        if (notice.text) d.innerHTML += `<div class="prose max-w-none text-gray-700 leading-relaxed">${notice.text.split('\n').map(l => `<p class="mb-2">${l}</p>`).join('')}</div>`;
-        if (notice.linkUrl) d.innerHTML += `<div class="mt-6 text-center"><a href="${notice.linkUrl}" target="_blank" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition transform no-underline"><span>${notice.linkText||'বিস্তারিত দেখুন'}</span><span>↗</span></a></div>`;
+        
+        // --- CUSTOM RENDERER FOR LOTTERY WINNER ---
+        const isLotteryWinner = notice.text && notice.text.includes('লটারি বিজয়ীর অভিনন্দন!');
+
+        if (isLotteryWinner) {
+            d.innerHTML += `
+            <div class="relative mt-8 p-6 md:p-10 bg-white rounded-3xl shadow-[0_10px_40px_rgba(234,179,8,0.15)] border-4 border-yellow-400 max-w-lg mx-auto transform hover:-translate-y-1 transition-transform duration-300 overflow-hidden group">
+                <!-- Golden Watermark -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-[0.07] pointer-events-none z-0 transform group-hover:scale-110 transition-transform duration-500">
+                    <span class="text-[200px] leading-none select-none grayscale-0 filter hue-rotate-15">🏆</span>
+                </div>
+                <div class="relative z-10 text-gray-800 font-medium text-lg md:text-xl space-y-2">
+                    ${notice.text.split('\n').map(l => {
+                        const trimmed = l.trim();
+                        if(!trimmed) return '<div class="h-2"></div>';
+                        
+                        if(trimmed.includes('লটারি বিজয়ীর অভিনন্দন!')) {
+                            let cleanTitle = trimmed.replace(/\*/g, '');
+                            return `<div class="text-center text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-amber-600 mb-6 drop-shadow-sm pb-3 border-b border-yellow-200">${cleanTitle}</div>`;
+                        }
+                        
+                        let formatted = trimmed.replace(/\*(.*?)\*/g, '<strong class="font-bold text-gray-900">$1</strong>');
+                        return `<div class="flex items-center gap-3 py-1.5 bg-gray-50/50 rounded-lg px-2 border border-gray-100 shadow-sm">
+                                    <span class="flex-1">${formatted}</span>
+                                </div>`;
+                    }).join('')}
+                </div>
+            </div>`;
+        } else if (notice.text) {
+            // Existing Premium Floating Backgrounds HTML for Normal Notices
+            d.innerHTML += `
+            <div class="relative mt-8 p-8 md:p-12 bg-white/90 rounded-[2rem] shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] border border-white backdrop-blur-xl overflow-hidden transform hover:-translate-y-2 transition-transform duration-500">
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-3xl animate-blob pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-gradient-to-tr from-purple-400/20 to-pink-500/20 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
+                
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 shadow-sm">
+                        <span class="flex h-3 w-3 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                        </span>
+                        <span class="text-indigo-800 text-sm font-extrabold tracking-wide">অফিসিয়াল নোটিশ বোর্ড</span>
+                    </div>
+                    <div class="text-slate-800 font-medium leading-loose md:text-lg space-y-4 drop-shadow-sm">
+                        ${notice.text.split('\n').map(l => {
+                            const trimmed = l.trim();
+                            if(!trimmed) return '<div class="h-2"></div>';
+                            return `<div class="flex items-start gap-3 bg-white/50 p-4 rounded-xl border border-white/60 shadow-sm hover:bg-white/80 transition-colors">
+                                        <span class="text-indigo-400 mt-1">✦</span>
+                                        <span class="flex-1">${trimmed.replace(/\*(.*?)\*/g, '<strong class="text-indigo-700">$1</strong>')}</span>
+                                    </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // Link Button Rendering (Including WhatsApp styling)
+        if (notice.linkUrl) {
+            const isContactBtn = notice.linkText && notice.linkText.includes('যোগাযোগ');
+            const btnClass = isContactBtn 
+                ? "bg-green-600 hover:bg-green-500 text-white shadow-green-600/30" 
+                : "bg-gradient-to-r from-indigo-600 to-blue-600 text-white";
+            const icon = isContactBtn ? "💬" : "↗";
+            
+            d.innerHTML += `<div class="mt-8 text-center relative z-10"><a href="${notice.linkUrl}" target="_blank" class="inline-flex items-center justify-center gap-2 ${btnClass} font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition transform no-underline text-lg"><span>${notice.linkText||'বিস্তারিত দেখুন'}</span><span>${icon}</span></a></div>`;
+        }
     };
 
     const renderUI = () => {
@@ -1006,7 +1104,7 @@
         document.getElementById('transactions-table-body').innerHTML = (m.transactions||[]).length===0 ? '<tr><td colspan="4" class="py-4 text-center text-gray-500">কোনো লেনদেন নেই।</td></tr>' :
             [...m.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(tx => {
                 const clr = tx.type==='deposit'?'text-green-600':tx.type==='loanTaken'?'text-blue-600':'text-yellow-700'; const typ = tx.type==='deposit'?'কিস্তি/জমা':tx.type==='loanTaken'?'ঋণ গ্রহণ':'ঋণ পরিশোধ';
-                return `<tr class="hover:bg-gray-100"><td class="py-2 px-4 text-sm">${formatDate(tx.date)}</td><td class="py-2 px-4 text-sm">${typ}${tx.linkedDepositId?' 🔗':''}<br><span class="text-xs text-gray-500">${tx.description||''}</span></td><td class="py-2 px-4 text-right font-mono font-semibold ${clr}">${getBengaliNumber(tx.amount)}</td><td class="py-2 px-4 text-center space-x-2"><button class="edit-transaction-btn text-blue-500" data-tid="${tx.id}" ${tx.linkedDepositId?'disabled':''}>✏️</button><button class="delete-transaction-btn text-red-500" data-tid="${tx.id}" ${tx.linkedDepositId?'disabled':''}>🗑️</button></td></tr>`;
+                return `<tr class="hover:bg-gray-100"><td class="py-2 px-4 text-sm">${formatDate(tx.date)}<br><span class="text-[10px] text-gray-400 font-mono">ID: ${tx.id}</span></td><td class="py-2 px-4 text-sm">${typ}${tx.linkedDepositId?' 🔗':''}<br><span class="text-xs text-gray-500">${tx.description||''}</span></td><td class="py-2 px-4 text-right font-mono font-semibold ${clr}">${getBengaliNumber(tx.amount)}</td><td class="py-2 px-4 text-center space-x-2"><button class="edit-transaction-btn text-blue-500" data-tid="${tx.id}" ${tx.linkedDepositId?'disabled':''}>✏️</button><button class="delete-transaction-btn text-red-500" data-tid="${tx.id}" ${tx.linkedDepositId?'disabled':''}>🗑️</button></td></tr>`;
             }).join('');
         document.getElementById('profile-modal').classList.remove('hidden', 'flex'); document.getElementById('profile-modal').classList.add('flex'); if (anim) { document.getElementById('profile-modal-box').classList.add('modal-enter-active'); }
     };
@@ -1039,51 +1137,40 @@
         }).join('');
     };
 
-    // --- FIREBASE OPS ---
     const initFirebase = () => { 
         try { 
             app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); 
 
-            // Initialize Auth State Listener (Updated to fix flicker)
             onAuthStateChanged(auth, async u => {
                 const loader = document.getElementById('app-loader');
                 
-                // If user exists, but we want to be sure about the emailVerified status to prevent flicker
                 if (u && !u.emailVerified) {
                     try { await reload(u); } catch(e) { console.log('Reload failed', e); }
                 }
 
-                // Transition logic
                 if (u && u.emailVerified) { 
-                    // User is logged in AND verified
                     document.getElementById('auth-modal').classList.add('hidden'); 
                     document.getElementById('verify-email-modal').classList.add('hidden'); 
                     document.getElementById('main-app-content').classList.remove('hidden'); 
                     listen(); 
                 } else if (u) { 
-                    // User is logged in BUT NOT verified
-                    // Only show verification modal if user JUST tried to login/register manually
-                    // Otherwise (on reload), force logout to show input box
                     if (isExplicitAuthAction) {
                         document.getElementById('user-email-info').textContent = u.email; 
-                        document.getElementById('auth-modal').classList.add('hidden'); // Hide login
-                        document.getElementById('main-app-content').classList.add('hidden'); // Hide main app
+                        document.getElementById('auth-modal').classList.add('hidden'); 
+                        document.getElementById('main-app-content').classList.add('hidden'); 
                         document.getElementById('verify-email-modal').classList.remove('hidden'); 
                         document.getElementById('verify-email-modal').classList.add('flex'); 
                     } else {
-                        // If this is a reload and user is unverified, sign out to show login screen
                         signOut(auth);
-                        return; // Exit here, onAuthStateChanged will fire again with u=null
+                        return;
                     }
                 } else { 
-                    // User is NOT logged in
                     document.getElementById('main-app-content').classList.add('hidden'); 
                     document.getElementById('verify-email-modal').classList.add('hidden'); 
                     document.getElementById('auth-modal').classList.remove('hidden'); 
                     document.getElementById('auth-modal').classList.add('flex'); 
                 }
 
-                // Hide loader
                 if(loader && !loader.classList.contains('opacity-0')) {
                     loader.classList.add('opacity-0');
                     setTimeout(() => loader.classList.add('hidden'), 500);
@@ -1096,9 +1183,8 @@
         } 
     };
     
-    // Updated Data Structure in updateData
     const updateData = async (d) => { 
-        if (isSaving) return; isSaving = true; showSyncStatus("সিঙ্ক...", true); 
+        showSyncStatus("সিঙ্ক...", true); 
         try { 
             await setDoc(doc(db, 'artifacts', appId, 'public-data', 'main'), { 
                 members: d.members!==undefined?d.members:members, 
@@ -1108,26 +1194,28 @@
                 importantLinks: d.importantLinks!==undefined?d.importantLinks:importantLinks, 
                 lottery: d.lottery!==undefined?d.lottery:lottery, 
                 appDownloadUrl: d.appDownloadUrl!==undefined?d.appDownloadUrl:appDownloadUrl,
-                activityLog: d.activityLog !== undefined ? d.activityLog : activityLog // Include Activity Log
+                activityLog: d.activityLog !== undefined ? d.activityLog : activityLog 
             }); 
             showSyncStatus("সেভ হয়েছে"); 
-        } catch(e){ showMessage("সেভ ব্যর্থ", 'error'); } finally { isSaving=false; hideSyncStatus(); } 
+        } catch(e){ 
+            showMessage("সেভ ব্যর্থ", 'error'); 
+        } finally { 
+            hideSyncStatus(); 
+        } 
     };
 
     const listen = () => onSnapshot(doc(db, 'artifacts', appId, 'public-data', 'main'), s => {
         const d = s.data(); if(!d) return;
         members = d.members || []; fundDistribution = d.fundDistribution || {}; logoUrl = d.logoUrl || ''; importantLinks = d.importantLinks || [];
-        appDownloadUrl = d.appDownloadUrl || ''; // Load App URL
-        activityLog = d.activityLog || []; // Load Activity Log
+        appDownloadUrl = d.appDownloadUrl || ''; 
+        activityLog = d.activityLog || []; 
 
         if (d.notice) { 
             if (typeof d.notice === 'string') { 
                 notice = { text: d.notice, imageUrls: [], linkText: '', linkUrl: '', scrollingText: '' }; 
             } else { 
                 notice = d.notice; 
-                // Ensure array
                 if (!notice.imageUrls && notice.imageUrl) { notice.imageUrls = [notice.imageUrl]; } else if (!notice.imageUrls) { notice.imageUrls = []; }
-                // Ensure scrolling text
                 if (notice.scrollingText === undefined) notice.scrollingText = '';
             } 
         } else { notice = { text: '', imageUrls: [], linkText: '', linkUrl: '', scrollingText: '' }; }
@@ -1136,23 +1224,21 @@
         if (dbLottery.liveDraw) { if (isFirstSnapshot) { lastDrawTime = dbLottery.liveDraw.ts; } else if (dbLottery.liveDraw.ts > lastDrawTime) { lastDrawTime = dbLottery.liveDraw.ts; if (!l_isAnimating) { if (!document.getElementById('lottery-modal').classList.contains('hidden')) { startLiveLottery(dbLottery.liveDraw.winnerIndex); } } } }
         isFirstSnapshot = false; 
         
-        renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); renderNotifications(); // Render Notifications
+        renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); renderNotifications(); 
         if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal(); if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
 
-        // Check for Auto Toasts on Initial Load (after login)
         if (!initialLoadComplete) {
             checkAndPlayNotifications();
             initialLoadComplete = true;
         }
     });
 
-    // Initialize the app
     initFirebase();
     
     // --- EVENT LISTENERS ---
     document.getElementById('login-form').addEventListener('submit', async e => { 
         e.preventDefault(); 
-        isExplicitAuthAction = true; // Set flag to allow verify modal
+        isExplicitAuthAction = true; 
         const btn = document.getElementById('login-button'); btn.disabled=true; btn.querySelector('.spinner').classList.remove('hidden');
         try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); } 
         catch(e){ document.getElementById('login-error').textContent='ভুল তথ্য।'; btn.disabled=false; btn.querySelector('.spinner').classList.add('hidden'); } 
@@ -1160,7 +1246,7 @@
     
     document.getElementById('register-form').addEventListener('submit', async e => { 
         e.preventDefault(); 
-        isExplicitAuthAction = true; // Set flag to allow verify modal
+        isExplicitAuthAction = true; 
         const btn = document.getElementById('register-button'); 
         const p = document.getElementById('register-password').value; 
         if(p!==document.getElementById('confirm-password').value) return document.getElementById('register-error').textContent='পাসওয়ার্ড মিলছে না'; 
@@ -1176,7 +1262,6 @@
     document.getElementById('logout-main-btn').addEventListener('click', () => signOut(auth));
     document.getElementById('logout-btn').addEventListener('click', () => {
         signOut(auth).then(() => {
-            // Force reload UI state
             document.getElementById('verify-email-modal').classList.add('hidden');
             document.getElementById('auth-modal').classList.remove('hidden');
             document.getElementById('auth-modal').classList.add('flex');
@@ -1184,7 +1269,6 @@
     });
     document.getElementById('resend-verification-btn').addEventListener('click', async () => { if(auth.currentUser) await sendEmailVerification(auth.currentUser); showMessage('পাঠানো হয়েছে।'); });
     
-    // ADD MEMBER LOGGED
     document.getElementById('add-member-form').addEventListener('submit', async e => { 
         e.preventDefault(); const n = document.getElementById('member-name').value, p = document.getElementById('member-phone').value; 
         if(!n||!p) return showMessage('নাম ও ফোন আবশ্যক', 'error'); 
@@ -1196,7 +1280,6 @@
     });
     document.getElementById('search-member-input').addEventListener('input', (e) => { searchQuery = e.target.value; renderUI(); });
 
-    // PASSWORD UPDATE LOGGED
     document.getElementById('save-password-btn').addEventListener('click', async () => {
         const newPass = document.getElementById('new-admin-password').value; if (!newPass || newPass.length < 6) return showMessage('পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে', 'error');
         const btn = document.getElementById('save-password-btn'); const spin = btn.querySelector('.spinner'); const txt = btn.querySelector('span');
@@ -1205,32 +1288,52 @@
             const user = auth.currentUser; 
             if (user) { 
                 await updatePassword(user, newPass); 
-                // Log password change internally if possible, but updateData won't run here necessarily.
-                // We'll update the log separately
                 await updateData({ activityLog: createLog('অ্যাডমিন পাসওয়ার্ড পরিবর্তন করা হয়েছে', 'warning') });
                 showMessage('পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে। অনুগ্রহ করে আবার লগইন করুন।'); document.getElementById('new-admin-password').value = ''; setTimeout(() => signOut(auth), 2000); 
             } else { showMessage('ব্যবহারকারী লগইন অবস্থায় নেই', 'error'); } 
         } catch (error) { console.error(error); if (error.code === 'auth/requires-recent-login') { showMessage('সুরক্ষার জন্য অনুগ্রহ করে লগআউট করে আবার লগইন করুন, তারপর চেষ্টা করুন।', 'error'); } else { showMessage('পাসওয়ার্ড পরিবর্তন ব্যর্থ: ' + error.message, 'error'); } } finally { txt.textContent = 'পাসওয়ার্ড আপডেট'; spin.classList.add('hidden'); btn.disabled = false; }
     });
 
+    // --- NOTICE SAVING UTILITY FUNCTION ---
+    window.saveWinnerToNotice = async () => {
+        const newNoticeText = window.currentLotteryDetailedMessage;
+        
+        // Setup WhatsApp link for contact button
+        let newLinkUrl = '';
+        let newLinkText = '';
+        if (window.currentLotteryWinnerPhone) {
+            const waPhone = formatPhoneForWA(window.currentLotteryWinnerPhone);
+            newLinkUrl = waPhone ? 'https://wa.me/' + waPhone : 'tel:' + window.currentLotteryWinnerPhone;
+            newLinkText = 'যোগাযোগ করুন';
+        }
+
+        await updateData({
+            notice: {
+                ...notice,
+                text: newNoticeText,
+                scrollingText: window.currentLotteryNoticeMessage,
+                linkUrl: newLinkUrl,
+                linkText: newLinkText
+            },
+            activityLog: createLog(`লটারি বিজয়ী নোটিশ বোর্ডে যুক্ত করা হয়েছে`, 'success')
+        });
+        showMessage('নোটিশ বোর্ডে সফলভাবে সেভ হয়েছে!');
+        renderNoticeBoard();
+    };
+
     document.addEventListener('click', async e => {
         const t = e.target.closest('button, svg'); if (!t) return;
         
-        // Notification Toggle Handlers (UPDATED)
         if (t.id === 'open-notif-btn' || t.closest('#open-notif-btn')) {
             const modal = document.getElementById('notif-modal');
             const panel = document.getElementById('notif-panel');
             modal.classList.remove('hidden');
-            modal.classList.add('flex'); // Ensure flex is added
+            modal.classList.add('flex'); 
             setTimeout(() => panel.classList.remove('translate-x-full'), 10);
             
-            // SAVE SEEN STATE TO LOCAL STORAGE
             if(activityLog.length > 0) {
-                // Save the latest log timestamp
                 const newestLogTime = activityLog[0].ts; 
                 localStorage.setItem('samiti_notif_last_read', newestLogTime);
-                
-                // Hide badge immediately
                 document.getElementById('notif-badge').classList.add('hidden');
             }
         }
@@ -1238,7 +1341,7 @@
             const modal = document.getElementById('notif-modal');
             const panel = document.getElementById('notif-panel');
             panel.classList.add('translate-x-full');
-            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); renderNotifications(); }, 300); // Re-render to clear highlighting when closed
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); renderNotifications(); }, 300); 
         }
         if (t.id === 'clear-notif-btn') {
             if(confirm('সব নোটিফিকেশন মুছে ফেলবেন?')) {
@@ -1247,9 +1350,43 @@
             }
         }
 
+        // ADD TO LOTTERY FROM PROFILE BUTTON HANDLER
+        if (t.id === 'add-to-lottery-btn' || t.closest('#add-to-lottery-btn')) {
+            if (!activeMember) return;
+            if (lottery.participants.includes(activeMember.name)) {
+                showMessage('এই সদস্য ইতোমধ্যে লটারিতে যুক্ত আছেন।', 'info');
+            } else {
+                lottery.participants.push(activeMember.name);
+                updateData({
+                    lottery: lottery,
+                    activityLog: createLog(`লটারিতে ${activeMember.name} যুক্ত হয়েছেন`, 'success')
+                }).then(() => {
+                    showMessage('লটারিতে যুক্ত করা হয়েছে।');
+                    if (!document.getElementById('lottery-modal').classList.contains('hidden')) renderLottery();
+                });
+            }
+        }
+
+        // --- NEW BUTTON HANDLERS FOR WINNER ACTIONS ---
+        if (t.id === 'send-winner-wa-btn' || t.closest('#send-winner-wa-btn')) {
+            if(window.currentLotteryDetailedMessage) {
+                window.sendBulkWhatsApp(window.currentLotteryDetailedMessage);
+            } else {
+                showMessage('বিজয়ীর মেসেজ পাওয়া যায়নি!', 'error');
+            }
+        }
+        if (t.id === 'save-winner-notice-btn' || t.closest('#save-winner-notice-btn')) {
+            if(confirm(`আপনি কি এই বিজয়ীর বিস্তারিত তথ্য ওয়েবসাইটের মূল নোটিশ বোর্ডে (Replace করে) এবং ভাসমান টিকারে সেভ করতে চান?`)) {
+                if(window.currentLotteryNoticeMessage) {
+                    window.saveWinnerToNotice();
+                } else {
+                    showMessage('বিজয়ীর তথ্য পাওয়া যায়নি!', 'error');
+                }
+            }
+        }
+
         if (t.classList.contains('profile-tab')) { document.querySelectorAll('.profile-tab').forEach(x=>x.classList.remove('tab-active', 'text-indigo-600')); t.classList.add('tab-active', 'text-indigo-600'); document.getElementById('profile-content-details').classList.toggle('hidden', t.id!=='profile-tab-details'); document.getElementById('profile-content-transactions').classList.toggle('hidden', t.id!=='profile-tab-transactions'); document.getElementById('profile-content-summary').classList.toggle('hidden', t.id!=='profile-tab-summary'); }
 
-        // --- MODERN TAB SWITCHING LOGIC ---
         if (t.id==='login-tab' || t.id==='register-tab') { 
             const isLogin = t.id === 'login-tab';
             const indicator = document.getElementById('tab-indicator');
@@ -1272,7 +1409,6 @@
         if (t.id==='edit-profile-btn') toggleProfileEditMode(true);
         if (t.id==='cancel-edit-btn') { showProfile(activeMember.id, false); toggleProfileEditMode(false); }
         
-        // PROFILE UPDATE LOGGED
         if (t.id==='save-profile-btn') { 
             const u = { name: document.getElementById('profile-name-edit').value, phone: document.getElementById('profile-phone-edit').value, photoUrl: document.getElementById('profile-photo-url-edit').value, employeeId: document.getElementById('profile-employee-id-edit').value, cardNumber: document.getElementById('profile-card-number-edit').value, email: document.getElementById('profile-email-edit').value, notes: document.getElementById('profile-notes-edit').value }; 
             const mm = JSON.parse(JSON.stringify(members)); Object.assign(mm.find(m=>m.id===activeMember.id), u); 
@@ -1280,21 +1416,34 @@
             showMessage('আপডেট হয়েছে'); activeMember = mm.find(m=>m.id===activeMember.id); showProfile(activeMember.id, false); 
         }
         
-        // MEMBER DELETE LOGGED
-        if (t.id==='delete-member-btn') { if(await showConfirmation('সদস্য মুছবেন?')) { await updateData({ members: members.filter(m=>m.id!==activeMember.id), activityLog: createLog(`${activeMember.name}-কে মুছে ফেলা হয়েছে`, 'error') }); closeProfileModal(); showMessage('মুছে ফেলা হয়েছে'); } }
+        if (t.id==='delete-member-btn') {
+            const mm = members.filter(m=>m.id!==activeMember.id);
+            const name = activeMember.name;
+            members = mm; 
+            closeProfileModal();
+            renderUI(); 
+            updateData({ members: mm, activityLog: createLog(`${name}-কে মুছে ফেলা হয়েছে`, 'error') })
+                .then(() => showMessage('সদস্য মুছে ফেলা হয়েছে'));
+        }
         
         if (t.id==='open-transaction-modal-btn') openTransactionModal();
         if (t.id==='close-transaction-modal') closeTransactionModal();
         if (t.classList.contains('edit-transaction-btn')) openTransactionModal(t.dataset.tid);
         
-        // TRANSACTION DELETE LOGGED
         if (t.classList.contains('delete-transaction-btn')) { 
-            if(await showConfirmation('লেনদেন মুছবেন?')) { 
-                const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); 
-                m.transactions = m.transactions.filter(x => x.id !== t.dataset.tid && x.linkedDepositId !== t.dataset.tid); 
-                await updateData({ members: mm, activityLog: createLog(`${m.name}-এর একটি লেনদেন মুছে ফেলা হয়েছে`, 'warning') }); 
-                showMessage('লেনদেন মুছে ফেলা হয়েছে'); showProfile(m.id, false); 
-            } 
+            t.disabled = true; 
+            t.innerHTML = '⏳';
+            
+            const mm = JSON.parse(JSON.stringify(members)); 
+            const m = mm.find(x=>x.id===activeMember.id); 
+            m.transactions = m.transactions.filter(x => x.id !== t.dataset.tid && x.linkedDepositId !== t.dataset.tid); 
+            
+            activeMember = m; 
+            members = mm; 
+            showProfile(m.id, false); 
+            
+            updateData({ members: mm, activityLog: createLog(`${m.name}-এর একটি লেনদেন মুছে ফেলা হয়েছে`, 'warning') })
+                .then(() => showMessage('লেনদেন মুছে ফেলা হয়েছে')); 
         }
         
         if (t.id==='open-fund-modal-btn') { editingFundMonth = null; renderFundModal(); document.getElementById('fund-modal').classList.remove('hidden'); document.getElementById('fund-modal').classList.add('flex'); }
@@ -1309,7 +1458,6 @@
             document.getElementById('notice-image-urls').value=(notice.imageUrls || (notice.imageUrl ? [notice.imageUrl] : [])).join('\n'); 
             document.getElementById('notice-link-text').value=notice.linkText||''; 
             document.getElementById('notice-link-url').value=notice.linkUrl||''; 
-            // Scrolling Text
             document.getElementById('notice-scrolling-text').value=notice.scrollingText||''; 
 
             document.getElementById('new-link-name').value=''; 
@@ -1317,7 +1465,6 @@
         }
         if (t.id==='cancel-notice-btn') { document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); }
         
-        // NOTICE UPDATE LOGGED
         if (t.id==='save-notice-btn') { 
             const rawUrls = document.getElementById('notice-image-urls').value; const urlArray = rawUrls.split('\n').map(l => l.trim()).filter(l => l !== ''); 
             await updateData({ 
@@ -1326,14 +1473,22 @@
                     imageUrls: urlArray, imageUrl: urlArray[0] || '', 
                     linkText: document.getElementById('notice-link-text').value, 
                     linkUrl: document.getElementById('notice-link-url').value,
-                    scrollingText: document.getElementById('notice-scrolling-text').value // Save Scrolling Text
+                    scrollingText: document.getElementById('notice-scrolling-text').value 
                 },
                 activityLog: createLog('নোটিশ বোর্ড আপডেট করা হয়েছে', 'warning')
             }); 
-            document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); showMessage('নোটিশ আপডেট হয়েছে'); 
+            document.getElementById('notice-edit').classList.add('hidden'); document.getElementById('notice-display').classList.remove('hidden'); document.getElementById('edit-notice-btn').classList.remove('hidden'); 
+            showMessage('নোটিশ আপডেট হয়েছে'); 
+            
+            // WHATSAPP BULK MESSAGE PROMPT FOR NOTICE
+            setTimeout(() => {
+                const noticeTxt = document.getElementById('notice-textarea').value;
+                if(noticeTxt && confirm(`আপনি কি সকল সদস্যকে এই নোটিশটি হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
+                    window.sendBulkWhatsApp(`📢 *অফিসিয়াল নোটিশ:*\n\n${noticeTxt}`);
+                }
+            }, 300);
         }
         
-        // --- ADMIN & LOTTERY TRIGGERS (UPDATED) ---
         if (t.id === 'open-admin-btn' || t.closest('#open-admin-btn')) { document.getElementById('admin-modal').classList.remove('hidden'); document.getElementById('admin-modal').classList.add('flex'); }
         if (t.id === 'close-admin-modal' || t.closest('#close-admin-modal')) { document.getElementById('admin-modal').classList.add('hidden'); document.getElementById('admin-modal').classList.remove('flex'); }
         
@@ -1344,11 +1499,13 @@
         if (t.id === 'lotteryClearHistoryBtn') clearLotteryHistory();
     });
 
-    // TRANSACTION ADD/UPDATE LOGGED
     document.getElementById('transaction-form').addEventListener('submit', async e => { 
         e.preventDefault(); const f = e.target; const amt = Number(f.amount.value); if(amt<0) return; 
         const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); 
         const d = { date: f.date.value, type: f.type.value, amount: amt, description: f.description.value };
+        
+        let finalTxId = f.id.value;
+
         if(f.id.value) { 
             const idx = m.transactions.findIndex(x=>x.id===f.id.value); 
             const oldTx = m.transactions[idx]; m.transactions[idx] = { ...oldTx, ...d };
@@ -1361,17 +1518,26 @@
             }
         } 
         else { 
-            const nid = 'T'+Date.now(); m.transactions.push({ id: nid, ...d }); 
-            if(d.type==='deposit') { const cur = calculateMemberTotals(m).currentLoan; if(cur>0) m.transactions.push({ id: 'T'+(Date.now()+1), date: d.date, type: 'loanRepayment', amount: Math.min(amt, cur), description: 'কিস্তি থেকে স্বয়ংক্রিয় পরিশোধ', linkedDepositId: nid }); } 
+            finalTxId = 'T'+Date.now(); m.transactions.push({ id: finalTxId, ...d }); 
+            if(d.type==='deposit') { const cur = calculateMemberTotals(m).currentLoan; if(cur>0) m.transactions.push({ id: 'T'+(Date.now()+1), date: d.date, type: 'loanRepayment', amount: Math.min(amt, cur), description: 'কিস্তি থেকে স্বয়ংক্রিয় পরিশোধ', linkedDepositId: finalTxId }); } 
         }
         
         const logMsg = f.id.value ? `${m.name}-এর লেনদেন আপডেট হয়েছে` : `${m.name}: ${f.type === 'deposit' ? 'জমা' : 'ঋণ'} ৳${getBengaliNumber(amt)}`;
         await updateData({ members: mm, activityLog: createLog(logMsg, 'info') }); 
         
         closeTransactionModal(); showProfile(m.id, false); showMessage('লেনদেন সেভ হয়েছে'); 
+        
+        const typeStr = f.type.value === 'deposit' ? 'কিস্তি/জমা' : (f.type.value === 'loanTaken' ? 'ঋণ গ্রহণ' : 'ঋণ পরিশোধ');
+        const now = new Date();
+        const txDateStr = formatDate(f.date.value) + ' ' + now.toLocaleTimeString('bn-BD');
+
+        setTimeout(() => {
+            if(confirm(`আপনি কি ${m.name}-কে এই লেনদেনের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
+                window.sendPersonalWhatsApp(m.phone, m.name, amt, typeStr, finalTxId, txDateStr);
+            }
+        }, 300);
     });
 
-    // FUND MANAGEMENT LOGGED
     document.getElementById('fund-list-container').addEventListener('submit', async e => { 
         e.preventDefault();
         const form = e.target;
@@ -1381,7 +1547,8 @@
             if(amt > globalFund) return showMessage('তহবিলে পর্যাপ্ত টাকা নেই।', 'error');
             if(await showConfirmation('তহবিল প্রদান করবেন?')) { 
                 const mm = JSON.parse(JSON.stringify(members)); 
-                mm.find(m=>m.id===rid).transactions.push({ id: 'T'+Date.now(), date: mk+'-01', type: 'loanTaken', amount: amt, description: 'তহবিল' }); 
+                const txIdFund = 'T'+Date.now();
+                mm.find(m=>m.id===rid).transactions.push({ id: txIdFund, date: mk+'-01', type: 'loanTaken', amount: amt, description: 'তহবিল' }); 
                 await updateData({ 
                     members: mm, 
                     fundDistribution: { ...fundDistribution, [mk]: { receiverId: rid, amount: amt } },
@@ -1389,6 +1556,14 @@
                 }); 
                 renderFundModal(); 
                 showMessage('প্রদান করা হয়েছে'); 
+
+                setTimeout(() => {
+                    const memberObj = mm.find(m=>m.id===rid);
+                    const txDateStr = formatDate(mk+'-01') + ' ' + new Date().toLocaleTimeString('bn-BD');
+                    if(confirm(`আপনি কি ${memberObj.name}-কে ঋণ/তহবিল প্রদানের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
+                        window.sendPersonalWhatsApp(memberObj.phone, memberObj.name, amt, 'তহবিল/ঋণ গ্রহণ', txIdFund, txDateStr);
+                    }
+                }, 300);
             } 
         } else if (form.classList.contains('edit-fund-form')) {
             const mk = form.dataset.month; const newRid = form.receiverId.value; const newAmt = Number(form.amount.value); const oldDist = fundDistribution[mk]; const mm = JSON.parse(JSON.stringify(members)); const oldReceiver = mm.find(m => m.id === oldDist.receiverId); const txIndex = oldReceiver.transactions.findIndex(t => t.date === mk+'-01' && t.type === 'loanTaken' && t.amount === oldDist.amount);
@@ -1403,9 +1578,42 @@
         }
     });
 
-    // --- LOTTERY LOGIC (FROM index1.txt) ---
+    // --- LOTTERY LOGIC ---
     let l_isAnimating = false;
+    
+    function showLastWinner() {
+        if (l_isAnimating) return;
+        const ws = document.getElementById("lotteryWinnerSection");
+        if (!lottery.history || lottery.history.length === 0) {
+            ws.classList.add('hidden');
+            return;
+        }
+        
+        const lastWinnerData = lottery.history[lottery.history.length - 1];
+        const w = lastWinnerData.winner;
+        const winnerMember = members.find(m => m.name === w);
+        const cardNumber = winnerMember && winnerMember.cardNumber ? winnerMember.cardNumber : "প্রযোজ্য নয়";
+        window.currentLotteryWinnerPhone = winnerMember ? winnerMember.phone : '';
+
+        const lotteryNumberCount = lottery.history.length;
+        const lotteryNumber = getBengaliNumber(lotteryNumberCount) + " তম";
+        const winMonth = new Date().toLocaleDateString('bn-BD', { month: 'long', year: 'numeric' });
+        
+        const detailedMessage = `🎉 *লটারি বিজয়ীর অভিনন্দন!* 🎉\n\n👤 *বিজয়ীর নাম:* ${w}\n💳 *কার্ড নম্বর:* ${cardNumber}\n🏆 *লটারি সংখ্যা:* ${lotteryNumber}\n📅 *তারিখ ও সময়:* ${lastWinnerData.date}`;
+        
+        window.currentLotteryDetailedMessage = detailedMessage;
+        window.currentLotteryNoticeMessage = `🎉 অভিনন্দন! ${winMonth}-এর ${lotteryNumber} মাসিক লটারিতে বিজয়ী হয়েছেন: ${w} (কার্ড: ${cardNumber})।`;
+
+        document.getElementById("lotteryWinnerText").textContent = w;
+        document.getElementById("lotteryWinnerDetails").textContent = window.currentLotteryDetailedMessage;
+        
+        document.getElementById("lotteryWinnerDetails").classList.remove('hidden');
+        document.getElementById("lotteryWinnerActions").classList.remove('hidden');
+        ws.classList.remove('hidden');
+    }
+
     function initLottery() { resizeCanvas(); renderLottery(); }
+    
     async function saveLotteryToFirebase() { try { await updateData({ lottery: lottery }); } catch (e) { showMessage("লটারি সেভ সমস্যা", "error"); } }
     
     function renderLottery() {
@@ -1422,9 +1630,12 @@
         historyEl.innerHTML = "";
         if (lh.length === 0) historyEl.innerHTML = `<li class="text-center text-slate-600 text-xs py-4">ইতিহাস নেই</li>`;
         else lh.slice().reverse().forEach(h => { historyEl.innerHTML += `<li class="flex justify-between items-center bg-slate-900/50 p-3 rounded border-l-4 border-cyan-500"><span class="text-cyan-400 font-medium">${h.winner}</span><span class="text-slate-500 text-xs">${h.date}</span></li>`; });
+        
+        if (!l_isAnimating) {
+            showLastWinner();
+        }
     }
     
-    // LOTTERY ADD PARTICIPANT LOGGED
     document.getElementById("lotteryAddForm").addEventListener("submit", async e => { 
         e.preventDefault(); const i = document.getElementById("lotteryNameInput"), n = i.value.trim(); if(!n) return; 
         lottery.participants.push(n); i.value=""; 
@@ -1435,7 +1646,6 @@
         renderLottery(); 
     });
     
-    // LOTTERY DELETE PARTICIPANT LOGGED
     async function deleteParticipant(i) { 
         if(l_isAnimating) return; 
         lottery.participants.splice(i, 1); 
@@ -1446,10 +1656,24 @@
         renderLottery(); 
     }
     
-    function clearLotteryList() { if(l_isAnimating || lottery.participants.length===0) return; if(confirm("সব নাম মুছবেন?")) { lottery.participants=[]; saveLotteryToFirebase(); renderLottery(); document.getElementById("lotteryWinnerSection").classList.add('hidden'); } }
-    function clearLotteryHistory() { if(confirm("ইতিহাস মুছবেন?")) { lottery.history=[]; saveLotteryToFirebase(); renderLottery(); } }
+    function clearLotteryList() { 
+        if(l_isAnimating || lottery.participants.length===0) return; 
+        if(confirm("সব নাম মুছবেন?")) { 
+            lottery.participants=[]; 
+            saveLotteryToFirebase(); 
+            renderLottery(); 
+        } 
+    }
+    
+    function clearLotteryHistory() { 
+        if(confirm("ইতিহাস মুছবেন?")) { 
+            lottery.history=[]; 
+            saveLotteryToFirebase(); 
+            renderLottery(); 
+            showLastWinner(); 
+        } 
+    }
 
-    // TRIGGER FOR LIVE LOTTERY
     document.getElementById("lotteryDrawBtn").addEventListener("click", async () => {
         if (l_isAnimating || lottery.participants.length < 2) return alert("কমপক্ষে ২টি নাম প্রয়োজন!");
         const winnerIndex = Math.floor(Math.random() * lottery.participants.length);
@@ -1484,22 +1708,43 @@
         anim();
     }
 
-    // LOTTERY WINNER LOGGED
     async function finish(i) {
         const w = lottery.participants[i];
         const ws = document.getElementById("lotteryWinnerSection");
-        document.getElementById("lotteryWinnerText").textContent = w;
-        ws.classList.remove('hidden', 'animate-bounce'); void ws.offsetWidth; ws.classList.add('animate-bounce');
+
         if (iAmTheDrawer) { 
-            lottery.history.push({ winner: w, date: new Date().toLocaleDateString('bn-BD') }); 
+            lottery.history.push({ winner: w, date: new Date().toLocaleString('bn-BD') }); 
             await updateData({ 
                 lottery: lottery,
                 activityLog: createLog(`লটারি বিজয়ী: ${w} 🎉`, 'success') 
             }); 
-            iAmTheDrawer = false; 
         }
-        startConfetti(); l_isAnimating = false; 
-        document.getElementById("lotteryDrawBtn").disabled=false; document.getElementById("lotteryDrawBtn").textContent="ড্র শুরু করুন 🎲"; renderLottery();
+
+        l_isAnimating = false; 
+        showLastWinner(); 
+        
+        ws.classList.add('animate-fade-in-up');
+
+        if (iAmTheDrawer) {
+            iAmTheDrawer = false; 
+
+            setTimeout(() => {
+                if(confirm(`লটারি সম্পন্ন হয়েছে!\n\nবিজয়ীর মেসেজটি অটো-জেনারেট হয়েছে। আপনি কি এখনই সকল সদস্যকে হোয়াটসঅ্যাপে মেসেজটি পাঠাতে চান?\n\n(পরে পাঠাতে চাইলে 'Cancel' চাপুন এবং স্ক্রিনের 'হোয়াটসঅ্যাপে পাঠান' বোতাম ব্যবহার করুন)`)) {
+                    window.sendBulkWhatsApp(window.currentLotteryDetailedMessage);
+                }
+                
+                setTimeout(async () => {
+                    if(confirm(`আপনি কি এই বিজয়ীর তথ্য ওয়েবসাইটের মূল নোটিশ বোর্ডে (Replace করে) এবং ভাসমান টিকারে (Scrolling Notice) সেভ করতে চান?`)) {
+                        window.saveWinnerToNotice();
+                    }
+                }, 500); 
+            }, 2000);
+        }
+
+        startConfetti(); 
+        document.getElementById("lotteryDrawBtn").disabled=false; 
+        document.getElementById("lotteryDrawBtn").textContent="ড্র শুরু করুন 🎲"; 
+        renderLottery();
     }
 
     const canvas = document.getElementById("confetti"), ctx = canvas.getContext("2d");
