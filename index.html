@@ -1664,10 +1664,16 @@
         if (lp.length === 0) listEl.innerHTML = `<li class="col-span-full text-center text-slate-500 italic py-10 text-lg">নাম নেই</li>`;
         else lp.forEach((n, i) => {
             const li = document.createElement("li"); li.className = "group relative flex flex-col justify-center items-center bg-slate-800/80 border border-slate-700 p-4 rounded-xl hover:border-slate-500 hover:bg-slate-700/50";
-            li.innerHTML = `<span class="absolute top-2 left-2 text-xs text-slate-500">#${i+1}</span><span class="font-semibold text-lg text-slate-200 truncate w-full text-center mt-2">${n}</span><button class="lottery-delete-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-red-400" data-index="${i}">✖</button>`;
+            li.innerHTML = `<span class="absolute top-2 left-2 text-xs text-slate-500">#${i+1}</span>
+            <span class="font-semibold text-lg text-slate-200 truncate w-full text-center mt-2">${n}</span>
+            <button class="lottery-manual-win-btn absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 text-yellow-500 hover:scale-125 transition-transform drop-shadow-md text-xl" data-index="${i}" title="ম্যানুয়ালি বিজয়ী করুন">🏆</button>
+            <button class="lottery-delete-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-red-400" data-index="${i}" title="মুছে ফেলুন">✖</button>`;
             listEl.appendChild(li);
         });
+        
         document.querySelectorAll('.lottery-delete-btn').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); deleteParticipant(parseInt(b.dataset.index)); }));
+        document.querySelectorAll('.lottery-manual-win-btn').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); manualWin(parseInt(b.dataset.index)); }));
+        
         historyEl.innerHTML = "";
         if (lh.length === 0) historyEl.innerHTML = `<li class="text-center text-slate-600 text-xs py-4">ইতিহাস নেই</li>`;
         else lh.slice().reverse().forEach(h => { historyEl.innerHTML += `<li class="flex justify-between items-center bg-slate-900/50 p-3 rounded border-l-4 border-cyan-500"><span class="text-cyan-400 font-medium">${h.winner}</span><span class="text-slate-500 text-xs">${h.date}</span></li>`; });
@@ -1713,6 +1719,14 @@
             renderLottery(); 
             showLastWinner(); 
         } 
+    }
+
+    async function manualWin(i) {
+        if(l_isAnimating) return;
+        if(confirm(`${lottery.participants[i]}-কে সরাসরি বিজয়ী ঘোষণা করবেন?`)) {
+            iAmTheDrawer = true;
+            finish(i);
+        }
     }
 
     document.getElementById("lotteryDrawBtn").addEventListener("click", async () => {
