@@ -733,10 +733,35 @@
         return cleanPhone;
     };
     
-    window.sendPersonalWhatsApp = (phone, name, amount, typeStr, txId, txDateStr) => {
-        const waPhone = formatPhoneForWA(phone);
+    // UPDATED WHATSAPP MESSAGE FORMATTING FUNCTION
+    window.sendPersonalWhatsApp = (member, amount, typeStr, txId, txDateStr) => {
+        const waPhone = formatPhoneForWA(member.phone);
         if(!waPhone) return showMessage('সঠিক মোবাইল নম্বর নেই', 'error');
-        const msg = `আসসালামু আলাইকুম,\n*প্রিয় ${name}*,\n\n🏢 *মেইন গেইট সমবায় সমিতি* থেকে আপনার ${typeStr} বাবদ *৳${getBengaliNumber(amount)}* সফলভাবে সম্পন্ন হয়েছে।\n\n🧾 *লেনদেনের বিবরণ:*\n▪ ট্রানজ্যাকশন আইডি: ${txId}\n▪ তারিখ ও সময়: ${txDateStr}\n\n🌐 আপনার লেনদেন ও অ্যাকাউন্টের বিস্তারিত জানতে ভিজিট করুন:\nhttps://hkshahadot24-netizen.github.io/sgloan/\n\nধন্যবাদান্তে,\nমেইন গেইট সমবায় সমিতি।`;
+
+        const totals = calculateMemberTotals(member);
+        const monthStr = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+        let winnerName = "N/A";
+        let winnerPhone = "N/A";
+        if (typeof lottery !== 'undefined' && lottery.history && lottery.history.length > 0) {
+            winnerName = lottery.history[lottery.history.length - 1].winner;
+            const wMember = members.find(m => m.name === winnerName);
+            if (wMember) winnerPhone = wMember.phone || "N/A";
+        }
+
+        let headerText = "Payment Received";
+        let bodyText = `Dear ${member.name}, your payment for ${monthStr} is received.`;
+        
+        if (typeStr === 'ঋণ গ্রহণ' || typeStr === 'তহবিল/ঋণ গ্রহণ') {
+            headerText = "Loan Disbursed";
+            bodyText = `Dear ${member.name}, your loan for ${monthStr} is disbursed.`;
+        } else if (typeStr === 'ঋণ পরিশোধ') {
+            headerText = "Payment Received";
+            bodyText = `Dear ${member.name}, your loan repayment for ${monthStr} is received.`;
+        }
+
+        const msg = `*${headerText}*\n${bodyText}\nTrxID: ${txId}\nAmt: ${amount} BDT\n\n*Your Summary:*\nTotal Savings: ${totals.totalDeposit} BDT\nCurrent Loan: ${totals.currentLoan} BDT\n\n*Lottery Winner:* ${winnerName}\nWhatsApp: ${winnerPhone}\nDetails: https://hkshahadot24-netizen.github.io/sgloan/\n\nThank you, Main Gate Somobay Somity.`;
+        
         window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     };
 
@@ -746,7 +771,15 @@
             let m = members[i];
             const waPhone = formatPhoneForWA(m.phone);
             if(waPhone) {
-                let msg = `আসসালামু আলাইকুম,\n*প্রিয় ${m.name}*,\n\n${baseMessage}\n\n🌐 আপনার লেনদেন ও অ্যাকাউন্টের বিস্তারিত জানতে ভিজিট করুন:\nhttps://hkshahadot24-netizen.github.io/sgloan/\n\nধন্যবাদান্তে,\ মেইন গেইট সমবায় সমিতি।`;
+                let msg = "";
+                // Check if it's a formatted custom template (like the lottery winner message)
+                if (baseMessage.includes('{{member_name}}')) {
+                    msg = baseMessage.replace(/{{member_name}}/g, m.name);
+                } else {
+                    // Default format for general notices - UPDATED AS PER REQUEST
+                    msg = `Dear *${m.name}*,\n\n${baseMessage}\n\nYour cooperation is vital to the progress of our society. For a detailed view of the winner list, individual savings, and loan summaries, please visit our official website link below.\n\nBest Regards,\n*Main Gate Somobay Somity*\nOfficial Website: https://hkshahadot24-netizen.github.io/sgloan/`;
+                }
+                
                 window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                 successCount++;
                 // ১.৫ সেকেন্ড বিরতি দিয়ে পরের ট্যাব ওপেন হবে (ব্রাউজার ব্লক এড়াতে)
@@ -1369,7 +1402,9 @@
 
         // --- NEW BUTTON HANDLERS FOR WINNER ACTIONS ---
         if (t.id === 'send-winner-wa-btn' || t.closest('#send-winner-wa-btn')) {
-            if(window.currentLotteryDetailedMessage) {
+            if(window.currentLotteryWaMessageTemplate) {
+                window.sendBulkWhatsApp(window.currentLotteryWaMessageTemplate);
+            } else if(window.currentLotteryDetailedMessage) {
                 window.sendBulkWhatsApp(window.currentLotteryDetailedMessage);
             } else {
                 showMessage('বিজয়ীর মেসেজ পাওয়া যায়নি!', 'error');
@@ -1533,7 +1568,8 @@
 
         setTimeout(() => {
             if(confirm(`আপনি কি ${m.name}-কে এই লেনদেনের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
-                window.sendPersonalWhatsApp(m.phone, m.name, amt, typeStr, finalTxId, txDateStr);
+                // CHANGED TO PASS THE FULL MEMBER OBJECT FOR THE NEW FORMAT
+                window.sendPersonalWhatsApp(m, amt, typeStr, finalTxId, txDateStr);
             }
         }, 300);
     });
@@ -1561,7 +1597,8 @@
                     const memberObj = mm.find(m=>m.id===rid);
                     const txDateStr = formatDate(mk+'-01') + ' ' + new Date().toLocaleTimeString('bn-BD');
                     if(confirm(`আপনি কি ${memberObj.name}-কে ঋণ/তহবিল প্রদানের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
-                        window.sendPersonalWhatsApp(memberObj.phone, memberObj.name, amt, 'তহবিল/ঋণ গ্রহণ', txIdFund, txDateStr);
+                        // CHANGED TO PASS THE FULL MEMBER OBJECT FOR THE NEW FORMAT
+                        window.sendPersonalWhatsApp(memberObj, amt, 'তহবিল/ঋণ গ্রহণ', txIdFund, txDateStr);
                     }
                 }, 300);
             } 
@@ -1598,11 +1635,15 @@
         const lotteryNumberCount = lottery.history.length;
         const lotteryNumber = getBengaliNumber(lotteryNumberCount) + " তম";
         const winMonth = new Date().toLocaleDateString('bn-BD', { month: 'long', year: 'numeric' });
+        const winMonthEng = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
         
         const detailedMessage = `🎉 *লটারি বিজয়ীর অভিনন্দন!* 🎉\n\n👤 *বিজয়ীর নাম:* ${w}\n💳 *কার্ড নম্বর:* ${cardNumber}\n🏆 *লটারি সংখ্যা:* ${lotteryNumber}\n📅 *তারিখ ও সময়:* ${lastWinnerData.date}`;
         
         window.currentLotteryDetailedMessage = detailedMessage;
         window.currentLotteryNoticeMessage = `🎉 অভিনন্দন! ${winMonth}-এর ${lotteryNumber} মাসিক লটারিতে বিজয়ী হয়েছেন: ${w} (কার্ড: ${cardNumber})।`;
+
+        // The specific WhatsApp template requested by the user
+        window.currentLotteryWaMessageTemplate = `Dear *{{member_name}}*,\nWe are excited to announce the lucky winner of the ${winMonthEng} Lottery Draw for Main Gate Somobay Somity!\n\n🏆 *Winner Name:* ${w}\n💳 *Member Bank Card No:* ${cardNumber}\n🎁 *Prize Status:* Confirmed & Ready for Collection\n\nYour consistency strengthens our community. Let’s grow together!\n\n*For Balance Inquiry & Details:*\nhttps://hkshahadot24-netizen.github.io/sgloan/\n\nCongratulations again to the winner!\n\nBest Regards,\n*Main Gate Somobay Somity*`;
 
         document.getElementById("lotteryWinnerText").textContent = w;
         document.getElementById("lotteryWinnerDetails").textContent = window.currentLotteryDetailedMessage;
@@ -1730,7 +1771,7 @@
 
             setTimeout(() => {
                 if(confirm(`লটারি সম্পন্ন হয়েছে!\n\nবিজয়ীর মেসেজটি অটো-জেনারেট হয়েছে। আপনি কি এখনই সকল সদস্যকে হোয়াটসঅ্যাপে মেসেজটি পাঠাতে চান?\n\n(পরে পাঠাতে চাইলে 'Cancel' চাপুন এবং স্ক্রিনের 'হোয়াটসঅ্যাপে পাঠান' বোতাম ব্যবহার করুন)`)) {
-                    window.sendBulkWhatsApp(window.currentLotteryDetailedMessage);
+                    window.sendBulkWhatsApp(window.currentLotteryWaMessageTemplate || window.currentLotteryDetailedMessage);
                 }
                 
                 setTimeout(async () => {
