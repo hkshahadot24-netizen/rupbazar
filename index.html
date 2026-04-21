@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>মেইন গেইট সমবায় সমিতি</title>
+  
+  <!-- Dynamic Favicon: লোগো আপডেট হলে এটিও স্বয়ংক্রিয়ভাবে আপডেট হবে -->
+  <link id="dynamic-favicon" rel="icon" type="image/png" href="https://placehold.co/48x48/FFFFFF/F87171?text=লোগো">
+  
   <!-- Added typography plugin for better notice rendering -->
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
@@ -733,7 +737,6 @@
         return cleanPhone;
     };
     
-    // UPDATED WHATSAPP MESSAGE FORMATTING FUNCTION
     window.sendPersonalWhatsApp = (member, amount, typeStr, txId, txDateStr) => {
         const waPhone = formatPhoneForWA(member.phone);
         if(!waPhone) return showMessage('সঠিক মোবাইল নম্বর নেই', 'error');
@@ -772,17 +775,14 @@
             const waPhone = formatPhoneForWA(m.phone);
             if(waPhone) {
                 let msg = "";
-                // Check if it's a formatted custom template (like the lottery winner message)
                 if (baseMessage.includes('{{member_name}}')) {
                     msg = baseMessage.replace(/{{member_name}}/g, m.name);
                 } else {
-                    // Default format for general notices - UPDATED AS PER REQUEST
                     msg = `Dear *${m.name}*,\n\n${baseMessage}\n\nYour cooperation is vital to the progress of our society. For a detailed view of the winner list, individual savings, and loan summaries, please visit our official website link below.\n\nBest Regards,\n*Main Gate Somobay Somity*\nOfficial Website: https://hkshahadot24-netizen.github.io/sgloan/`;
                 }
                 
                 window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                 successCount++;
-                // ১.৫ সেকেন্ড বিরতি দিয়ে পরের ট্যাব ওপেন হবে (ব্রাউজার ব্লক এড়াতে)
                 await new Promise(r => setTimeout(r, 1500)); 
             }
         }
@@ -951,7 +951,19 @@
     };
 
     // --- UI RENDERING ---
-    const renderHeaderLogo = () => { const img = document.getElementById('header-logo-img'); img.src = logoUrl || 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; img.onerror = () => img.src = 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; document.getElementById('logo-url-input').value = logoUrl || ''; };
+    const renderHeaderLogo = () => { 
+        const img = document.getElementById('header-logo-img'); 
+        const newLogoUrl = logoUrl || 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো';
+        img.src = newLogoUrl; 
+        img.onerror = () => img.src = 'https://placehold.co/48x48/FFFFFF/F87171?text=লোগো'; 
+        document.getElementById('logo-url-input').value = logoUrl || ''; 
+        
+        // Update Favicon as well
+        const favicon = document.getElementById('dynamic-favicon');
+        if (favicon) {
+            favicon.href = newLogoUrl;
+        }
+    };
     
     const renderHeaderAppButton = () => {
         const headerAppBtn = document.getElementById('header-app-btn');
@@ -1162,7 +1174,7 @@
             if (isEditing && dist) {
                 content = `<div class="mt-3 p-3 border border-blue-200 rounded-lg bg-blue-50"><h5 class="text-sm font-bold text-blue-800 mb-2">তহবিল তথ্য সম্পাদনা করুন</h5><form class="edit-fund-form space-y-3" data-month="${k}"><div><label class="block text-xs text-gray-600 mb-1">প্রাপক</label><select name="receiverId" required class="w-full p-2 border rounded-lg bg-white text-sm">${members.map(m => `<option value="${m.id}" ${m.id === dist.receiverId ? 'selected' : ''}>${m.name}</option>`).join('')}</select></div><div><label class="block text-xs text-gray-600 mb-1">পরিমাণ (৳)</label><input type="number" name="amount" required class="w-full p-2 border rounded-lg text-sm" min="0" value="${dist.amount}"></div><div class="flex gap-2 pt-1"><button type="submit" class="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700">সেভ করুন</button><button type="button" class="cancel-fund-edit bg-gray-400 text-white px-3 py-1.5 rounded text-sm hover:bg-gray-500">বাতিল</button></div></form></div>`;
             } else if (r) {
-                content = `<div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center justify-between gap-2 group"><div class="flex items-center gap-4"><img src="${r.photoUrl||`https://placehold.co/40x40?text=${r.name[0]}`}" class="w-12 h-12 rounded-full border-2 border-green-200 object-cover"><div><p class="text-sm font-semibold text-green-700">✅ তহবিল প্রাপ্ত:</p><p class="text-lg font-bold">${r.name}</p><p class="text-md font-semibold text-green-600">৳ ${getBengaliNumber(dist.amount)}</p></div></div><button class="edit-fund-btn bg-white border border-gray-200 p-2 rounded-full shadow-sm hover:bg-gray-100 text-blue-600 transition opacity-0 group-hover:opacity-100 focus:opacity-100" data-month="${k}" title="সম্পাদনা করুন">✏️</button></div>`;
+                content = `<div class="mt-3 p-3 bg-green-50 rounded-lg flex items-center justify-between gap-2 group"><div class="flex items-center gap-4"><img src="${r.photoUrl||`https://placehold.co/40x40?text=${r.name[0]}`}" class="w-12 h-12 rounded-full border-2 border-green-200 object-cover"><div><p class="text-sm font-semibold text-green-700">✅ তহবিল প্রাপ্ত:</p><p class="text-lg font-bold">${r.name}</p><p class="text-md font-semibold text-green-600">৳ ${getBengaliNumber(dist.amount)}</p></div></div><div class="flex gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition"><button class="edit-fund-btn bg-white border border-gray-200 p-2 rounded-full shadow-sm hover:bg-gray-100 text-blue-600" data-month="${k}" title="সম্পাদনা করুন">✏️</button><button class="delete-fund-btn bg-white border border-gray-200 p-2 rounded-full shadow-sm hover:bg-red-50 text-red-600" data-month="${k}" title="তহবিল বাতিল করুন">🗑️</button></div></div>`;
             } else {
                 content = `<form class="assign-fund-form mt-3 space-y-2" data-month="${k}"><p class="text-xs">সর্বোচ্চ ঋণযোগ্য: <b>৳ ${getBengaliNumber(max)}</b></p><p class="text-xs text-gray-500">(তহবিলে অবশিষ্ট: ৳ ${getBengaliNumber(g)})</p><select required class="w-full p-2 border rounded-lg bg-white"><option value="">সদস্য নির্বাচন</option>${members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select><input type="number" required class="w-full p-2 border rounded-lg" min="0" max="${max}" data-max="${max}"><button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">ঋণ প্রদান করুন</button></form>`;
             }
@@ -1483,6 +1495,45 @@
         
         if (t.id==='open-fund-modal-btn') { editingFundMonth = null; renderFundModal(); document.getElementById('fund-modal').classList.remove('hidden'); document.getElementById('fund-modal').classList.add('flex'); }
         if (t.id==='close-fund-modal') document.getElementById('fund-modal').classList.add('hidden');
+        
+        // --- FUND DELETE BUTTON HANDLER ---
+        if (t.classList.contains('delete-fund-btn') || t.closest('.delete-fund-btn')) {
+            const btn = t.classList.contains('delete-fund-btn') ? t : t.closest('.delete-fund-btn');
+            const mk = btn.dataset.month;
+            if(await showConfirmation('আপনি কি সত্যিই এই মাসের তহবিল বিতরণ বাতিল করে মুছে ফেলতে চান?')) {
+                const oldDist = fundDistribution[mk];
+                if (oldDist) {
+                    const mm = JSON.parse(JSON.stringify(members));
+                    const receiver = mm.find(m => m.id === oldDist.receiverId);
+                    
+                    if (receiver) {
+                        // Find the exact transaction by matching date, type, and amount
+                        const txIndex = receiver.transactions.findIndex(tr => tr.date === mk+'-01' && tr.type === 'loanTaken' && tr.amount === oldDist.amount);
+                        if (txIndex !== -1) {
+                            receiver.transactions.splice(txIndex, 1);
+                        }
+                    }
+                    
+                    const newFundDist = { ...fundDistribution };
+                    delete newFundDist[mk];
+                    
+                    // Update state locally first to avoid UI flicker
+                    fundDistribution = newFundDist;
+                    members = mm;
+                    
+                    await updateData({
+                        members: mm,
+                        fundDistribution: newFundDist,
+                        activityLog: createLog(`তহবিল বিতরণ বাতিল করা হয়েছে (${formatDate(mk+'-01','monthYear')})`, 'error')
+                    });
+                    
+                    editingFundMonth = null;
+                    renderFundModal();
+                    showMessage('তহবিল মুছে ফেলা হয়েছে');
+                }
+            }
+        }
+
         if (t.classList.contains('edit-fund-btn')) { editingFundMonth = t.dataset.month; renderFundModal(); }
         if (t.classList.contains('cancel-fund-edit')) { editingFundMonth = null; renderFundModal(); }
         if (t.id==='edit-notice-btn') { 
@@ -1568,7 +1619,6 @@
 
         setTimeout(() => {
             if(confirm(`আপনি কি ${m.name}-কে এই লেনদেনের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
-                // CHANGED TO PASS THE FULL MEMBER OBJECT FOR THE NEW FORMAT
                 window.sendPersonalWhatsApp(m, amt, typeStr, finalTxId, txDateStr);
             }
         }, 300);
@@ -1597,7 +1647,6 @@
                     const memberObj = mm.find(m=>m.id===rid);
                     const txDateStr = formatDate(mk+'-01') + ' ' + new Date().toLocaleTimeString('bn-BD');
                     if(confirm(`আপনি কি ${memberObj.name}-কে ঋণ/তহবিল প্রদানের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
-                        // CHANGED TO PASS THE FULL MEMBER OBJECT FOR THE NEW FORMAT
                         window.sendPersonalWhatsApp(memberObj, amt, 'তহবিল/ঋণ গ্রহণ', txIdFund, txDateStr);
                     }
                 }, 300);
@@ -1642,7 +1691,6 @@
         window.currentLotteryDetailedMessage = detailedMessage;
         window.currentLotteryNoticeMessage = `🎉 অভিনন্দন! ${winMonth}-এর ${lotteryNumber} মাসিক লটারিতে বিজয়ী হয়েছেন: ${w} (কার্ড: ${cardNumber})।`;
 
-        // The specific WhatsApp template requested by the user
         window.currentLotteryWaMessageTemplate = `Dear *{{member_name}}*,\nWe are excited to announce the lucky winner of the ${winMonthEng} Lottery Draw for Main Gate Somobay Somity!\n\n🏆 *Winner Name:* ${w}\n💳 *Member Bank Card No:* ${cardNumber}\n🎁 *Prize Status:* Confirmed & Ready for Collection\n\nYour consistency strengthens our community. Let’s grow together!\n\n*For Balance Inquiry & Details:*\nhttps://hkshahadot24-netizen.github.io/sgloan/\n\nCongratulations again to the winner!\n\nBest Regards,\n*Main Gate Somobay Somity*`;
 
         document.getElementById("lotteryWinnerText").textContent = w;
