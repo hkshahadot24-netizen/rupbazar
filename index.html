@@ -332,10 +332,15 @@
 
         <!-- Member List -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b">
+          <div class="p-4 sm:p-6 flex flex-col md:flex-row justify-between md:items-center gap-4 border-b">
             <h3 class="text-2xl font-bold text-gray-800">সদস্য তালিকা</h3>
-            <div class="space-x-2">
-                <button id="open-fund-modal-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-blue-700 transition duration-200 shadow-sm">মাসিক তহবিল</button>
+            <div class="flex flex-wrap gap-2">
+                <button id="open-mm-modal-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-indigo-700 transition duration-200 shadow-sm flex items-center gap-2">
+                    <span>👥 ম্যানেজমেন্ট</span>
+                </button>
+                <button id="open-fund-modal-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold hover:bg-blue-700 transition duration-200 shadow-sm flex items-center gap-2">
+                    <span>মাসিক তহবিল</span>
+                </button>
             </div>
           </div>
           <div class="p-4 border-b">
@@ -510,7 +515,7 @@
       <div id="profile-modal-content" class="flex flex-col h-full">
         <div class="flex flex-col items-center justify-center pt-2 pb-6 border-b">
             <img id="profile-header-img" src="https://placehold.co/96x96/EFEFEF/AAAAAA?text=?" alt="সদস্যের ছবি" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-200 shadow-lg mb-3">
-            <h2 id="profile-header-name" class="text-3xl font-bold text-indigo-700 truncate">সদস্যের নাম</h2>
+            <h2 id="profile-header-name" class="text-3xl font-bold text-indigo-700 truncate flex items-center justify-center gap-2">সদস্যের নাম <span id="profile-status-badge"></span></h2>
         </div>
         <div class="flex border-b border-gray-200 mb-6 flex-shrink-0">
             <button id="profile-tab-details" class="profile-tab tab-active flex items-center justify-center gap-2 py-3 px-6 font-semibold"><span class="hidden sm:inline">👤</span><span>সদস্য বিস্তারিত</span></button>
@@ -611,13 +616,72 @@
       </div>
   </div>
 
+  <!-- NEW MEMBER MANAGEMENT MODAL -->
+  <div id="mm-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-80 z-[150] justify-center items-start p-4 pt-10 overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl p-6 relative modal-exit">
+          <button id="close-mm-modal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-3xl font-bold transition">&times;</button>
+          <h3 class="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2 flex items-center gap-2">
+              <span>👥 মেম্বার ম্যানেজমেন্ট ও বাল্ক এন্ট্রি</span>
+          </h3>
+          
+          <!-- Bulk Entry Section -->
+          <div class="bg-indigo-50 p-4 rounded-xl mb-6 border border-indigo-100 shadow-sm">
+              <h4 class="font-bold text-indigo-800 mb-3 flex items-center gap-2"><span>💰 নির্বাচিত সদস্যদের একসাথে লেনদেন এন্ট্রি করুন</span></h4>
+              <form id="bulk-deposit-form" class="flex flex-wrap gap-4 items-end">
+                  <div class="flex-1 min-w-[140px]">
+                      <label class="block text-xs font-bold text-gray-600 mb-1">তারিখ</label>
+                      <input type="date" id="bulk-date" required class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                  </div>
+                  <div class="flex-1 min-w-[140px]">
+                      <label class="block text-xs font-bold text-gray-600 mb-1">লেনদেনের ধরন</label>
+                      <select id="bulk-type" required class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-bold">
+                          <option value="deposit">কিস্তি/জমা</option>
+                          <option value="loanTaken">ঋণ গ্রহণ</option>
+                          <option value="loanRepayment">ঋণ পরিশোধ</option>
+                      </select>
+                  </div>
+                  <div class="flex-1 min-w-[140px]">
+                      <label class="block text-xs font-bold text-gray-600 mb-1">পরিমাণ (৳)</label>
+                      <input type="number" id="bulk-amount" required class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-bold" placeholder="0">
+                  </div>
+                  <div class="flex-[2] min-w-[180px]">
+                      <label class="block text-xs font-bold text-gray-600 mb-1">মন্তব্য</label>
+                      <input type="text" id="bulk-desc" value="মাসিক এন্ট্রি" required class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                  </div>
+                  <button type="submit" id="bulk-submit-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md whitespace-nowrap flex items-center gap-2">
+                      <span>এন্ট্রি করুন</span>
+                      <div class="spinner hidden"></div>
+                  </button>
+              </form>
+          </div>
+
+          <!-- Table Section -->
+          <div class="overflow-x-auto border border-gray-200 rounded-xl max-h-[60vh] shadow-inner relative">
+              <table class="min-w-full bg-white text-sm">
+                  <thead class="bg-slate-100 sticky top-0 z-10 shadow-sm">
+                      <tr>
+                          <th class="py-3 px-4 text-left"><input type="checkbox" id="mm-select-all" class="w-4 h-4 rounded text-indigo-600 border-gray-300 cursor-pointer" title="শুধুমাত্র অ্যাক্টিভ সদস্যদের নির্বাচন করুন"></th>
+                          <th class="py-3 px-4 text-left font-bold text-gray-700 uppercase text-xs">সদস্যের নাম</th>
+                          <th class="py-3 px-4 text-center font-bold text-gray-700 uppercase text-xs">স্ট্যাটাস (অ্যাক্টিভ)</th>
+                          <th class="py-3 px-4 text-center font-bold text-gray-700 uppercase text-xs">মেসেজ (অন/অফ)</th>
+                          <th class="py-3 px-4 text-right font-bold text-gray-700 uppercase text-xs">মোট জমা</th>
+                      </tr>
+                  </thead>
+                  <tbody id="mm-table-body" class="divide-y divide-gray-200">
+                      <!-- JS renders here -->
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
   <!-- Confirmation Modal -->
   <div id="confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-[70] justify-center items-center p-4">
         <div id="confirmation-modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center modal-exit">
-            <p id="confirmation-message" class="text-lg mb-6"></p>
+            <p id="confirmation-message" class="text-lg mb-6 font-medium text-gray-800"></p>
             <div class="flex justify-center gap-4">
-                <button id="confirm-yes" class="bg-red-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700">হ্যাঁ</button>
-                <button id="confirm-no" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-bold hover:bg-gray-400">না</button>
+                <button id="confirm-yes" class="bg-red-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700 transition">হ্যাঁ</button>
+                <button id="confirm-no" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-bold hover:bg-gray-400 transition">না</button>
             </div>
         </div>
   </div>
@@ -695,7 +759,7 @@
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, sendEmailVerification, signOut, updatePassword, reload } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
-    setLogLevel('Debug');
+    setLogLevel('silent');
     
     // --- FIREBASE CONFIGURATION ---
     const appId = 'default-samiti-app-id';
@@ -738,6 +802,7 @@
     };
     
     window.sendPersonalWhatsApp = (member, amount, typeStr, txId, txDateStr) => {
+        // Check message preference before sending individually too if needed, but manual action is fine.
         const waPhone = formatPhoneForWA(member.phone);
         if(!waPhone) return showMessage('সঠিক মোবাইল নম্বর নেই', 'error');
 
@@ -768,10 +833,16 @@
         window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     };
 
-    window.sendBulkWhatsApp = async (baseMessage) => {
+    window.sendBulkWhatsApp = async (baseMessage, specificMembers = null) => {
         let successCount = 0;
-        for (let i = 0; i < members.length; i++) {
-            let m = members[i];
+        const targetMembers = specificMembers || members;
+        
+        for (let i = 0; i < targetMembers.length; i++) {
+            let m = targetMembers[i];
+            
+            // SKIP IF NOT ACTIVE OR MESSAGES DISABLED
+            if (m.isActive === false || m.messageEnabled === false) continue;
+
             const waPhone = formatPhoneForWA(m.phone);
             if(waPhone) {
                 let msg = "";
@@ -1110,12 +1181,69 @@
         }
     };
 
+    // --- MEMBER MANAGEMENT TABLE RENDERER ---
+    const renderMemberManagementTable = () => {
+        const tbody = document.getElementById('mm-table-body');
+        tbody.innerHTML = '';
+        
+        let sortedMembers = [...members].sort((a,b) => a.name.localeCompare(b.name, 'bn'));
+        
+        sortedMembers.forEach(m => {
+            const t = calculateMemberTotals(m);
+            const isAct = m.isActive !== false; // Default true
+            const isMsg = m.messageEnabled !== false; // Default true
+            
+            const tr = document.createElement('tr');
+            tr.className = `hover:bg-slate-50 transition-colors ${!isAct ? 'bg-red-50/50 opacity-75' : ''}`;
+            tr.innerHTML = `
+                <td class="py-3 px-4 text-left border-b border-gray-100">
+                    <input type="checkbox" class="mm-row-checkbox w-4 h-4 rounded text-indigo-600 border-gray-300 ${!isAct ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}" data-id="${m.id}" ${!isAct ? 'disabled title="নিষ্ক্রিয় সদস্য"' : ''}>
+                </td>
+                <td class="py-3 px-4 text-left border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <img class="h-10 w-10 rounded-full object-cover border border-gray-200" src="${m.photoUrl||`https://placehold.co/40x40/EFEFEF/AAAAAA?text=${m.name[0]}`}" onerror="this.src='https://placehold.co/40x40/EFEFEF/AAAAAA?text=?'">
+                        <div>
+                            <p class="font-bold text-gray-800">${m.name}</p>
+                            <p class="text-xs text-gray-500">${m.phone}</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="py-3 px-4 text-center border-b border-gray-100">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer toggle-status" data-id="${m.id}" ${isAct ? 'checked' : ''}>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
+                </td>
+                <td class="py-3 px-4 text-center border-b border-gray-100">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer toggle-message" data-id="${m.id}" ${isMsg ? 'checked' : ''}>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                    </label>
+                </td>
+                <td class="py-3 px-4 text-right border-b border-gray-100 font-bold text-green-600">
+                    ৳ ${getBengaliNumber(t.totalDeposit)}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        // Reset Select All
+        const selectAllCb = document.getElementById('mm-select-all');
+        if(selectAllCb) selectAllCb.checked = false;
+    };
+
     const renderUI = () => {
         let td = 0, tlt = 0, tlr = 0; members.forEach(m => { const t = calculateMemberTotals(m); td += t.totalDeposit; tlt += t.totalLoanTaken; tlr += t.totalLoanRepaid; });
         document.getElementById('total-members').textContent = getBengaliNumber(members.length); document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(td)}`; document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(tlt)}`;
         renderCharts(td, tlt, tlr);
         const c = document.getElementById('member-list-cards'), p = document.getElementById('member-list-placeholder'); c.innerHTML = '';
-        const fm = members.filter(m => { const q = searchQuery.toLowerCase(); return (m.name||'').toLowerCase().includes(q) || (m.id||'').toLowerCase().includes(q) || (m.cardNumber||'').toLowerCase().includes(q) || (m.phone||'').includes(q) || (m.employeeId||'').toLowerCase().includes(q); });
+        
+        // HIDE INACTIVE MEMBERS FROM HOME PAGE
+        const fm = members.filter(m => { 
+            if (m.isActive === false) return false; 
+            const q = searchQuery.toLowerCase(); 
+            return (m.name||'').toLowerCase().includes(q) || (m.id||'').toLowerCase().includes(q) || (m.cardNumber||'').toLowerCase().includes(q) || (m.phone||'').includes(q) || (m.employeeId||'').toLowerCase().includes(q); 
+        });
         
         if (fm.length === 0) { p.classList.remove('hidden'); p.textContent = searchQuery ? 'কোনো সদস্য পাওয়া যায়নি।' : 'কোনো সদস্য নেই।'; }
         else {
@@ -1123,7 +1251,7 @@
             fm.sort((a,b)=>a.name.localeCompare(b.name, 'bn')).forEach(m => {
                 const t = calculateMemberTotals(m);
                 c.innerHTML += `<div class="bg-white rounded-lg shadow-md border border-gray-200 p-4 flex flex-col transition-transform hover:scale-[1.02] duration-200">
-                    <div class="flex items-center gap-4 mb-4"><img class="h-16 w-16 rounded-full object-cover border-2 border-indigo-200" src="${m.photoUrl||`https://placehold.co/64x64/EFEFEF/AAAAAA?text=${m.name[0]}`}" onerror="this.src='https://placehold.co/64x64/EFEFEF/AAAAAA?text=?'"><div class="overflow-hidden"><h4 class="text-lg font-bold text-gray-900 truncate">${m.name}</h4><p class="text-sm text-gray-600">কার্ড: ${m.cardNumber||'N/A'}</p><p class="text-sm text-gray-600">ফোন: ${m.phone}</p></div></div>
+                    <div class="flex items-center gap-4 mb-4"><img class="h-16 w-16 rounded-full object-cover border-2 border-indigo-200" src="${m.photoUrl||`https://placehold.co/64x64/EFEFEF/AAAAAA?text=${m.name[0]}`}" onerror="this.src='https://placehold.co/64x64/EFEFEF/AAAAAA?text=?'"><div class="overflow-hidden"><h4 class="text-lg font-bold text-gray-900 truncate flex items-center">${m.name}</h4><p class="text-sm text-gray-600">কার্ড: ${m.cardNumber||'N/A'}</p><p class="text-sm text-gray-600">ফোন: ${m.phone}</p></div></div>
                     <div class="space-y-2 flex-grow"><div class="flex justify-between bg-green-50 p-2 rounded-md"><span class="text-sm font-medium text-green-700">মোট জমা:</span><span class="text-lg font-bold text-green-600">৳ ${getBengaliNumber(t.totalDeposit)}</span></div><div class="flex justify-between bg-red-50 p-2 rounded-md"><span class="text-sm font-medium text-red-700">বর্তমান ঋণ:</span><span class="text-lg font-bold text-red-600">৳ ${getBengaliNumber(t.currentLoan)}</span></div></div>
                     <button class="view-profile-btn mt-4 w-full bg-indigo-500 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-600" data-id="${m.id}">বিস্তারিত দেখুন</button></div>`;
             });
@@ -1139,7 +1267,23 @@
     const showProfile = (id, anim=true) => {
         const m = members.find(x => x.id === id); activeMember = m; if (!m) return;
         toggleProfileEditMode(false); const t = calculateMemberTotals(m);
-        document.getElementById('profile-header-img').src = m.photoUrl || `https://placehold.co/96x96/EFEFEF/AAAAAA?text=${m.name[0]}`; document.getElementById('profile-header-name').textContent = m.name;
+        const isAct = m.isActive !== false;
+        
+        // DISABLE NEW TRANSACTION BUTTON IF INACTIVE
+        const addTxBtn = document.getElementById('open-transaction-modal-btn');
+        if (!isAct) {
+            addTxBtn.disabled = true;
+            addTxBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            addTxBtn.title = "সদস্য নিষ্ক্রিয় থাকায় লেনদেন বন্ধ";
+        } else {
+            addTxBtn.disabled = false;
+            addTxBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            addTxBtn.title = "";
+        }
+
+        document.getElementById('profile-status-badge').innerHTML = isAct ? '<span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded shadow-sm border border-green-200">অ্যাক্টিভ</span>' : '<span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded shadow-sm border border-red-200">নিষ্ক্রিয়</span>';
+
+        document.getElementById('profile-header-img').src = m.photoUrl || `https://placehold.co/96x96/EFEFEF/AAAAAA?text=${m.name[0]}`; document.getElementById('profile-header-name').firstChild.textContent = m.name + " ";
         ['name','id','photo-url','employee-id','card-number','email','phone','notes'].forEach(k => {
             const v = document.getElementById(`profile-${k}-view`); const e = document.getElementById(`profile-${k}-edit`);
             const val = m[k.replace(/-/g,'')] || m[k==='photo-url'?'photoUrl':k==='employee-id'?'employeeId':k==='card-number'?'cardNumber':k] || 'N/A';
@@ -1270,7 +1414,13 @@
         isFirstSnapshot = false; 
         
         renderUI(); renderNoticeBoard(); renderHeaderLogo(); renderImportantLinks(); renderNotifications(); 
-        if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal(); if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
+        if(!document.getElementById('fund-modal').classList.contains('hidden')) renderFundModal(); 
+        if(!document.getElementById('lottery-modal').classList.contains('hidden') && !l_isAnimating) renderLottery();
+        
+        // Re-render Member Management table if modal is open
+        if(!document.getElementById('mm-modal').classList.contains('hidden')) {
+            renderMemberManagementTable();
+        }
 
         if (!initialLoadComplete) {
             checkAndPlayNotifications();
@@ -1318,7 +1468,16 @@
         e.preventDefault(); const n = document.getElementById('member-name').value, p = document.getElementById('member-phone').value; 
         if(!n||!p) return showMessage('নাম ও ফোন আবশ্যক', 'error'); 
         await updateData({ 
-            members: [...members, { id: 'M'+Date.now(), name: n, phone: p, transactions: [], photoUrl: document.getElementById('member-photo-url').value, employeeId: document.getElementById('member-employee-id').value, cardNumber: document.getElementById('member-card-number').value, email: document.getElementById('member-email').value, notes: '' }],
+            members: [...members, { 
+                id: 'M'+Date.now(), name: n, phone: p, transactions: [], 
+                photoUrl: document.getElementById('member-photo-url').value, 
+                employeeId: document.getElementById('member-employee-id').value, 
+                cardNumber: document.getElementById('member-card-number').value, 
+                email: document.getElementById('member-email').value, 
+                notes: '',
+                isActive: true, // Default to true
+                messageEnabled: true // Default to true
+            }],
             activityLog: createLog(`নতুন সদস্য যুক্ত: ${n}`, 'success') 
         }); 
         e.target.reset(); showMessage('সদস্য যোগ হয়েছে'); 
@@ -1367,8 +1526,51 @@
     };
 
     document.addEventListener('click', async e => {
-        const t = e.target.closest('button, svg'); if (!t) return;
+        const t = e.target.closest('button, svg, input[type="checkbox"]'); if (!t) return;
         
+        // --- MEMBER MANAGEMENT HANDLERS ---
+        if (t.id === 'open-mm-modal-btn' || t.closest('#open-mm-modal-btn')) {
+            document.getElementById('bulk-date').valueAsDate = new Date();
+            renderMemberManagementTable();
+            document.getElementById('mm-modal').classList.remove('hidden');
+            document.getElementById('mm-modal').classList.add('flex');
+        }
+        if (t.id === 'close-mm-modal' || t.closest('#close-mm-modal')) {
+            document.getElementById('mm-modal').classList.add('hidden');
+            document.getElementById('mm-modal').classList.remove('flex');
+        }
+        
+        // Select All Handler (Only selects enabled checkboxes)
+        if (t.id === 'mm-select-all') {
+            const isChecked = t.checked;
+            document.querySelectorAll('.mm-row-checkbox:not([disabled])').forEach(cb => cb.checked = isChecked);
+        }
+
+        // Status Toggle Handler
+        if (t.classList.contains('toggle-status')) {
+            const mId = t.dataset.id;
+            const newStatus = t.checked;
+            const mm = JSON.parse(JSON.stringify(members));
+            const memberToUpdate = mm.find(m => m.id === mId);
+            if (memberToUpdate) {
+                memberToUpdate.isActive = newStatus;
+                await updateData({ members: mm, activityLog: createLog(`${memberToUpdate.name}-এর স্ট্যাটাস ${newStatus ? 'অ্যাক্টিভ' : 'নিষ্ক্রিয়'} করা হয়েছে`, 'warning') });
+                // Note: We avoid showMessage here to prevent UI spamming
+            }
+        }
+
+        // Message System Toggle Handler
+        if (t.classList.contains('toggle-message')) {
+            const mId = t.dataset.id;
+            const newStatus = t.checked;
+            const mm = JSON.parse(JSON.stringify(members));
+            const memberToUpdate = mm.find(m => m.id === mId);
+            if (memberToUpdate) {
+                memberToUpdate.messageEnabled = newStatus;
+                await updateData({ members: mm, activityLog: createLog(`${memberToUpdate.name}-এর মেসেজ রিসিভ ${newStatus ? 'চালু' : 'বন্ধ'} করা হয়েছে`, 'info') });
+            }
+        }
+
         if (t.id === 'open-notif-btn' || t.closest('#open-notif-btn')) {
             const modal = document.getElementById('notif-modal');
             const panel = document.getElementById('notif-panel');
@@ -1585,6 +1787,107 @@
         if (t.id === 'lotteryClearHistoryBtn') clearLotteryHistory();
     });
 
+    // --- BULK DEPOSIT SUBMIT HANDLER ---
+    document.getElementById('bulk-deposit-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        
+        const selectedCheckboxes = document.querySelectorAll('.mm-row-checkbox:checked');
+        if(selectedCheckboxes.length === 0) {
+            return showMessage('দয়া করে অন্তত একজন সদস্য নির্বাচন করুন!', 'error');
+        }
+
+        const dateVal = document.getElementById('bulk-date').value;
+        const amountVal = Number(document.getElementById('bulk-amount').value);
+        const descVal = document.getElementById('bulk-desc').value;
+        const typeVal = document.getElementById('bulk-type').value;
+
+        if (amountVal <= 0) return showMessage('সঠিক পরিমাণ দিন', 'error');
+
+        const btn = document.getElementById('bulk-submit-btn');
+        btn.disabled = true;
+        btn.querySelector('.spinner').classList.remove('hidden');
+
+        try {
+            const mm = JSON.parse(JSON.stringify(members));
+            const selectedMembersForWa = [];
+
+            selectedCheckboxes.forEach((cb, index) => {
+                const memberId = cb.dataset.id;
+                const m = mm.find(x => x.id === memberId);
+                
+                if (m && m.isActive !== false) {
+                    const finalTxId = 'T' + Date.now() + '_' + index;
+                    const d = { id: finalTxId, date: dateVal, type: typeVal, amount: amountVal, description: descVal };
+                    m.transactions.push(d);
+
+                    // Auto loan repayment logic (ONLY for deposit)
+                    if (typeVal === 'deposit') {
+                        const curLoan = calculateMemberTotals({transactions: m.transactions.filter(tx=>tx.id !== finalTxId)}).currentLoan;
+                        if(curLoan > 0) {
+                            m.transactions.push({ 
+                                id: 'T' + Date.now() + '_R_' + index, 
+                                date: dateVal, type: 'loanRepayment', 
+                                amount: Math.min(amountVal, curLoan), 
+                                description: 'কিস্তি থেকে স্বয়ংক্রিয় পরিশোধ', 
+                                linkedDepositId: finalTxId 
+                            });
+                        }
+                    }
+                    
+                    // Keep track of members for WA if they are opted in
+                    if(m.messageEnabled !== false) {
+                        selectedMembersForWa.push({ m: m, txId: finalTxId });
+                    }
+                }
+            });
+
+            const actionStr = typeVal === 'deposit' ? 'জমা' : (typeVal === 'loanTaken' ? 'ঋণ প্রদান' : 'ঋণ পরিশোধ');
+
+            await updateData({ 
+                members: mm, 
+                activityLog: createLog(`একসাথে ${selectedCheckboxes.length} জন সদস্যের ৳${getBengaliNumber(amountVal)} ${actionStr} এন্ট্রি করা হয়েছে`, 'success') 
+            });
+
+            showMessage(`সফলভাবে ${selectedCheckboxes.length} জনের এন্ট্রি হয়েছে!`);
+            
+            // Clear form
+            document.getElementById('bulk-amount').value = '';
+            document.querySelectorAll('.mm-row-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('mm-select-all').checked = false;
+
+            // Optional WhatsApp Bulk Notification (USING INDIVIDUAL MESSAGE FORMAT)
+            if (selectedMembersForWa.length > 0) {
+                setTimeout(() => {
+                    if(confirm(`আপনি কি এই এন্ট্রির মেসেজ ${selectedMembersForWa.length} জন নির্বাচিত সদস্যের হোয়াটসঅ্যাপে পাঠাতে চান?\n\n(সিস্টেম স্বয়ংক্রিয়ভাবে একটি একটি করে নতুন ট্যাব খুলবে)`)) {
+                        let typeStr = typeVal === 'deposit' ? 'কিস্তি/জমা' : (typeVal === 'loanTaken' ? 'ঋণ গ্রহণ' : 'ঋণ পরিশোধ');
+                        let i = 0;
+                        
+                        const sendNext = () => {
+                            if (i < selectedMembersForWa.length) {
+                                const { m, txId } = selectedMembersForWa[i];
+                                const txDateStr = formatDate(dateVal) + ' ' + new Date().toLocaleTimeString('bn-BD');
+                                // Call the exact individual message formatting function
+                                window.sendPersonalWhatsApp(m, amountVal, typeStr, txId, txDateStr);
+                                i++;
+                                setTimeout(sendNext, 1500); // 1.5 seconds delay between tabs to avoid browser block
+                            } else {
+                                showMessage(`${selectedMembersForWa.length} জন সদস্যকে মেসেজ পাঠানো সম্পন্ন হয়েছে।`);
+                            }
+                        };
+                        sendNext();
+                    }
+                }, 500);
+            }
+
+        } catch (error) {
+            console.error(error);
+            showMessage('এন্ট্রিতে সমস্যা হয়েছে!', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.querySelector('.spinner').classList.add('hidden');
+        }
+    });
+
     document.getElementById('transaction-form').addEventListener('submit', async e => { 
         e.preventDefault(); const f = e.target; const amt = Number(f.amount.value); if(amt<0) return; 
         const mm = JSON.parse(JSON.stringify(members)); const m = mm.find(x=>x.id===activeMember.id); 
@@ -1618,8 +1921,13 @@
         const txDateStr = formatDate(f.date.value) + ' ' + now.toLocaleTimeString('bn-BD');
 
         setTimeout(() => {
-            if(confirm(`আপনি কি ${m.name}-কে এই লেনদেনের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
-                window.sendPersonalWhatsApp(m, amt, typeStr, finalTxId, txDateStr);
+            // Check message status
+            if(m.messageEnabled !== false) {
+                if(confirm(`আপনি কি ${m.name}-কে এই লেনদেনের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
+                    window.sendPersonalWhatsApp(m, amt, typeStr, finalTxId, txDateStr);
+                }
+            } else {
+                showMessage(`${m.name}-এর মেসেজ সার্ভিস অফ করা আছে।`, 'warning');
             }
         }, 300);
     });
@@ -1646,8 +1954,11 @@
                 setTimeout(() => {
                     const memberObj = mm.find(m=>m.id===rid);
                     const txDateStr = formatDate(mk+'-01') + ' ' + new Date().toLocaleTimeString('bn-BD');
-                    if(confirm(`আপনি কি ${memberObj.name}-কে ঋণ/তহবিল প্রদানের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
-                        window.sendPersonalWhatsApp(memberObj, amt, 'তহবিল/ঋণ গ্রহণ', txIdFund, txDateStr);
+                    
+                    if(memberObj.messageEnabled !== false) {
+                        if(confirm(`আপনি কি ${memberObj.name}-কে ঋণ/তহবিল প্রদানের তথ্য হোয়াটসঅ্যাপে পাঠাতে চান?`)) {
+                            window.sendPersonalWhatsApp(memberObj, amt, 'তহবিল/ঋণ গ্রহণ', txIdFund, txDateStr);
+                        }
                     }
                 }, 300);
             } 
