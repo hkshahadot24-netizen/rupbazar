@@ -1452,22 +1452,19 @@
             return !hasPaidThisMonth;
         });
 
-        let hasLotteryThisMonth = false;
+        let hasLottery = false;
         let lotteryTs = 0;
         if (lottery && lottery.liveDraw && lottery.liveDraw.ts) {
-            const drawDate = new Date(lottery.liveDraw.ts);
-            if (drawDate.getMonth() === now.getMonth() && drawDate.getFullYear() === now.getFullYear()) {
-                hasLotteryThisMonth = true;
-                lotteryTs = lottery.liveDraw.ts;
-            }
+            hasLottery = true;
+            lotteryTs = lottery.liveDraw.ts;
         }
 
         if (defaulters.length > 0) {
             defaulters.sort((a,b) => a.name.localeCompare(b.name, 'bn')).forEach(m => {
                 let timeStr = '';
-                if (hasLotteryThisMonth) {
+                if (hasLottery) {
                     const daysPassed = Math.max(0, Math.floor((Date.now() - lotteryTs) / (1000 * 60 * 60 * 24)));
-                    timeStr = daysPassed > 0 ? `লটারির পর ${getBengaliNumber(daysPassed)} দিন` : 'আজ ড্র হয়েছে';
+                    timeStr = daysPassed > 0 ? `সর্বশেষ ড্র এর পর ${getBengaliNumber(daysPassed)} দিন` : 'আজ ড্র হয়েছে';
                 } else {
                     timeStr = `মাসের ${getBengaliNumber(now.getDate())} দিন`;
                 }
@@ -1482,7 +1479,7 @@
                     <td class="py-3 px-4 text-left border-b border-red-100 text-gray-600">${m.phone}</td>
                     <td class="py-3 px-4 text-center border-b border-red-100 text-red-600 font-bold">${timeStr}</td>
                     <td class="py-3 px-4 text-right border-b border-red-100">
-                        <button class="send-defaulter-msg-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition transform hover:scale-105 flex items-center gap-1 ml-auto" data-id="${m.id}" data-haslottery="${hasLotteryThisMonth}" data-lotteryts="${lotteryTs}">
+                        <button class="send-defaulter-msg-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition transform hover:scale-105 flex items-center gap-1 ml-auto" data-id="${m.id}" data-haslottery="${hasLottery}" data-lotteryts="${lotteryTs}">
                             <span>📲</span> তাগাদা পাঠান
                         </button>
                     </td>
@@ -1858,11 +1855,11 @@
                         const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                         
                         if (days > 0) {
-                            timeMsg = `মাসিক লটারি ড্র ইতিমধ্যে ${getBengaliNumber(days)} দিন পার হয়ে গেছে`;
+                            timeMsg = `সর্বশেষ মাসিক লটারি ড্র এর পর ইতিমধ্যে ${getBengaliNumber(days)} দিন পার হয়ে গেছে`;
                         } else if (hours > 0) {
-                            timeMsg = `মাসিক লটারি ড্র ইতিমধ্যে ${getBengaliNumber(hours)} ঘণ্টা পার হয়ে গেছে`;
+                            timeMsg = `সর্বশেষ মাসিক লটারি ড্র এর পর ইতিমধ্যে ${getBengaliNumber(hours)} ঘণ্টা পার হয়ে গেছে`;
                         } else {
-                            timeMsg = `মাসিক লটারি ড্র কিছুক্ষণ আগে সম্পন্ন হয়েছে`;
+                            timeMsg = `সর্বশেষ মাসিক লটারি ড্র কিছুক্ষণ আগে সম্পন্ন হয়েছে`;
                         }
                     } else {
                         const now = new Date();
