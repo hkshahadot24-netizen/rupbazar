@@ -256,6 +256,29 @@
           </div>
         </div>
 
+        <!-- Defaulters List Section (Visible on Home Page automatically after lottery draw) -->
+        <div id="home-defaulter-section" class="bg-red-50 p-6 rounded-2xl shadow-xl border border-red-200 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+            <div class="relative z-10 flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-red-800 flex items-center gap-2">
+                    <span class="animate-pulse">⚠️</span> <span>চলতি মাসের বকেয়া সদস্য তালিকা</span>
+                </h3>
+            </div>
+            <div class="relative z-10 overflow-x-auto border border-red-200 rounded-xl shadow-inner bg-white max-h-[40vh]">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-red-100 sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="py-3 px-4 text-left font-bold text-red-800">সদস্যের নাম</th>
+                            <th class="py-3 px-4 text-left font-bold text-red-800">মোবাইল</th>
+                            <th class="py-3 px-4 text-center font-bold text-red-800">অতিবাহিত সময়</th>
+                            <th class="py-3 px-4 text-right font-bold text-red-800">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="home-defaulter-table-body" class="divide-y divide-red-100"></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-white p-6 rounded-xl shadow-lg text-center transition-transform hover:scale-105">
@@ -505,7 +528,7 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-6 relative h-[85vh] flex flex-col modal-exit">
           <button id="close-analytics-modal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-3xl font-bold transition z-10">&times;</button>
           <h3 class="text-2xl font-bold text-indigo-700 border-b pb-3 mb-4 flex items-center gap-2">
-            <span>📊</span> <span>ভিজিটর পরিসংখ্যান ও রিয়েল-টাইম ট্র্যাকিং</span>
+            <span>📊</span> <span>ভিজিটর পরিসংখ্যান ও রিয়ে-টাইম ট্র্যাকিং</span>
           </h3>
 
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 flex-shrink-0">
@@ -900,7 +923,6 @@
         tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10"><div class="spinner-gray mx-auto"></div></td></tr>';
         
         try {
-            // FIXED THE FIRESTORE INVALID COLLECTION SEGMENTS ERROR (4 segments -> 5 segments)
             const snapshot = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'visitors'));
             const visitors = [];
             snapshot.forEach(doc => visitors.push(doc.data()));
@@ -1029,7 +1051,6 @@
 
     // --- DYNAMIC RICH NOTIFICATION SYSTEM ---
     const generateRichNotificationText = (m, txId, type, amt, date) => {
-        // Compute transaction summaries excluding current action to assess history state
         const transactionsExcludingCurrent = (m.transactions || []).filter(tx => tx.id !== txId && tx.linkedDepositId !== txId);
         const totalsBefore = calculateMemberTotals({ transactions: transactionsExcludingCurrent });
         
@@ -1370,7 +1391,7 @@
         tbody.innerHTML = '';
         
         let sortedMembers = [...members].sort((a,b) => a.name.localeCompare(b.name, 'bn'));
-        
+
         sortedMembers.forEach(m => {
             const t = calculateMemberTotals(m);
             const isAct = m.isActive !== false; 
@@ -1414,10 +1435,73 @@
         if(selectAllCb) selectAllCb.checked = false;
     };
 
+    // --- NEW: RENDER DEFAULTERS ON HOME PAGE ---
+    const renderDefaultersList = () => {
+        const defSection = document.getElementById('home-defaulter-section');
+        const defTbody = document.getElementById('home-defaulter-table-body');
+        if (!defSection || !defTbody) return;
+
+        defTbody.innerHTML = '';
+        
+        const now = new Date();
+        const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        
+        const defaulters = members.filter(m => {
+            if (m.isActive === false) return false;
+            const hasPaidThisMonth = (m.transactions || []).some(tx => tx.type === 'deposit' && tx.date.startsWith(currentMonthPrefix));
+            return !hasPaidThisMonth;
+        });
+
+        let hasLotteryThisMonth = false;
+        let lotteryTs = 0;
+        if (lottery && lottery.liveDraw && lottery.liveDraw.ts) {
+            const drawDate = new Date(lottery.liveDraw.ts);
+            if (drawDate.getMonth() === now.getMonth() && drawDate.getFullYear() === now.getFullYear()) {
+                hasLotteryThisMonth = true;
+                lotteryTs = lottery.liveDraw.ts;
+            }
+        }
+
+        if (defaulters.length > 0) {
+            defaulters.sort((a,b) => a.name.localeCompare(b.name, 'bn')).forEach(m => {
+                let timeStr = '';
+                if (hasLotteryThisMonth) {
+                    const daysPassed = Math.max(0, Math.floor((Date.now() - lotteryTs) / (1000 * 60 * 60 * 24)));
+                    timeStr = daysPassed > 0 ? `লটারির পর ${getBengaliNumber(daysPassed)} দিন` : 'আজ ড্র হয়েছে';
+                } else {
+                    timeStr = `মাসের ${getBengaliNumber(now.getDate())} দিন`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-red-50/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-left border-b border-red-100 font-semibold text-gray-800 flex items-center gap-2">
+                        <img class="h-8 w-8 rounded-full object-cover border border-red-200" src="${m.photoUrl||`https://placehold.co/32x32/EFEFEF/AAAAAA?text=${m.name[0]}`}" onerror="this.src='https://placehold.co/32x32/EFEFEF/AAAAAA?text=?'">
+                        ${m.name}
+                    </td>
+                    <td class="py-3 px-4 text-left border-b border-red-100 text-gray-600">${m.phone}</td>
+                    <td class="py-3 px-4 text-center border-b border-red-100 text-red-600 font-bold">${timeStr}</td>
+                    <td class="py-3 px-4 text-right border-b border-red-100">
+                        <button class="send-defaulter-msg-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition transform hover:scale-105 flex items-center gap-1 ml-auto" data-id="${m.id}" data-haslottery="${hasLotteryThisMonth}" data-lotteryts="${lotteryTs}">
+                            <span>📲</span> তাগাদা পাঠান
+                        </button>
+                    </td>
+                `;
+                defTbody.appendChild(tr);
+            });
+        } else {
+            defTbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-green-700 font-bold bg-green-50/50">🎉 চলতি মাসে সকল সদস্যের জমা সম্পন্ন হয়েছে। কোনো বকেয়া নেই।</td></tr>`;
+        }
+    };
+
     const renderUI = () => {
         let td = 0, tlt = 0, tlr = 0; members.forEach(m => { const t = calculateMemberTotals(m); td += t.totalDeposit; tlt += t.totalLoanTaken; tlr += t.totalLoanRepaid; });
         document.getElementById('total-members').textContent = getBengaliNumber(members.length); document.getElementById('total-paid').textContent = `৳ ${getBengaliNumber(td)}`; document.getElementById('total-loan-given').textContent = `৳ ${getBengaliNumber(tlt)}`;
         renderCharts(td, tlt, tlr);
+        
+        // Defaulters list on home page
+        renderDefaultersList();
+
         const c = document.getElementById('member-list-cards'), p = document.getElementById('member-list-placeholder'); c.innerHTML = '';
         
         const fm = members.filter(m => { 
@@ -1756,6 +1840,44 @@
     document.addEventListener('click', async e => {
         const t = e.target.closest('button, svg, input[type="checkbox"]'); if (!t) return;
         
+        // --- SEND DEFAULTER WHATSAPP MSG BUTTON LOGIC ---
+        if (t.classList.contains('send-defaulter-msg-btn') || t.closest('.send-defaulter-msg-btn')) {
+            const btn = t.classList.contains('send-defaulter-msg-btn') ? t : t.closest('.send-defaulter-msg-btn');
+            const mId = btn.dataset.id;
+            const hasLottery = btn.dataset.haslottery === 'true';
+            const lotteryTs = Number(btn.dataset.lotteryts);
+            
+            const m = members.find(x => x.id === mId);
+            if (m) {
+                const waPhone = formatPhoneForWA(m.phone);
+                if (waPhone) {
+                    let timeMsg = "";
+                    if (hasLottery && lotteryTs > 0) {
+                        const diffMs = Date.now() - lotteryTs;
+                        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        
+                        if (days > 0) {
+                            timeMsg = `মাসিক লটারি ড্র ইতিমধ্যে ${getBengaliNumber(days)} দিন পার হয়ে গেছে`;
+                        } else if (hours > 0) {
+                            timeMsg = `মাসিক লটারি ড্র ইতিমধ্যে ${getBengaliNumber(hours)} ঘণ্টা পার হয়ে গেছে`;
+                        } else {
+                            timeMsg = `মাসিক লটারি ড্র কিছুক্ষণ আগে সম্পন্ন হয়েছে`;
+                        }
+                    } else {
+                        const now = new Date();
+                        timeMsg = `চলতি মাসের ইতিমধ্যে ${getBengaliNumber(now.getDate())} দিন পার হয়ে গেছে`;
+                    }
+
+                    const msg = `জরুরি নোটিশ (ESCS):\nপ্রিয় ${m.name}, আমাদের ${timeMsg}। কিন্তু অত্যন্ত দুঃখের বিষয়, আপনার চলতি মাসের জমার টাকা এখনো সম্পূর্ণ পরিশোধ করা হয়নি।\nসমবায়ের নিয়ম বজায় রাখতে অনুগ্রহ করে দ্রুত আপনার বকেয়া টাকা পরিশোধের ব্যবস্থা করুন।\nবিস্তারিত দেখুন: https://hkshahadot24-netizen.github.io/sgloan/\nধন্যবাদ— ইএসসিএস।`;
+                    
+                    window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                } else {
+                    showMessage('সঠিক মোবাইল নম্বর নেই', 'error');
+                }
+            }
+        }
+
         if (t.id === 'open-analytics-btn' || t.closest('#open-analytics-btn')) {
             document.getElementById('admin-modal').classList.add('hidden');
             document.getElementById('analytics-modal').classList.remove('hidden');
