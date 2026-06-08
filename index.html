@@ -849,6 +849,43 @@
     const calculateMemberTotals = (m) => { const t = { totalDeposit: 0, totalLoanTaken: 0, totalLoanRepaid: 0, currentLoan: 0 }; (m?.transactions || []).forEach(tx => { const a = Number(tx.amount)||0; if(tx.type==='deposit') t.totalDeposit+=a; else if(tx.type==='loanTaken') t.totalLoanTaken+=a; else if(tx.type==='loanRepayment') t.totalLoanRepaid+=a; }); t.currentLoan = t.totalLoanTaken - t.totalLoanRepaid; return t; };
     const calculateAvailableFund = () => { let td=0, tlt=0, tlr=0; members.forEach(m => { const t = calculateMemberTotals(m); td+=t.totalDeposit; tlt+=t.totalLoanTaken; tlr+=t.totalLoanRepaid; }); return td + tlr - tlt; };
 
+    // --- NEW: স্মার্ট বকেয়া দিন গণনা করার ফাংশন ---
+    const calculateDueDaysInfo = () => {
+        const today = new Date();
+        let savedDrawDate = localStorage.getItem('lastLotteryDrawDate');
+
+        // যদি অন্য ডিভাইস থেকে অ্যাক্সেস করা হয় তবে ফায়ারবেস হিস্টোরি বা লাইভ ড্র ডাটা থেকে ব্যাকআপ নেওয়া
+        if (!savedDrawDate && typeof lottery !== 'undefined') {
+            if (lottery.history && lottery.history.length > 0) {
+                const lastHist = lottery.history[lottery.history.length - 1];
+                if (lastHist.isoDate) savedDrawDate = lastHist.isoDate;
+            } else if (lottery.liveDraw && lottery.liveDraw.ts) {
+                savedDrawDate = new Date(lottery.liveDraw.ts).toISOString();
+            }
+        }
+
+        let calculationStartDate;
+        let isFromLottery = false;
+
+        if (savedDrawDate) {
+            calculationStartDate = new Date(savedDrawDate);
+            isFromLottery = true;
+        } else {
+            // যদি কোনো কারণে লটারির তারিখ না পাওয়া যায়, তবে ব্যাকআপ হিসেবে চলতি মাসের ১ তারিখ ধরা হবে
+            calculationStartDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        }
+
+        const timeDiff = today.getTime() - calculationStartDate.getTime();
+        const dueDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const dueHours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+        return {
+            dueDays: dueDays < 0 ? 0 : dueDays,
+            dueHours: dueHours < 0 ? 0 : dueHours,
+            isFromLottery
+        };
+    };
+
     // --- VISITOR TRACKING & ANALYTICS HELPER ---
     function getBrowserInfo() {
         var ua = navigator.userAgent, tem, M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
@@ -1019,7 +1056,7 @@
             bodyText = `Dear ${member.name}, your loan repayment for ${monthStr} is received.`;
         }
 
-        const msg = `*${headerText}*\n${bodyText}\nTrxID: ${txId}\nAmt: ${amount} BDT\n\n*Your Summary:*\nTotal Savings: ${totals.totalDeposit} BDT\nCurrent Loan: ${totals.currentLoan} BDT\n\n*Lottery Winner:* ${winnerName}\nWhatsApp: ${winnerPhone}\nDetails: https://hkshahadot24-netizen.github.io/sgloan/\n\nThank you, Ekota Sonchoy Co-operative Society (ESCS).`;
+        const msg = `*${headerText}*\n${bodyText}\nTrxID: ${txId}\nAmt: ${amount} BDT\n\n*Your Summary:*\nTotal Savings: ${totals.totalDeposit} BDT\nCurrent Loan: ${totals.currentLoan} BDT\n\n*Lottery Winner:* ${winnerName}\nWhatsApp: ${winnerPhone}\nDetails: https://tinyurl.com/n8hx5z39\n\nThank you, Ekota Sonchoy Co-operative Society (ESCS).`;
         
         window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     };
@@ -1038,7 +1075,7 @@
                 if (baseMessage.includes('{{member_name}}')) {
                     msg = baseMessage.replace(/{{member_name}}/g, m.name);
                 } else {
-                    msg = `Dear *${m.name}*,\n\n${baseMessage}\n\nYour cooperation is vital to the progress of our society. For a detailed view of the winner list, individual savings, and loan summaries, please visit our official website link below.\n\nBest Regards,\n*Ekota Sonchoy Co-operative Society (ESCS)*\nOfficial Website: https://hkshahadot24-netizen.github.io/sgloan/`;
+                    msg = `Dear *${m.name}*,\n\n${baseMessage}\n\nYour cooperation is vital to the progress of our society. For a detailed view of the winner list, individual savings, and loan summaries, please visit our official website link below.\n\nBest Regards,\n*Ekota Sonchoy Co-operative Society (ESCS)*\nOfficial Website: https://tinyurl.com/n8hx5z39`;
                 }
                 
                 window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -1435,7 +1472,7 @@
         if(selectAllCb) selectAllCb.checked = false;
     };
 
-    // --- NEW: RENDER DEFAULTERS ON HOME PAGE ---
+    // --- RENDER DEFAULTERS ON HOME PAGE (UPDATED) ---
     const renderDefaultersList = () => {
         const defSection = document.getElementById('home-defaulter-section');
         const defTbody = document.getElementById('home-defaulter-table-body');
@@ -1452,21 +1489,16 @@
             return !hasPaidThisMonth;
         });
 
-        let hasLottery = false;
-        let lotteryTs = 0;
-        if (lottery && lottery.liveDraw && lottery.liveDraw.ts) {
-            hasLottery = true;
-            lotteryTs = lottery.liveDraw.ts;
-        }
+        // নতুন আপডেট করা বকেয়া দিন গণনা ফাংশন থেকে তথ্য আনা হচ্ছে
+        const dueInfo = calculateDueDaysInfo();
 
         if (defaulters.length > 0) {
             defaulters.sort((a,b) => a.name.localeCompare(b.name, 'bn')).forEach(m => {
                 let timeStr = '';
-                if (hasLottery) {
-                    const daysPassed = Math.max(0, Math.floor((Date.now() - lotteryTs) / (1000 * 60 * 60 * 24)));
-                    timeStr = daysPassed > 0 ? `সর্বশেষ ড্র এর পর ${getBengaliNumber(daysPassed)} দিন` : 'আজ ড্র হয়েছে';
+                if (dueInfo.isFromLottery) {
+                    timeStr = dueInfo.dueDays > 0 ? `সর্বশেষ ড্র এর পর ${getBengaliNumber(dueInfo.dueDays)} দিন` : 'আজ ড্র হয়েছে';
                 } else {
-                    timeStr = `মাসের ${getBengaliNumber(now.getDate())} দিন`;
+                    timeStr = `মাসের ${getBengaliNumber(dueInfo.dueDays)} দিন`;
                 }
 
                 const tr = document.createElement('tr');
@@ -1479,7 +1511,7 @@
                     <td class="py-3 px-4 text-left border-b border-red-100 text-gray-600">${m.phone}</td>
                     <td class="py-3 px-4 text-center border-b border-red-100 text-red-600 font-bold">${timeStr}</td>
                     <td class="py-3 px-4 text-right border-b border-red-100">
-                        <button class="send-defaulter-msg-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition transform hover:scale-105 flex items-center gap-1 ml-auto" data-id="${m.id}" data-haslottery="${hasLottery}" data-lotteryts="${lotteryTs}">
+                        <button class="send-defaulter-msg-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md transition transform hover:scale-105 flex items-center gap-1 ml-auto" data-id="${m.id}">
                             <span>📲</span> তাগাদা পাঠান
                         </button>
                     </td>
@@ -1837,36 +1869,22 @@
     document.addEventListener('click', async e => {
         const t = e.target.closest('button, svg, input[type="checkbox"]'); if (!t) return;
         
-        // --- SEND DEFAULTER WHATSAPP MSG BUTTON LOGIC ---
+        // --- SEND DEFAULTER WHATSAPP MSG BUTTON LOGIC (UPDATED) ---
         if (t.classList.contains('send-defaulter-msg-btn') || t.closest('.send-defaulter-msg-btn')) {
             const btn = t.classList.contains('send-defaulter-msg-btn') ? t : t.closest('.send-defaulter-msg-btn');
             const mId = btn.dataset.id;
-            const hasLottery = btn.dataset.haslottery === 'true';
-            const lotteryTs = Number(btn.dataset.lotteryts);
             
             const m = members.find(x => x.id === mId);
             if (m) {
                 const waPhone = formatPhoneForWA(m.phone);
                 if (waPhone) {
-                    let timeMsg = "";
-                    if (hasLottery && lotteryTs > 0) {
-                        const diffMs = Date.now() - lotteryTs;
-                        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        
-                        if (days > 0) {
-                            timeMsg = `সর্বশেষ মাসিক লটারি ড্র এর পর ইতিমধ্যে ${getBengaliNumber(days)} দিন পার হয়ে গেছে`;
-                        } else if (hours > 0) {
-                            timeMsg = `সর্বশেষ মাসিক লটারি ড্র এর পর ইতিমধ্যে ${getBengaliNumber(hours)} ঘণ্টা পার হয়ে গেছে`;
-                        } else {
-                            timeMsg = `সর্বশেষ মাসিক লটারি ড্র কিছুক্ষণ আগে সম্পন্ন হয়েছে`;
-                        }
-                    } else {
-                        const now = new Date();
-                        timeMsg = `চলতি মাসের ইতিমধ্যে ${getBengaliNumber(now.getDate())} দিন পার হয়ে গেছে`;
-                    }
+                    const dueInfo = calculateDueDaysInfo();
+                    
+                    let lotteryNumberCount = (typeof lottery !== 'undefined' && lottery.history) ? lottery.history.length : 0;
+                    let lotteryNumberStr = lotteryNumberCount > 0 ? getBengaliNumber(lotteryNumberCount) + " তম" : "চলতি";
+                    let daysOver = getBengaliNumber(dueInfo.dueDays > 0 ? dueInfo.dueDays : 0);
 
-                    const msg = `জরুরি নোটিশ (ESCS):\nপ্রিয় ${m.name}, আমাদের ${timeMsg}। কিন্তু অত্যন্ত দুঃখের বিষয়, আপনার চলতি মাসের জমার টাকা এখনো সম্পূর্ণ পরিশোধ করা হয়নি।\nসমবায়ের নিয়ম বজায় রাখতে অনুগ্রহ করে দ্রুত আপনার বকেয়া টাকা পরিশোধের ব্যবস্থা করুন।\nবিস্তারিত দেখুন: https://hkshahadot24-netizen.github.io/sgloan/\nধন্যবাদ— ইএসসিএস।`;
+                    const msg = `সম্মানিত সদস্য ${m.name}, চলতি মাসের (${lotteryNumberStr} লটারি) ড্র শেষ হওয়ার পর আজ ${daysOver} দিন অতিবাহিত হলেও আপনার সঞ্চয়ের কিস্তিটি জমা পড়েনি। অনুগ্রহ করে আর দেরি না করে আজই জরুরি ভিত্তিতে আপনার বকেয়া কিস্তিটি পরিশোধ করুন।\n\nধন্যবাদ, ইএসসিএস (ESCS)।\nবিস্তারিত জানতে সমিতির লিংক: https://tinyurl.com/n8hx5z39`;
                     
                     window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                 } else {
@@ -2334,7 +2352,7 @@
         }
     });
 
-    // --- LOTTERY LOGIC ---
+    // --- LOTTERY LOGIC (UPDATED WITH DATE SAVE) ---
     let l_isAnimating = false;
     
     function showLastWinner() {
@@ -2361,7 +2379,7 @@
         window.currentLotteryDetailedMessage = detailedMessage;
         window.currentLotteryNoticeMessage = `🎉 অভিনন্দন! ${winMonth}-এর ${lotteryNumber} মাসিক লটারিতে বিজয়ী হয়েছেন: ${w} (কার্ড: ${cardNumber})।`;
 
-        window.currentLotteryWaMessageTemplate = `Dear *{{member_name}}*,\nWe are excited to announce the lucky winner of the ${winMonthEng} Lottery Draw for একতা সঞ্চয় কো-অপারেটিভ সোসাইটি (ইএসসিএস)!\n\n🏆 *Winner Name:* ${w}\n💳 *Member Bank Card No:* ${cardNumber}\n🎁 *Prize Status:* Confirmed & Ready for Collection\n\nYour consistency strengthens our community. Let’s grow together!\n\n*For Balance Inquiry & Details:*\nhttps://hkshahadot24-netizen.github.io/sgloan/\n\nCongratulations again to the winner!\n\nBest Regards,\n*এএকতা সঞ্চয় কো-অপারেটিভ সোসাইটি (ইএসসিএস)*`;
+        window.currentLotteryWaMessageTemplate = `Dear *{{member_name}}*,\nWe are excited to announce the lucky winner of the ${winMonthEng} Lottery Draw for একতা সঞ্চয় কো-অপারেটিভ সোসাইটি (ইএসসিএস)!\n\n🏆 *Winner Name:* ${w}\n💳 *Member Bank Card No:* ${cardNumber}\n🎁 *Prize Status:* Confirmed & Ready for Collection\n\nYour consistency strengthens our community. Let’s grow together!\n\n*For Balance Inquiry & Details:*\nhttps://tinyurl.com/n8hx5z39\n\nCongratulations again to the winner!\n\nBest Regards,\n*এএকতা সঞ্চয় কো-অপারেটিভ সোসাইটি (ইএসসিএস)*`;
 
         document.getElementById("lotteryWinnerText").textContent = w;
         document.getElementById("lotteryWinnerDetails").textContent = window.currentLotteryDetailedMessage;
@@ -2490,7 +2508,12 @@
         const ws = document.getElementById("lotteryWinnerSection");
 
         if (iAmTheDrawer) { 
-            lottery.history.push({ winner: w, date: new Date().toLocaleString('bn-BD') }); 
+            const isoNow = new Date().toISOString();
+            
+            // ডাটাবেসে সেভ করার পাশাপাশি লোকাল স্টোরেজেও সেভ করা হচ্ছে
+            lottery.history.push({ winner: w, date: new Date().toLocaleString('bn-BD'), isoDate: isoNow }); 
+            localStorage.setItem('lastLotteryDrawDate', isoNow);
+
             await updateData({ 
                 lottery: lottery,
                 activityLog: createLog(`লটারি বিজয়ী: ${w} 🎉`, 'success') 
